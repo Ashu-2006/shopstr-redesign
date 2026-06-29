@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopstr — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================ TOKENS (mirror of styles/design-system.css) === */
+:root{
+  --ink:#121212; --ink-soft:#3a3a3a;
+  --paper:#f4f3ef; --paper-pure:#ffffff; --paper-warm:#efe9df; --paper-2:#ece9e1;
+  --text:#121212; --text-muted:#5c5b55; --text-subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-press:#4a42c9; --purple-soft:#e7e5fb; --on-purple:#fff;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e;
+  --blue:#00aeff; --pink:#ff3dac;
+  --yellow-soft:#fff1cc; --green-soft:#d3f5e3; --pink-soft:#ffdcef; --blue-soft:#cdeeff;
+  --font-display:"Archivo Black",system-ui,sans-serif;
+  --font-body:"Space Grotesk",system-ui,sans-serif;
+  --font-mono:"Space Mono",ui-monospace,monospace;
+  --r-sm:.5rem; --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --stroke:1.5px; --stroke-bold:2.5px;
+  --dur-fast:140ms; --dur-base:240ms; --ease:cubic-bezier(.2,0,0,1);
+  --max:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper); color:var(--text); font-family:var(--font-body);
+  line-height:1.5; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  padding-bottom:8rem;
+}
+.display{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-.02em;line-height:.95;text-wrap:balance}
+.value{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.mono{font-family:var(--font-mono)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.press{transition:scale var(--dur-fast) var(--ease)}
+.press:active{scale:.96}
+.muted{color:var(--text-muted)}
+.subtle{color:var(--text-subtle)}
+section{padding:64px 0;border-top:var(--stroke) solid var(--ink)}
+.kicker{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.kicker::before{content:"";width:12px;height:12px;background:var(--purple);border-radius:3px;display:inline-block}
+h2.sec{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(2rem,5vw,3.25rem);line-height:.92;margin-bottom:8px}
+.grid{display:grid;gap:20px}
+
+/* ============================ HERO ======================================== */
+.hero{background:var(--purple);color:var(--on-purple);border-bottom:var(--stroke) solid var(--ink)}
+.hero .wrap{padding-top:56px;padding-bottom:56px;position:relative;overflow:hidden}
+.hero .logo{display:flex;align-items:center;gap:0;margin-bottom:40px}
+.logo-mark{display:flex;align-items:flex-end;gap:3px;height:54px}
+.logo-mark .pac{width:40px;height:50px;background:var(--yellow);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:relative;clip-path:polygon(0 0,100% 0,100% 38%,55% 50%,100% 62%,100% 100%,0 100%)}
+.logo-mark .sq{width:44px;height:44px;background:var(--orange);border-radius:8px 8px 8px 8px}
+.logo-mark .house{width:46px;height:50px;background:var(--orange);clip-path:polygon(0 38%,50% 0,100% 38%,100% 100%,0 100%);border-radius:6px}
+.logo-mark .arrow{width:52px;height:52px;position:relative}
+.logo-mark .arrow svg{width:100%;height:100%}
+.hero h1{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-.03em;line-height:.86;font-size:clamp(3.2rem,11vw,8rem);margin:8px 0 18px}
+.hero p{max-width:540px;font-size:1.15rem;opacity:.92}
+.hero .tagrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.hero .deco{position:absolute;pointer-events:none}
+.hero .d-circle{width:120px;height:120px;border-radius:50%;background:var(--green);top:30px;right:8%}
+.hero .d-tri{width:0;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:104px solid var(--pink);bottom:-10px;right:20%}
+.hero .d-sq{width:80px;height:80px;background:var(--yellow);border-radius:14px;bottom:40px;right:4%;rotate:18deg}
+
+/* ============================ CHIPS / PILLS =============================== */
+.chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body);font-weight:600;font-size:.9rem;padding:9px 16px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);background:var(--paper-pure);color:var(--ink)}
+.chip.solid-ink{background:var(--ink);color:var(--on-dark);border-color:var(--ink)}
+.chip.solid-purple{background:var(--purple);color:var(--on-purple);border-color:var(--purple)}
+.chip.y{background:var(--yellow);border-color:var(--ink)}
+.chip.g{background:var(--green);border-color:var(--ink)}
+.chip.p{background:var(--pink);border-color:var(--ink)}
+.chip.b{background:var(--blue);color:var(--ink);border-color:var(--ink)}
+.chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+
+/* ============================ BUTTONS ===================================== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font-body);font-weight:700;font-size:1rem;padding:16px 28px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);cursor:pointer;text-decoration:none}
+.btn-primary{background:var(--ink);color:var(--on-dark);border-color:var(--ink)}
+.btn-secondary{background:var(--purple);color:var(--on-purple);border-color:var(--purple)}
+.btn-ghost{background:transparent;color:var(--ink)}
+.btn-y{background:var(--yellow);color:var(--ink)}
+.btn-icon{width:56px;height:56px;padding:0;border-radius:50%}
+.btn-block{display:flex;width:100%}
+
+/* The "Buy / chat" control row from the ref — pill + circle + triangle, on ink */
+.control-row{background:var(--ink);border-radius:var(--r-2xl);padding:14px;display:flex;align-items:center;gap:12px}
+.control-row .buy{flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:18px;font-family:var(--font-body);font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.control-row .c-circle{width:56px;height:56px;border-radius:50%;background:var(--yellow);border:none;cursor:pointer}
+.control-row .c-tri{width:0;height:0;border-left:28px solid transparent;border-right:28px solid transparent;border-bottom:48px solid var(--green);cursor:pointer}
+
+/* ============================ COLOR SWATCHES ============================== */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.sw{border-radius:var(--r-lg);border:var(--stroke) solid var(--ink);overflow:hidden}
+.sw .fill{height:96px;display:flex;align-items:flex-end;padding:10px}
+.sw .meta{padding:10px 12px;background:var(--paper-pure);border-top:var(--stroke) solid var(--ink)}
+.sw .name{font-weight:700;font-size:.9rem}
+.sw .hex{font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted)}
+.sw .tag{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:rgba(0,0,0,.18);color:#fff}
+
+/* ============================ SHAPES ====================================== */
+.shape-row{display:flex;flex-wrap:wrap;gap:24px;align-items:center}
+.shape{display:flex;flex-direction:column;align-items:center;gap:10px}
+.shape .lbl{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.s-circle{width:88px;height:88px;border-radius:50%;background:var(--purple)}
+.s-square{width:88px;height:88px;border-radius:18px;background:var(--yellow)}
+.s-tri{width:0;height:0;border-left:48px solid transparent;border-right:48px solid transparent;border-bottom:84px solid var(--green)}
+.s-semi{width:96px;height:48px;background:var(--pink);border-radius:96px 96px 0 0}
+.s-arrow{width:84px;height:84px;display:flex;align-items:center;justify-content:center}
+.s-pill{width:120px;height:56px;border-radius:var(--r-pill);background:var(--blue)}
+
+/* ============================ PRODUCT CARDS =============================== */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.card{background:var(--paper-pure);border:var(--stroke) solid var(--ink);border-radius:var(--r-xl);overflow:hidden;display:flex;flex-direction:column}
+.card .ph{aspect-ratio:1;position:relative;display:flex;align-items:center;justify-content:center}
+.card .ph .seg{font-family:var(--font-display);font-size:2rem;text-transform:uppercase;color:rgba(0,0,0,.18)}
+.card .body{padding:16px;display:flex;flex-direction:column;gap:6px}
+.card .ttl{font-weight:700;font-size:1.02rem;line-height:1.15}
+.card .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
+.card .price{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;font-size:1.05rem}
+.card .loc{font-family:var(--font-mono);font-size:.72rem;color:var(--text-subtle)}
+.fav{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;background:var(--paper-pure);border:var(--stroke) solid var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* seller strip from the pink mockup ref */
+.seller{background:var(--ink);color:var(--on-dark);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:12px}
+.seller .av{width:44px;height:44px;border-radius:12px;background:var(--yellow);color:var(--ink);font-family:var(--font-display);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.seller .h{font-weight:700}
+.seller .meta{font-family:var(--font-mono);font-size:.74rem;color:#bdbcb4}
+.seller .view{margin-left:auto;background:var(--paper-pure);color:var(--ink);border:none;border-radius:var(--r-pill);padding:9px 16px;font-weight:700;font-family:var(--font-body);cursor:pointer}
+
+/* ============================ NAV ========================================= */
+.nav{background:var(--ink);border-radius:var(--r-pill);padding:8px;display:inline-flex;gap:8px;align-items:center}
+.nav .item{height:60px;border-radius:var(--r-pill);display:flex;align-items:center;gap:12px;padding:0 14px;border:none;background:transparent;cursor:pointer;color:#fff}
+.nav .item .ic{width:34px;height:34px;border-radius:50%;border:2.5px solid #fff;display:block}
+.nav .item.active{background:var(--yellow);color:var(--ink);padding:0 24px 0 14px}
+.nav .item.active .ic{border-color:var(--ink)}
+.nav .item .name{font-family:var(--font-display);text-transform:uppercase;font-size:.95rem;letter-spacing:-.01em}
+
+/* ============================ TYPE SPECIMENS ============================== */
+.type-spec{display:grid;gap:28px}
+.type-row{display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:baseline;border-top:var(--stroke) solid var(--ink);padding-top:18px}
+.type-row .label{font-family:var(--font-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
+.spec-display{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-.02em;line-height:.92;font-size:clamp(2rem,6vw,4rem)}
+.spec-body{font-size:1.25rem;line-height:1.5;max-width:60ch}
+.spec-value{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;font-size:clamp(2rem,6vw,3.4rem)}
+
+/* ============================ MODE BANNERS ================================ */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.mode{border-radius:var(--r-xl);padding:22px;border:var(--stroke) solid var(--ink);min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.mode .mt{font-family:var(--font-display);text-transform:uppercase;font-size:1.4rem;letter-spacing:-.02em;line-height:.95}
+.mode .md{font-family:var(--font-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em}
+.mode.sell{background:var(--green)}
+.mode.buy{background:var(--purple);color:#fff}
+.mode.buy .md{color:#e7e5fb}
+.mode.alert{background:var(--pink)}
+.mode.dark{background:var(--ink);color:var(--on-dark)}
+.mode.dark .md{color:#bdbcb4}
+
+.usage{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.8rem}
+.rule{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:var(--r-md);background:var(--paper-pure);border:var(--stroke) solid var(--ink)}
+.rule b{font-family:var(--font-body)}
+.rule .yes{color:var(--green)} .rule .no{color:var(--red)}
+
+/* ============================ STICKERS / ASSETS ========================== */
+.sticker-row{display:flex;flex-wrap:wrap;gap:24px;align-items:center}
+.sticker-demo{display:flex;flex-direction:column;align-items:center;gap:10px}
+.sticker-demo .lbl{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
+.sticker-demo img{height:88px;width:auto;display:block}
+/* sticker BUTTON: hover (desktop) OR tap (mobile, via .tapped) pops it */
+.sbtn{border:none;background:none;cursor:pointer;padding:0;line-height:0;-webkit-tap-highlight-color:transparent}
+.sbtn img{display:block;height:72px;transition:transform .35s var(--ease-out)}
+@media (hover:hover){ .sbtn:hover img{transform:rotate(-12deg) scale(1.14)} }
+.sbtn:active img,.sbtn.tapped img{transform:rotate(-12deg) scale(1.14)}
+/* letter-swap: a sticker replaces a glyph in a heading */
+.swap{display:inline-block}
+.swap img{height:.78em;width:auto;vertical-align:-.12em;margin:0 .02em;transition:transform .5s var(--ease-out)}
+@media (hover:hover){ .swap-demo:hover .swap img{transform:rotate(180deg)} }
+.swap-demo.tapped .swap img{transform:rotate(180deg)}
+/* on-action reveal: a sticker pops in next to a CTA when pressed */
+.reveal-wrap{display:inline-flex;align-items:center;gap:14px}
+.reveal-sticker{height:0;opacity:0;transform:scale(.2) rotate(-40deg);transition:height .3s var(--ease-out),opacity .3s var(--ease-out),transform .4s var(--ease-out)}
+.reveal-wrap.on .reveal-sticker{height:56px;opacity:1;transform:scale(1) rotate(0)}
+footer{padding:40px 0;color:var(--text-muted);font-family:var(--font-mono);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<!-- ============================ HERO ============================ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="deco d-circle"></span>
+    <span class="deco d-tri"></span>
+    <span class="deco d-sq"></span>
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="pac"></span>
+        <span class="house"></span>
+        <span class="arrow">
+          <svg viewBox="0 0 52 52" fill="none"><path d="M10 42 L42 10 M22 10 H42 V30" stroke="#3dd68c" stroke-width="9" stroke-linecap="square"/></svg>
+        </span>
+      </div>
+    </div>
+    <h1>Shopstr</h1>
+    <p>A circular Bitcoin economy. Buy and sell real goods for sats — bold, fast, and yours. This is the design system, built in its own style.</p>
+    <div class="tagrow">
+      <span class="chip y"><span class="dot"></span>Light theme primary</span>
+      <span class="chip solid-ink">Neutral first</span>
+      <span class="chip g">Purple accent · #5A51E5</span>
+      <span class="chip p">No shadows</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ COLOR ============================ -->
+<section id="color">
+  <div class="wrap">
+    <div class="kicker">01 — Color</div>
+    <h2 class="sec">Neutral first,<br>accents loud</h2>
+    <p class="muted" style="max-width:620px;margin-bottom:36px">Neutral ink &amp; paper do the structural work — primary buttons and backgrounds. Purple is the one accent for emphasis. The playful set is used at every chance: chips, shapes, category coding, and full-bleed mode backgrounds.</p>
+
+    <div class="grid" style="grid-template-columns:1fr;gap:40px">
+      <div>
+        <div class="kicker" style="margin-bottom:14px">Neutrals · structural</div>
+        <div class="swatches">
+          <div class="sw"><div class="fill" style="background:#121212"><span class="tag">text · btn</span></div><div class="meta"><div class="name">Ink</div><div class="hex">#121212</div></div></div>
+          <div class="sw"><div class="fill" style="background:#f4f3ef"></div><div class="meta"><div class="name">Paper</div><div class="hex">#F4F3EF</div></div></div>
+          <div class="sw"><div class="fill" style="background:#ffffff"></div><div class="meta"><div class="name">Paper pure</div><div class="hex">#FFFFFF</div></div></div>
+          <div class="sw"><div class="fill" style="background:#ece9e1"></div><div class="meta"><div class="name">Paper sunken</div><div class="hex">#ECE9E1</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="kicker" style="margin-bottom:14px">Primary accent · purple</div>
+        <div class="swatches">
+          <div class="sw"><div class="fill" style="background:#5a51e5"><span class="tag">accent</span></div><div class="meta"><div class="name">Purple</div><div class="hex">#5A51E5</div></div></div>
+          <div class="sw"><div class="fill" style="background:#4a42c9"></div><div class="meta"><div class="name">Purple press</div><div class="hex">#4A42C9</div></div></div>
+          <div class="sw"><div class="fill" style="background:#e7e5fb"></div><div class="meta"><div class="name">Purple soft</div><div class="hex">#E7E5FB</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="kicker" style="margin-bottom:14px">Playful set · the only six · use everywhere</div>
+        <div class="swatches">
+          <div class="sw"><div class="fill" style="background:#ff8336"></div><div class="meta"><div class="name">Orange</div><div class="hex">#FF8336</div></div></div>
+          <div class="sw"><div class="fill" style="background:#ffc313"></div><div class="meta"><div class="name">Yellow</div><div class="hex">#FFC313</div></div></div>
+          <div class="sw"><div class="fill" style="background:#ff4040"></div><div class="meta"><div class="name">Red</div><div class="hex">#FF4040</div></div></div>
+          <div class="sw"><div class="fill" style="background:#25c26e"></div><div class="meta"><div class="name">Green</div><div class="hex">#25C26E</div></div></div>
+          <div class="sw"><div class="fill" style="background:#00aeff"></div><div class="meta"><div class="name">Blue</div><div class="hex">#00AEFF</div></div></div>
+          <div class="sw"><div class="fill" style="background:#ff3dac"></div><div class="meta"><div class="name">Pink</div><div class="hex">#FF3DAC</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ TYPE ============================ -->
+<section id="type">
+  <div class="wrap">
+    <div class="kicker">02 — Type</div>
+    <h2 class="sec">Three families,<br>three jobs</h2>
+    <p class="muted" style="max-width:620px;margin-bottom:36px">Display shouts, body reads, mono counts sats. Headings are uppercase Archivo Black with tight tracking; body is Space Grotesk; every number that represents value uses Space Mono with tabular figures.</p>
+    <div class="type-spec">
+      <div class="type-row">
+        <div class="label">Display<br>Archivo Black</div>
+        <div><div class="spec-display">Sell anything<br>for sats</div><div class="subtle mono" style="margin-top:10px;font-size:.74rem">uppercase · tracking -0.02em · line-height 0.92</div></div>
+      </div>
+      <div class="type-row">
+        <div class="label">Body<br>Space Grotesk</div>
+        <div><div class="spec-body">A circular economy where buyers and sellers meet over Bitcoin. List a product, get paid in sats, build a reputation that travels with your keys — no email, no middleman.</div></div>
+      </div>
+      <div class="type-row">
+        <div class="label">Value<br>Space Mono</div>
+        <div>
+          <div class="spec-value">12,000 <span style="font-size:.4em" class="muted">sats</span></div>
+          <div class="mono" style="margin-top:10px;font-size:1rem">★ 4.9 · 81 reviews · 248,000 sats total</div>
+          <div class="subtle mono" style="margin-top:8px;font-size:.74rem">tabular-nums — no layout shift on live updates</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SHAPES ============================ -->
+<section id="shapes">
+  <div class="wrap">
+    <div class="kicker">03 — Shapes as assets</div>
+    <h2 class="sec">Geometry is<br>the language</h2>
+    <p class="muted" style="max-width:620px;margin-bottom:36px">Circle, square, triangle, semicircle, pill and arrow are first-class — used as buttons, accents, dividers and decoration. Mix and stack them generously.</p>
+    <div class="shape-row">
+      <div class="shape"><div class="s-circle"></div><span class="lbl">Circle</span></div>
+      <div class="shape"><div class="s-square"></div><span class="lbl">Square</span></div>
+      <div class="shape"><div class="s-tri"></div><span class="lbl">Triangle</span></div>
+      <div class="shape"><div class="s-semi"></div><span class="lbl">Semicircle</span></div>
+      <div class="shape"><div class="s-pill"></div><span class="lbl">Pill</span></div>
+      <div class="shape"><div class="s-arrow"><svg viewBox="0 0 84 84" fill="none"><path d="M16 68 L68 16 M34 16 H68 V50" stroke="#5a51e5" stroke-width="13" stroke-linecap="square"/></svg></div><span class="lbl">Arrow</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ STICKERS ============================ -->
+<section id="stickers">
+  <div class="wrap">
+    <div class="kicker">03b — Stickers &amp; assets</div>
+    <h2 class="sec swap-demo">Sticker p<span class="swap"><img src="assets/shape-sunstar-yellow.svg" alt="o"></span>p</h2>
+    <p class="muted" style="max-width:640px;margin-bottom:36px">The sticker library (in <code>/Assets</code>) is scattered through the UI for personality — as decoration, as buttons, as letter-swaps in headings, and as on-action rewards. Hover the heading above; hover and click the demos below.</p>
+
+    <div class="grid" style="grid-template-columns:1fr;gap:44px">
+      <div>
+        <div class="kicker" style="margin-bottom:16px">Decoration — scatter freely</div>
+        <div class="sticker-row">
+          <div class="sticker-demo"><img src="assets/shape-starburst.svg" alt=""><span class="lbl">starburst</span></div>
+          <div class="sticker-demo"><img src="assets/shape-sparkle-4pt.svg" alt=""><span class="lbl">sparkle</span></div>
+          <div class="sticker-demo"><img src="assets/shape-daisy-yellow.svg" alt=""><span class="lbl">daisy</span></div>
+          <div class="sticker-demo"><img src="assets/badge-new-speech.svg" alt=""><span class="lbl">new! bubble</span></div>
+          <div class="sticker-demo"><img src="assets/badge-bff-star.svg" alt=""><span class="lbl">bff badge</span></div>
+          <div class="sticker-demo"><img src="assets/badge-love-heart.svg" alt=""><span class="lbl">love badge</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="kicker" style="margin-bottom:16px">As buttons — hover to pop, click to press</div>
+        <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+          <button class="sbtn" title="Chat"><img src="assets/shape-daisy-yellow.svg" alt="chat"></button>
+          <button class="sbtn" title="Boost"><img src="assets/shape-sunstar-purple.svg" alt="boost"></button>
+          <button class="sbtn" title="Like"><img src="assets/shape-heart-circle.svg" alt="like"></button>
+          <button class="sbtn" title="Share"><img src="assets/shape-smiley.svg" alt="share"></button>
+        </div>
+      </div>
+
+      <div>
+        <div class="kicker" style="margin-bottom:16px">On-action reveal — a sticker rewards the tap</div>
+        <button class="btn btn-secondary press reveal-wrap" id="revealBtn" onclick="this.classList.toggle('on')">
+          <span>Add to cart</span>
+          <img class="reveal-sticker" src="assets/shape-sparkle-4pt.svg" alt="">
+        </button>
+        <p class="subtle" style="margin-top:10px;font-family:var(--font-mono);font-size:.72rem">tap the button — the sparkle pops in</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ BUTTONS + CONTROLS ============================ -->
+<section id="buttons">
+  <div class="wrap">
+    <div class="kicker">04 — Buttons &amp; controls</div>
+    <h2 class="sec">Chunky, tactile,<br>strokes not shadows</h2>
+    <div class="grid" style="grid-template-columns:1fr;gap:40px;margin-top:12px">
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary press">Primary · Buy now</button>
+        <button class="btn btn-secondary press">Secondary</button>
+        <button class="btn btn-ghost press">Ghost</button>
+        <button class="btn btn-y press">Yellow</button>
+        <button class="btn btn-icon btn-primary press">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#f4f3ef" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div>
+        <div class="kicker" style="margin-bottom:14px">"Buy / chat" control row — built from the reference, one layout, faithfully</div>
+        <div class="control-row" style="max-width:520px">
+          <button class="buy press">Buy now</button>
+          <button class="c-circle press" aria-label="Chat"></button>
+          <button class="c-tri press" aria-label="More"></button>
+        </div>
+      </div>
+
+      <div>
+        <div class="kicker" style="margin-bottom:14px">Chips &amp; filter pills</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span class="chip solid-ink">All</span>
+          <span class="chip">Electronics</span>
+          <span class="chip y"><span class="dot"></span>Apparel</span>
+          <span class="chip g">Home</span>
+          <span class="chip p">Coffee</span>
+          <span class="chip b">Photography</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ NAV ============================ -->
+<section id="nav">
+  <div class="wrap">
+    <div class="kicker">05 — Navigation</div>
+    <h2 class="sec">Pill nav, active<br>item shouts</h2>
+    <p class="muted" style="margin-bottom:28px">From the reference: dark pill bar, circular icon slots, the active item expands into a colored pill with an uppercase label.</p>
+    <nav class="nav">
+      <button class="item active"><span class="ic"></span><span class="name">Shop</span></button>
+      <button class="item"><span class="ic"></span></button>
+      <button class="item"><span class="ic"></span></button>
+      <button class="item"><span class="ic"></span></button>
+    </nav>
+  </div>
+</section>
+
+<!-- ============================ PRODUCT CARDS ============================ -->
+<section id="cards">
+  <div class="wrap">
+    <div class="kicker">06 — Product cards</div>
+    <h2 class="sec">Sats up front,<br>seller in ink</h2>
+    <div class="cards" style="margin-top:14px">
+      <div class="card">
+        <div class="ph" style="background:var(--yellow-soft)"><span class="seg">Mug</span><span class="fav press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5 6 5c2 0 3.2 1.3 4 2.5C10.8 6.3 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.4-9.5 9-9.5 9z" stroke="#121212" stroke-width="2"/></svg></span></div>
+        <div class="body">
+          <div class="ttl">Hand-thrown stoneware mug</div>
+          <div class="row"><span class="price">18,000</span><span class="loc">Lisbon</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ph" style="background:var(--blue-soft)"><span class="seg">Keys</span><span class="fav press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5 6 5c2 0 3.2 1.3 4 2.5C10.8 6.3 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.4-9.5 9-9.5 9z" stroke="#121212" stroke-width="2"/></svg></span></div>
+        <div class="body">
+          <div class="ttl">Refurbished mechanical keyboard</div>
+          <div class="row"><span class="price">95,000</span><span class="loc">Berlin</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ph" style="background:var(--green-soft)"><span class="seg">Tee</span><span class="fav press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5 6 5c2 0 3.2 1.3 4 2.5C10.8 6.3 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.4-9.5 9-9.5 9z" stroke="#121212" stroke-width="2"/></svg></span></div>
+        <div class="body">
+          <div class="ttl">Organic cotton tee</div>
+          <div class="row"><span class="price">32,000</span><span class="loc">Austin</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:520px;margin-top:28px">
+      <div class="kicker" style="margin-bottom:14px">Seller strip (ink card)</div>
+      <div class="seller">
+        <span class="av">E</span>
+        <div><div class="h">@ekko</div><div class="meta">★ 4.9 · 81 reviews · Berlin</div></div>
+        <button class="view press">View →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MODES ============================ -->
+<section id="modes">
+  <div class="wrap">
+    <div class="kicker">07 — Color modes</div>
+    <h2 class="sec">Accents go<br>full-bleed</h2>
+    <p class="muted" style="max-width:620px;margin-bottom:28px">Certain modes flood the whole surface with an accent. Text stays black on every accent except ink and purple, where it goes white.</p>
+    <div class="modes">
+      <div class="mode sell"><div class="md">Mode</div><div class="mt">Selling</div></div>
+      <div class="mode buy"><div class="md">Mode</div><div class="mt">Buying</div></div>
+      <div class="mode alert"><div class="md">Mode</div><div class="mt">Offer</div></div>
+      <div class="mode dark"><div class="md">Mode</div><div class="mt">Wallet</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ RULES ============================ -->
+<section id="rules">
+  <div class="wrap">
+    <div class="kicker">08 — Hard rules</div>
+    <h2 class="sec">What keeps it<br>Shopstr</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:14px">
+      <div class="rule"><span class="no">✕</span><div><b>No shadows.</b> Separate with spacing first; a 1.5px ink stroke only when needed.</div></div>
+      <div class="rule"><span class="yes">✓</span><div><b>Neutral primary.</b> Primary buttons &amp; backgrounds are ink/paper. Purple is the accent.</div></div>
+      <div class="rule"><span class="yes">✓</span><div><b>Black text.</b> White only over ink (#121212) and purple (#5A51E5).</div></div>
+      <div class="rule"><span class="yes">✓</span><div><b>Mono for value.</b> Every sat amount, rating &amp; count in Space Mono, tabular.</div></div>
+      <div class="rule"><span class="yes">✓</span><div><b>Shapes as assets.</b> Circle/square/triangle/semicircle/arrow used liberally.</div></div>
+      <div class="rule"><span class="no">✕</span><div><b>Don't mix layouts.</b> Reference one Pinterest layout per component and build it fully.</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">SHOPSTR DESIGN SYSTEM · light theme primary · neutral + #5A51E5 · Archivo Black / Space Grotesk / Space Mono · icons: Phosphor + Bitcoin Design Atoms · desktop hover · mobile tap</div>
+</footer>
+
+<script>
+/* Touch parity: tap a sticker button or the letter-swap heading to animate it
+   on devices without hover. Desktop uses pure-CSS @media(hover:hover). */
+(function () {
+  function pulse(el, ms) { el.classList.add('tapped'); setTimeout(function(){ el.classList.remove('tapped'); }, ms || 500); }
+  document.querySelectorAll('.sbtn').forEach(function (b) { b.addEventListener('click', function(){ pulse(b, 400); }); });
+  document.querySelectorAll('.swap-demo').forEach(function (h) { h.addEventListener('click', function(){ pulse(h, 600); }); });
+})();
+</script>
+</body>
+</html>

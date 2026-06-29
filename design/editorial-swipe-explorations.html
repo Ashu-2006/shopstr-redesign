@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopstr — Editorial &amp; Swipe (desktop + cards)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#121212; --paper:#f4f3ef; --pp:#fff; --p2:#ece9e1;
+  --muted:#5c5b55; --subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-soft:#e7e5fb;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e; --blue:#00aeff; --pink:#ff3dac;
+  --ys:#fff1cc; --gs:#d3f5e3; --ps:#ffdcef; --bs:#cdeeff;
+  --fd:"Archivo Black",system-ui,sans-serif; --fb:"Space Grotesk",system-ui,sans-serif; --fm:"Space Mono",monospace;
+  --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --st:2px; --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased;padding:44px 0 120px}
+.display{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;line-height:.92}
+.val{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 28px}
+img{display:block}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* page intro + section heads */
+.intro{margin-bottom:18px}
+.intro .tag{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center;margin-bottom:14px}
+.intro .tag::before{content:"";width:12px;height:12px;background:var(--purple);border-radius:3px}
+.intro h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.03em;line-height:.86;font-size:clamp(2.4rem,6vw,4.4rem)}
+.intro p{max-width:720px;margin-top:12px;color:var(--muted);font-size:1.05rem}
+.sec{margin-top:64px;border-top:var(--st) solid var(--ink);padding-top:22px}
+.sec .lead{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(1.6rem,4vw,2.4rem)}
+.sec .sub{font-family:var(--fm);font-size:.78rem;color:var(--muted);max-width:640px;margin-top:6px}
+.label{font-family:var(--fm);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:5px 12px;display:inline-block;margin:28px 0 14px;background:var(--pp)}
+
+/* atoms */
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.76rem;padding:6px 12px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);background:var(--pp);white-space:nowrap}
+.pill.ink{background:var(--ink);color:var(--on-dark)}
+.pill.y{background:var(--yellow)}.pill.g{background:var(--green)}.pill.p{background:var(--pink)}.pill.b{background:var(--blue)}.pill.pu{background:var(--purple);color:#fff;border-color:var(--purple)}
+.press{transition:scale .14s var(--ease);cursor:pointer}.press:active{scale:.97}
+.imgwrap{position:relative;overflow:hidden}
+.imgwrap img{width:100%;height:100%;object-fit:cover}
+.imgoutline{outline:1px solid rgba(0,0,0,.08);outline-offset:-1px}
+
+/* ================= CARD GALLERY GRID ================= */
+.cardgrid{display:grid;gap:22px}
+.cardgrid.hero5{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
+.cardgrid.pair5{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.cardgrid.swipe5{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.cardgrid.compact5{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.cardcell{display:flex;flex-direction:column;gap:10px}
+.cardcell .cap{font-family:var(--fm);font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+/* =========================================================================
+   HERO CARD — 5 variations (big full-bleed editorial listing)
+   ========================================================================= */
+.hero-base{border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative}
+
+/* H1 overlay-bottom */
+.h1c{height:340px}
+.h1c .imgwrap{position:absolute;inset:0}
+.h1c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(0,0,0,.78))}
+.h1c .num{position:absolute;top:14px;left:16px;z-index:2;font-family:var(--fd);font-size:2.6rem;color:#fff;mix-blend-mode:difference}
+.h1c .chips{position:absolute;top:16px;right:16px;z-index:2;display:flex;gap:6px}
+.h1c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px;color:#fff}
+.h1c .cap h3{font-family:var(--fd);text-transform:uppercase;font-size:1.9rem;line-height:.92;letter-spacing:-.02em}
+.h1c .cap .meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.h1c .cap .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+.h1c .cap .loc{font-family:var(--fm);font-size:.74rem;opacity:.85}
+
+/* H2 split image-left text-right on color */
+.h2c{display:grid;grid-template-columns:1.1fr 1fr;height:300px;background:var(--purple);color:#fff}
+.h2c .imgwrap{height:100%}
+.h2c .side{padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+.h2c .side .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:#cfcbff}
+.h2c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em;margin-top:auto}
+.h2c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.5rem;margin-top:10px}
+.h2c .side .buy{margin-top:14px;align-self:flex-start;background:#fff;color:var(--purple);border:none;border-radius:var(--r-pill);padding:11px 22px;font-weight:700;font-family:var(--fb)}
+.h2c .side .stk{position:absolute;right:18px;top:18px;width:48px;height:48px}
+
+/* H3 magazine: caption bar below image, big serif-like number */
+.h3c{background:var(--pp)}
+.h3c .imgwrap{height:240px;border-bottom:var(--st) solid var(--ink)}
+.h3c .bar{display:flex;align-items:center;gap:16px;padding:16px 18px}
+.h3c .bar .num{font-family:var(--fd);font-size:2.4rem;line-height:.8;color:var(--purple)}
+.h3c .bar .mid{flex:1;min-width:0}
+.h3c .bar h3{font-family:var(--fd);text-transform:uppercase;font-size:1.25rem;line-height:.95;letter-spacing:-.02em}
+.h3c .bar .loc{font-family:var(--fm);font-size:.72rem;color:var(--subtle);margin-top:3px}
+.h3c .bar .pr{font-family:var(--fm);font-weight:700;font-size:1.2rem;text-align:right;white-space:nowrap}
+
+/* H4 full-bleed accent, image inset card-in-card */
+.h4c{background:var(--green);padding:18px;height:340px;display:flex;flex-direction:column}
+.h4c .top{display:flex;justify-content:space-between;align-items:flex-start}
+.h4c .top .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
+.h4c .imgwrap{flex:1;border-radius:var(--r-lg);border:var(--st) solid var(--ink);margin:14px 0;min-height:0}
+.h4c h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.92;letter-spacing:-.02em}
+.h4c .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
+.h4c .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+
+/* H5 wide editorial: tall image left, deep text column right on paper */
+.h5c{display:grid;grid-template-columns:1fr 1.2fr;height:320px;background:var(--pp)}
+.h5c .imgwrap{height:100%;border-right:var(--st) solid var(--ink)}
+.h5c .side{padding:24px;display:flex;flex-direction:column}
+.h5c .side .tagrow{display:flex;gap:6px;margin-bottom:14px}
+.h5c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.8rem;line-height:.92;letter-spacing:-.02em}
+.h5c .side p{color:var(--muted);font-size:.9rem;margin-top:10px;line-height:1.45}
+.h5c .side .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:14px}
+.h5c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.5rem}
+.h5c .side .buy{background:var(--ink);color:#fff;border:none;border-radius:var(--r-pill);padding:11px 22px;font-weight:700;font-family:var(--fb)}
+
+/* =========================================================================
+   PAIR CARD — 5 variations (the small 2-up cards that looked bad)
+   ========================================================================= */
+.p-base{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp)}
+
+/* P1 image-top, generous padding, price chip */
+.p1c .imgwrap{height:200px}
+.p1c .b{padding:14px}
+.p1c .t{font-weight:700;font-size:1rem;line-height:1.12}
+.p1c .row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.p1c .pr{font-family:var(--fm);font-weight:700;font-size:.95rem;background:var(--yellow);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:5px 12px}
+.p1c .loc{font-family:var(--fm);font-size:.68rem;color:var(--subtle)}
+
+/* P2 overlay caption on image */
+.p2c{position:relative;height:280px;color:#fff}
+.p2c .imgwrap{position:absolute;inset:0}
+.p2c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.75))}
+.p2c .tag{position:absolute;top:12px;left:12px;z-index:2}
+.p2c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:14px}
+.p2c .t{font-weight:700;font-size:1rem;line-height:1.1}
+.p2c .pr{font-family:var(--fm);font-weight:700;margin-top:6px}
+
+/* P3 split: square image + text side (horizontal) */
+.p3c{display:grid;grid-template-columns:auto 1fr;align-items:stretch}
+.p3c .imgwrap{width:120px;height:140px;border-right:var(--st) solid var(--ink)}
+.p3c .b{padding:14px;display:flex;flex-direction:column}
+.p3c .t{font-weight:700;font-size:.95rem;line-height:1.12}
+.p3c .loc{font-family:var(--fm);font-size:.66rem;color:var(--subtle);margin-top:4px}
+.p3c .pr{font-family:var(--fm);font-weight:700;font-size:1.05rem;margin-top:auto}
+
+/* P4 color block top, white info bottom (sticker pop) */
+.p4c .top{height:150px;background:var(--blue);position:relative;border-bottom:var(--st) solid var(--ink)}
+.p4c .top .imgwrap{position:absolute;inset:14px;border-radius:var(--r-md);border:var(--st) solid var(--ink)}
+.p4c .top .stk{position:absolute;top:-10px;right:-10px;width:44px;height:44px;z-index:2}
+.p4c .b{padding:13px}
+.p4c .t{font-weight:700;font-size:.95rem;line-height:1.12}
+.p4c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
+.p4c .pr{font-family:var(--fm);font-weight:700}
+.p4c .loc{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+
+/* P5 minimal: image, then bold price-first row, title under */
+.p5c .imgwrap{height:190px;border-bottom:var(--st) solid var(--ink)}
+.p5c .b{padding:14px}
+.p5c .pr{font-family:var(--fd);font-size:1.5rem;line-height:.9}
+.p5c .pr span{font-family:var(--fm);font-size:.7rem;color:var(--muted)}
+.p5c .t{font-weight:600;font-size:.9rem;margin-top:6px;color:var(--muted)}
+.p5c .tagrow{display:flex;gap:6px;margin-top:10px}
+
+/* =========================================================================
+   SWIPE CARD — 5 variations (immersive single listing)
+   ========================================================================= */
+.s-base{border-radius:var(--r-2xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative;height:520px}
+
+/* S1 full-bleed photo, gradient, meta bottom + action dots */
+.s1c .imgwrap{position:absolute;inset:0}
+.s1c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.82))}
+.s1c .counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--fm);font-size:.66rem;background:rgba(0,0,0,.5);color:#fff;padding:5px 13px;border-radius:var(--r-pill)}
+.s1c .chips{position:absolute;top:16px;left:16px;z-index:2}
+.s1c .stk{position:absolute;top:14px;right:14px;z-index:2;width:52px;height:52px}
+.s1c .meta{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:20px;color:#fff}
+.s1c .meta h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em}
+.s1c .meta .pr{font-family:var(--fm);font-weight:700;font-size:1.4rem;margin-top:6px}
+.s1c .meta .seller{font-family:var(--fm);font-size:.74rem;opacity:.85;margin-top:6px}
+
+/* S2 photo top 60% + solid info panel bottom */
+.s2c{display:flex;flex-direction:column;background:var(--pp)}
+.s2c .imgwrap{height:58%}
+.s2c .panel{flex:1;padding:18px;display:flex;flex-direction:column}
+.s2c .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:1.45rem;line-height:.92;letter-spacing:-.02em}
+.s2c .panel .pr{font-family:var(--fm);font-weight:700;font-size:1.3rem;margin-top:6px}
+.s2c .panel .seller{display:flex;align-items:center;gap:8px;margin-top:auto;font-family:var(--fm);font-size:.72rem;color:var(--muted)}
+.s2c .panel .seller .av{width:28px;height:28px;border-radius:8px;background:var(--yellow);border:var(--st) solid var(--ink)}
+
+/* S3 full-bleed accent (no photo dominance) — big type poster style */
+.s3c{background:var(--pink);display:flex;flex-direction:column;padding:20px}
+.s3c .counter{font-family:var(--fm);font-size:.66rem;align-self:flex-start;background:var(--ink);color:#fff;padding:5px 13px;border-radius:var(--r-pill)}
+.s3c .imgwrap{height:240px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);margin:16px 0}
+.s3c h3{font-family:var(--fd);text-transform:uppercase;font-size:2rem;line-height:.9;letter-spacing:-.02em}
+.s3c .pr{font-family:var(--fm);font-weight:700;font-size:1.6rem;margin-top:8px}
+.s3c .seller{font-family:var(--fm);font-size:.76rem;margin-top:auto}
+.s3c .stk{position:absolute;right:16px;top:60px;width:56px;height:56px;z-index:2}
+
+/* S4 framed photo with stat ribbons (editorial-immersive hybrid) */
+.s4c{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:16px}
+.s4c .imgwrap{flex:1;border-radius:var(--r-xl);min-height:0}
+.s4c .ribbons{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.s4c .rb{font-family:var(--fm);font-size:.68rem;background:#262521;border-radius:var(--r-pill);padding:6px 12px}
+.s4c h3{font-family:var(--fd);text-transform:uppercase;font-size:1.4rem;line-height:.92;letter-spacing:-.02em;margin-top:12px}
+.s4c .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:6px}
+.s4c .pr{font-family:var(--fm);font-weight:700;font-size:1.3rem;color:var(--yellow)}
+
+/* S5 photo with floating glass info chip (minimal) */
+.s5c .imgwrap{position:absolute;inset:0}
+.s5c .counter{position:absolute;top:16px;right:16px;z-index:2;font-family:var(--fm);font-size:.66rem;background:rgba(255,255,255,.85);color:var(--ink);padding:5px 13px;border-radius:var(--r-pill)}
+.s5c .chips{position:absolute;top:16px;left:16px;z-index:2}
+.s5c .floatcard{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-xl);padding:16px}
+.s5c .floatcard h3{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;line-height:.92;letter-spacing:-.02em}
+.s5c .floatcard .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.s5c .floatcard .pr{font-family:var(--fm);font-weight:700;font-size:1.2rem}
+.s5c .floatcard .loc{font-family:var(--fm);font-size:.7rem;color:var(--subtle)}
+
+/* =========================================================================
+   COMPACT CARD — 5 variations (grid/list product card)
+   ========================================================================= */
+.c-base{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp)}
+/* C1 classic image+meta */
+.c1c .imgwrap{height:170px}
+.c1c .b{padding:12px}
+.c1c .t{font-weight:700;font-size:.9rem;line-height:1.12}
+.c1c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
+.c1c .pr{font-family:var(--fm);font-weight:700;font-size:.9rem}
+.c1c .loc{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+/* C2 horizontal row */
+.c2c{display:flex;align-items:center;gap:12px;padding:10px}
+.c2c .imgwrap{width:64px;height:64px;border-radius:var(--r-md);border:var(--st) solid var(--ink);flex:0 0 auto}
+.c2c .mid{flex:1;min-width:0}
+.c2c .t{font-weight:700;font-size:.9rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c2c .sub{font-family:var(--fm);font-size:.64rem;color:var(--subtle);margin-top:3px}
+.c2c .pr{font-family:var(--fd);font-size:1.05rem;line-height:.9;text-align:right;white-space:nowrap}
+/* C3 tall poster, price overlaid */
+.c3c{position:relative;height:240px;color:#fff}
+.c3c .imgwrap{position:absolute;inset:0}
+.c3c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.7))}
+.c3c .pr{position:absolute;top:10px;right:10px;z-index:2;font-family:var(--fm);font-weight:700;font-size:.82rem;background:var(--yellow);color:var(--ink);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:4px 10px}
+.c3c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:12px}
+.c3c .t{font-weight:700;font-size:.9rem;line-height:1.1}
+/* C4 color-tint frame */
+.c4c{background:var(--ys);padding:10px}
+.c4c .imgwrap{height:150px;border-radius:var(--r-md);border:var(--st) solid var(--ink)}
+.c4c .b{padding:10px 4px 4px}
+.c4c .t{font-weight:700;font-size:.88rem;line-height:1.12}
+.c4c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.c4c .pr{font-family:var(--fm);font-weight:700;font-size:.88rem}
+.c4c .loc{font-family:var(--fm);font-size:.62rem;color:var(--muted)}
+/* C5 price-first big-number compact */
+.c5c .imgwrap{height:150px;border-bottom:var(--st) solid var(--ink)}
+.c5c .b{padding:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.c5c .pr{font-family:var(--fd);font-size:1.4rem;line-height:.85}
+.c5c .pr span{font-family:var(--fm);font-size:.6rem;color:var(--muted);display:block;margin-top:2px}
+.c5c .t{font-size:.82rem;font-weight:600;text-align:right;line-height:1.1}
+
+/* =========================================================================
+   DESKTOP LAYOUTS — shared frame
+   ========================================================================= */
+.browser{border:var(--st) solid var(--ink);border-radius:var(--r-xl);overflow:hidden;background:var(--paper);margin-top:6px}
+.bchrome{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:var(--st) solid var(--ink);background:var(--pp)}
+.bchrome .d{width:11px;height:11px;border-radius:50%;border:var(--st) solid var(--ink)}
+.bchrome .url{margin-left:10px;font-family:var(--fm);font-size:.72rem;color:var(--muted);background:var(--paper);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:4px 14px}
+/* desktop top bar (progressive disclosure: search collapsed behind icon) */
+.dnav{display:flex;align-items:center;gap:16px;padding:16px 26px;border-bottom:var(--st) solid var(--ink);background:var(--paper);position:relative}
+.dnav .brand{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;letter-spacing:-.02em;display:flex;align-items:center}
+.dnav .brand img{height:.78em;vertical-align:-.12em;margin:0 .02em}
+.dnav .navlinks{display:flex;gap:22px;font-weight:600;font-size:.92rem;margin-left:14px}
+.dnav .navlinks a{color:var(--ink);text-decoration:none;padding-bottom:2px}
+.dnav .navlinks a.on{border-bottom:3px solid var(--purple)}
+.dnav .spacer{flex:1}
+.dnav .ic{width:42px;height:42px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dnav .cart{background:var(--yellow);position:relative}
+.dnav .cart b{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;font-family:var(--fm);font-size:.58rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* ED-A : asymmetric — sticky rail left, big hero + pair grid right */
+.eda{display:grid;grid-template-columns:230px 1fr;gap:0}
+.eda .rail{border-right:var(--st) solid var(--ink);padding:24px 18px;display:flex;flex-direction:column;gap:8px;background:var(--pp)}
+.eda .rail .h{font-family:var(--fm);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+.eda .rail a{font-weight:600;font-size:.92rem;color:var(--ink);text-decoration:none;padding:7px 10px;border-radius:var(--r-md);cursor:pointer}
+.eda .rail a.on{background:var(--ink);color:#fff}
+.eda .stage{padding:24px}
+.eda .heroRow{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:18px}
+.eda .pairRow{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+
+/* ED-B : centered editorial column, full-bleed alternating rows */
+.edb{max-width:920px;margin:0 auto;padding:26px}
+.edb .kick{font-family:var(--fm);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:8px}
+.edb .bighead{font-family:var(--fd);text-transform:uppercase;text-align:center;font-size:clamp(2rem,4vw,3.2rem);line-height:.9;letter-spacing:-.02em;margin-bottom:24px}
+.edb .row1{margin-bottom:18px}
+.edb .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.edb .row3{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
+
+/* ED-C : magazine masonry — 3-col with feature spanning, tight editorial */
+.edc{padding:24px;columns:3;column-gap:18px}
+.edc>*{break-inside:avoid;margin-bottom:18px}
+@media(max-width:1000px){.edc{columns:2}}
+
+/* SW-A : split-screen — big card left, queue list right */
+.swa{display:grid;grid-template-columns:1.3fr .9fr;gap:0;min-height:620px}
+.swa .stagewrap{padding:26px;border-right:var(--st) solid var(--ink);display:flex;flex-direction:column;gap:16px;background:var(--ps)}
+.swa .actions{display:flex;align-items:center;gap:12px;justify-content:center}
+.swa .actions .x{width:58px;height:58px;border-radius:50%;background:var(--pp);border:var(--st) solid var(--ink);font-size:1.4rem;cursor:pointer}
+.swa .actions .save{background:var(--purple);color:#fff;border:var(--st) solid var(--purple);border-radius:var(--r-pill);padding:17px 40px;font-weight:700;font-family:var(--fb);font-size:1.05rem;cursor:pointer}
+.swa .actions .like{width:58px;height:58px;border:none;background:none;cursor:pointer;padding:0}
+.swa .actions .like img{width:58px;height:58px}
+.swa .queue{padding:22px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.swa .queue .h{font-family:var(--fd);text-transform:uppercase;font-size:1.1rem}
+.swa .qrow{display:flex;align-items:center;gap:12px;padding:9px;border:var(--st) solid var(--ink);border-radius:var(--r-md);background:var(--pp);cursor:pointer}
+.swa .qrow.cur{background:var(--ink);color:#fff}
+.swa .qrow img{width:50px;height:50px;border-radius:8px;object-fit:cover;flex:0 0 auto}
+.swa .qrow .t{font-weight:700;font-size:.84rem;line-height:1.05}
+.swa .qrow .pr{font-family:var(--fm);font-size:.72rem;margin-left:auto;white-space:nowrap}
+
+/* SW-B : centered stage with side-peek of prev/next cards */
+.swb{padding:34px 24px;display:flex;align-items:center;justify-content:center;gap:18px;background:var(--bs);min-height:620px}
+.swb .peek{width:150px;height:430px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;opacity:.55;flex:0 0 auto}
+.swb .peek img{width:100%;height:100%;object-fit:cover}
+.swb .center{width:380px;flex:0 0 auto;display:flex;flex-direction:column;gap:14px}
+.swb .center .actions{display:flex;gap:12px;justify-content:center}
+.swb .center .actions button{border:var(--st) solid var(--ink);background:var(--pp);border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:pointer}
+.swb .center .actions .save{width:auto;border-radius:var(--r-pill);background:var(--ink);color:#fff;padding:0 34px;font-weight:700;font-family:var(--fb)}
+
+/* SW-C : immersive full-bleed with overlaid sidebar info + thumbnails strip */
+.swc{position:relative;min-height:640px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;overflow:hidden}
+.swc .bg{position:absolute;inset:0}.swc .bg img{width:100%;height:100%;object-fit:cover}
+.swc::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent 55%),linear-gradient(transparent 50%,rgba(0,0,0,.8))}
+.swc .panel{position:relative;z-index:2;max-width:560px;padding:34px}
+.swc .panel .counter{font-family:var(--fm);font-size:.7rem;background:rgba(255,255,255,.2);padding:5px 14px;border-radius:var(--r-pill);display:inline-block;margin-bottom:14px}
+.swc .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:2.6rem;line-height:.9;letter-spacing:-.02em}
+.swc .panel .pr{font-family:var(--fm);font-weight:700;font-size:1.8rem;margin-top:10px}
+.swc .panel .seller{font-family:var(--fm);font-size:.84rem;opacity:.9;margin-top:8px}
+.swc .panel .cta{display:flex;gap:12px;margin-top:20px}
+.swc .panel .cta .save{background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:15px 34px;font-weight:700;font-family:var(--fb);cursor:pointer}
+.swc .panel .cta .skip{background:rgba(255,255,255,.15);color:#fff;border:2px solid #fff;border-radius:var(--r-pill);padding:15px 28px;font-weight:700;font-family:var(--fb);cursor:pointer}
+.swc .strip{position:absolute;right:24px;top:24px;z-index:2;display:flex;flex-direction:column;gap:10px}
+.swc .strip img{width:64px;height:64px;border-radius:var(--r-md);border:2px solid #fff;object-fit:cover;opacity:.8;cursor:pointer}
+.swc .strip img.cur{opacity:1;outline:3px solid var(--yellow)}
+
+footer{margin-top:60px;font-family:var(--fm);font-size:.78rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <span class="tag">Shopstr · editorial + swipe · desktop &amp; cards</span>
+    <h1>Editorial &amp; Swipe<br>desktop + card sets</h1>
+    <p>Two parts. First, the <b>card redesigns</b> — 5 variations each of the four card types used across the Editorial and Swipe layouts (Hero, Pair, Swipe, Compact). Then <b>desktop/web breakpoint layouts</b> — 3 genuinely different compositions each for Editorial rows and Swipe. Pick the cards and the layout you like and I'll wire them into the real app.</p>
+  </div>
+
+  <!-- ============================================================ CARDS -->
+  <div class="sec">
+    <div class="lead">Part 1 — Card redesigns</div>
+    <div class="sub">5 variations of each card type. The Pair cards are the ones that looked cramped before — these give them room, hierarchy, and rhythm.</div>
+
+    <span class="label">Hero card · 5 variations</span>
+    <div class="cardgrid hero5">
+      <div class="cardcell"><span class="cap">H1 · overlay-bottom + numeral</span>
+        <div class="hero-base h1c press">
+          <span class="num">01</span>
+          <span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span>
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=800" alt=""></div>
+          <div class="cap"><h3>Vintage 35mm<br>rangefinder</h3><div class="meta"><span class="pr">240,000 sats</span><span class="loc">★ 4.9 · Tokyo</span></div></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H2 · split, text on purple</span>
+        <div class="hero-base h2c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600" alt=""></div>
+          <div class="side"><span class="k">Featured · apparel</span><h3>Organic cotton tee</h3><span class="pr">32,000 sats</span><button class="buy">Buy now</button></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H3 · magazine caption bar</span>
+        <div class="hero-base h3c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800" alt=""></div>
+          <div class="bar"><span class="num">04</span><div class="mid"><h3>Riso zine — Soft Static</h3><div class="loc">★ 4.8 · Berlin · @ekko</div></div><span class="pr">12,000<br>sats</span></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H4 · full-bleed accent, inset photo</span>
+        <div class="hero-base h4c press">
+          <div class="top"><span class="k">New this week</span><span class="pill ink" style="font-size:.66rem">Ceramics</span></div>
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700" alt=""></div>
+          <h3>Glazed ramen bowl, pair</h3>
+          <div class="row"><span class="pr">33,000 sats</span><span class="val" style="font-size:.74rem">Lisbon</span></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H5 · wide editorial w/ description</span>
+        <div class="hero-base h5c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600" alt=""></div>
+          <div class="side"><div class="tagrow"><span class="pill p">Art &amp; print</span><span class="pill">Edition of 12</span></div><h3>Silver gelatin print</h3><p>Hand-printed 8×10, archival, signed verso. Darkroom-made in Tokyo.</p><div class="foot"><span class="pr">120,000 sats</span><button class="buy">Buy</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="label">Pair card · 5 variations</span>
+    <div class="cardgrid pair5">
+      <div class="cardcell"><span class="cap">P1 · roomy, price chip</span>
+        <div class="p-base p1c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="t">Linen apron, cross-back</div><div class="row"><span class="pr">38,000 sats</span><span class="loc">Austin</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P2 · overlay caption</span>
+        <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">New</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500" alt=""></div><div class="cap"><div class="t">Merino beanie</div><div class="pr">26,000 sats</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P3 · horizontal split</span>
+        <div class="p-base p3c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=300" alt=""></div><div class="b"><div class="t">Cast-iron skillet</div><div class="loc">Reykjavik · used</div><div class="pr">42,000 sats</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P4 · color block + sticker</span>
+        <div class="p-base p4c press"><div class="top"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" alt=""></div><img class="stk" src="assets/shape-sparkle-4pt.svg" alt=""></div><div class="b"><div class="t">Synthwave sample pack</div><div class="row"><span class="pr">35,000 sats</span><span class="loc">Remote</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P5 · price-first minimal</span>
+        <div class="p-base p5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500" alt=""></div><div class="b"><div class="pr">18,000 <span>sats</span></div><div class="t">Hand-thrown stoneware mug</div><div class="tagrow"><span class="pill g" style="font-size:.66rem">New</span><span class="pill" style="font-size:.66rem">Lisbon</span></div></div></div>
+      </div>
+    </div>
+
+    <span class="label">Swipe card · 5 variations</span>
+    <div class="cardgrid swipe5">
+      <div class="cardcell"><span class="cap">S1 · full-bleed photo + meta</span>
+        <div class="s-base s1c press"><span class="counter">3 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><img class="stk" src="assets/badge-bff-star.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=700" alt=""></div><div class="meta"><h3>35mm rangefinder</h3><div class="pr">240,000 sats</div><div class="seller">★ 4.9 · @daveshoots · Tokyo</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S2 · photo + solid info panel</span>
+        <div class="s-base s2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=600" alt=""></div><div class="panel"><h3>Merino beanie</h3><div class="pr">26,000 sats</div><div class="seller"><span class="av"></span>@mara.knits · Reykjavik</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S3 · full-bleed accent poster</span>
+        <div class="s-base s3c press"><span class="counter">5 / 24</span><img class="stk" src="assets/shape-sunstar-yellow.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600" alt=""></div><h3>Riso zine no.4</h3><div class="pr">12,000 sats</div><div class="seller">★ 4.8 · @ekko · Berlin</div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S4 · ink frame + stat ribbons</span>
+        <div class="s-base s4c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=600" alt=""></div><div class="ribbons"><span class="rb">Used · good</span><span class="rb">Ships tracked</span><span class="rb">★ 4.7</span></div><h3>Cast-iron skillet</h3><div class="row"><span class="pr">42,000 sats</span><span class="val" style="font-size:.72rem;color:#bdbcb4">Reykjavik</span></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S5 · photo + floating info card</span>
+        <div class="s-base s5c press"><span class="counter">8 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700" alt=""></div><div class="floatcard"><h3>Organic cotton tee</h3><div class="row"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div>
+      </div>
+    </div>
+
+    <span class="label">Compact card · 5 variations</span>
+    <div class="cardgrid compact5">
+      <div class="cardcell"><span class="cap">C1 · classic</span>
+        <div class="c-base c1c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400" alt=""></div><div class="b"><div class="t">Cold-brew concentrate · 1L</div><div class="row"><span class="pr">14,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C2 · horizontal row</span>
+        <div class="c-base c2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=200" alt=""></div><div class="mid"><div class="t">Refurbished 65% keyboard</div><div class="sub">Resale · Berlin · ★ 4.6</div></div><div class="pr">95,000<br><span class="val" style="font-size:.56rem;color:var(--muted)">sats</span></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C3 · tall poster overlay</span>
+        <div class="c-base c3c press"><span class="pr">8,000 sats</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400" alt=""></div><div class="cap"><div class="t">Die-cut vinyl stickers (10)</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C4 · color-tint frame</span>
+        <div class="c-base c4c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400" alt=""></div><div class="b"><div class="t">Glazed ramen bowl, pair</div><div class="row"><span class="pr">33,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C5 · price-first big number</span>
+        <div class="c-base c5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=400" alt=""></div><div class="b"><div class="pr">78,000<span>sats</span></div><div class="t">Wool throw blanket</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================== DESKTOP: EDITORIAL -->
+  <div class="sec">
+    <div class="lead">Part 2 — Editorial, desktop</div>
+    <div class="sub">3 genuinely different web compositions of the editorial layout. Search is progressive-disclosure (the magnifier in the top bar).</div>
+
+    <!-- ED-A asymmetric rail -->
+    <span class="label">Editorial A · sticky category rail + hero & pair grid</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <span class="spacer"></span>
+        <span class="ic press" title="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart press"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="eda">
+        <aside class="rail">
+          <div class="h">Browse</div>
+          <a class="on">All listings</a><a>New this week</a><a>Near me</a><a>Following</a>
+          <div class="h">Category</div>
+          <a>Ceramics</a><a>Apparel</a><a>Photography</a><a>Home</a><a>Coffee</a><a>Music</a>
+          <div class="h">Type</div>
+          <a>Physical</a><a>Digital</a><a>Service</a>
+        </aside>
+        <div class="stage">
+          <div class="heroRow">
+            <div class="hero-base h1c press"><span class="num">01</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=800" alt=""></div><div class="cap"><h3>Vintage 35mm rangefinder</h3><div class="meta"><span class="pr">240,000 sats</span><span class="loc">★ 4.9 · Tokyo</span></div></div></div>
+            <div class="hero-base h4c press"><div class="top"><span class="k">New this week</span><span class="pill ink" style="font-size:.66rem">Ceramics</span></div><div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700" alt=""></div><h3>Glazed ramen bowl</h3><div class="row"><span class="pr">33,000 sats</span><span class="val" style="font-size:.74rem">Lisbon</span></div></div>
+          </div>
+          <div class="pairRow">
+            <div class="p-base p1c press"><div class="imgwrap" style="height:170px"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="t">Linen apron</div><div class="row"><span class="pr">38,000 sats</span><span class="loc">Austin</span></div></div></div>
+            <div class="p-base p4c press"><div class="top"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" alt=""></div><img class="stk" src="assets/shape-sparkle-4pt.svg" alt=""></div><div class="b"><div class="t">Synthwave pack</div><div class="row"><span class="pr">35,000 sats</span><span class="loc">Remote</span></div></div></div>
+            <div class="p-base p1c press"><div class="imgwrap" style="height:170px"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500" alt=""></div><div class="b"><div class="t">Merino beanie</div><div class="row"><span class="pr">26,000 sats</span><span class="loc">Reykjavik</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ED-B centered column -->
+    <span class="label">Editorial B · centered magazine column, alternating rows</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <nav class="navlinks"><a class="on">Browse</a><a>New</a><a>Following</a><a>Communities</a></nav>
+        <span class="spacer"></span>
+        <span class="ic press" title="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart press"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="edb">
+        <div class="kick">Circular · Bitcoin-native · curated daily</div>
+        <div class="bighead">Found things,<br>worth keeping</div>
+        <div class="row1"><div class="hero-base h1c press" style="height:380px"><span class="num">01</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900" alt=""></div><div class="cap"><h3>Organic cotton tee</h3><div class="meta"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div></div>
+        <div class="row2">
+          <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">Resale</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500" alt=""></div><div class="cap"><div class="t">Refurb 65% keyboard</div><div class="pr">95,000 sats</div></div></div>
+          <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">Used</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500" alt=""></div><div class="cap"><div class="t">Cast-iron skillet</div><div class="pr">42,000 sats</div></div></div>
+        </div>
+        <div class="row3">
+          <div class="hero-base h3c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600" alt=""></div><div class="bar"><span class="num">04</span><div class="mid"><h3>Riso zine no.4</h3><div class="loc">Berlin · @ekko</div></div><span class="pr">12,000<br>sats</span></div></div>
+          <div class="hero-base h2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600" alt=""></div><div class="side"><span class="k">Edition of 12</span><h3>Silver gelatin print</h3><span class="pr">120,000 sats</span><button class="buy">Buy now</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ED-C masonry -->
+    <span class="label">Editorial C · 3-column magazine masonry</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <nav class="navlinks"><a class="on">Browse</a><a>New</a><a>Near me</a><a>Following</a></nav>
+        <span class="spacer"></span>
+        <span class="ic press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart press"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="edc">
+        <div class="hero-base h1c press" style="height:300px"><span class="num">01</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=600" alt=""></div><div class="cap"><h3>35mm rangefinder</h3><div class="meta"><span class="pr">240,000</span><span class="loc">Tokyo</span></div></div></div>
+        <div class="p-base p1c press"><div class="imgwrap" style="height:200px"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500" alt=""></div><div class="b"><div class="t">Stoneware mug</div><div class="row"><span class="pr">18,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+        <div class="hero-base h4c press" style="height:300px"><div class="top"><span class="k">New</span><span class="pill ink" style="font-size:.66rem">Home</span></div><div class="imgwrap"><img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=500" alt=""></div><h3>Wool throw</h3><div class="row"><span class="pr">78,000 sats</span><span class="val" style="font-size:.72rem">Reykjavik</span></div></div>
+        <div class="p-base p5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="pr">38,000 <span>sats</span></div><div class="t">Linen apron</div></div></div>
+        <div class="p-base p2c press" style="height:240px"><span class="tag pill ink" style="font-size:.66rem">Digital</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" alt=""></div><div class="cap"><div class="t">Synthwave pack</div><div class="pr">35,000 sats</div></div></div>
+        <div class="p-base p1c press"><div class="imgwrap" style="height:180px"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500" alt=""></div><div class="b"><div class="t">Ramen bowl pair</div><div class="row"><span class="pr">33,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================== DESKTOP: SWIPE -->
+  <div class="sec">
+    <div class="lead">Part 2 — Swipe, desktop</div>
+    <div class="sub">3 genuinely different web compositions of the swipe experience. Desktop has room, so the single card gets context (a queue, side-peeks, or an immersive stage).</div>
+
+    <!-- SW-A split + queue -->
+    <span class="label">Swipe A · split-screen card + up-next queue</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swa">
+        <div class="stagewrap">
+          <div class="s-base s1c" style="height:480px"><span class="counter">3 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><img class="stk" src="assets/badge-bff-star.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=800" alt=""></div><div class="meta"><h3>35mm rangefinder</h3><div class="pr">240,000 sats</div><div class="seller">★ 4.9 · @daveshoots · Tokyo</div></div></div>
+          <div class="actions"><button class="x press">✕</button><button class="save press">Save it</button><button class="like press"><img src="assets/shape-daisy-yellow.svg" alt="like"></button></div>
+        </div>
+        <div class="queue">
+          <div class="h">Up next</div>
+          <div class="qrow cur"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=120" alt=""><div><div class="t">35mm rangefinder</div></div><span class="pr">240,000</span></div>
+          <div class="qrow press"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=120" alt=""><div><div class="t">Merino beanie</div></div><span class="pr">26,000</span></div>
+          <div class="qrow press"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=120" alt=""><div><div class="t">Riso zine no.4</div></div><span class="pr">12,000</span></div>
+          <div class="qrow press"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=120" alt=""><div><div class="t">Cast-iron skillet</div></div><span class="pr">42,000</span></div>
+          <div class="qrow press"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120" alt=""><div><div class="t">Organic cotton tee</div></div><span class="pr">32,000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SW-B centered with peeks -->
+    <span class="label">Swipe B · centered stage with prev/next peek</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swb">
+        <div class="peek"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=300" alt=""></div>
+        <div class="center">
+          <div class="s-base s5c" style="height:430px"><span class="counter">8 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700" alt=""></div><div class="floatcard"><h3>Organic cotton tee</h3><div class="row"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div>
+          <div class="actions"><button class="press">✕</button><button class="save press">Save it</button><button class="press">♡</button></div>
+        </div>
+        <div class="peek"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=300" alt=""></div>
+      </div>
+    </div>
+
+    <!-- SW-C immersive -->
+    <span class="label">Swipe C · immersive full-bleed stage + thumbnail strip</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swc">
+        <div class="bg"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=1200" alt=""></div>
+        <div class="strip">
+          <img class="cur" src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=140" alt="">
+        </div>
+        <div class="panel">
+          <span class="counter">3 / 24 · Photography</span>
+          <h3>Vintage 35mm<br>rangefinder</h3>
+          <div class="pr">240,000 sats</div>
+          <div class="seller">★ 4.9 · @daveshoots · serviced, light meter recalibrated · Tokyo</div>
+          <div class="cta"><button class="save">Save it</button><button class="skip">Skip →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="foot">SHOPSTR · 20 card variations · 3 editorial + 3 swipe desktop layouts · progressive-disclosure search · stickers from design/assets</footer>
+</div>
+</body>
+</html>

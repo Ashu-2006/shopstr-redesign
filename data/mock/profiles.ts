@@ -1,0 +1,156 @@
+import type { Profile, SellerReviews, ChatThread } from "@/data/types";
+
+export const MOCK_PROFILES: Record<string, Profile> = {
+  pk_alice: {
+    pubkey: "pk_alice",
+    npub: "npub1alice00000000000000000000000000000000000000000000000000",
+    handle: "alice",
+    nip05: "alice@shopstr.store",
+    about: "Ceramics and coffee out of a small Lisbon studio.",
+    picture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200",
+    totalSales: 412000,
+  },
+  pk_bob: {
+    pubkey: "pk_bob",
+    npub: "npub1bob000000000000000000000000000000000000000000000000000",
+    handle: "bobbuilds",
+    nip05: "bob@shopstr.store",
+    about: "Refurbishing keyboards and small electronics.",
+    picture: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200",
+    totalSales: 1850000,
+  },
+  pk_carol: {
+    pubkey: "pk_carol",
+    npub: "npub1carol0000000000000000000000000000000000000000000000000",
+    handle: "carol.makes",
+    about: "Slow-made apparel and zero-waste home goods.",
+    picture: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200",
+    totalSales: 920000,
+  },
+  pk_dave: {
+    pubkey: "pk_dave",
+    npub: "npub1dave00000000000000000000000000000000000000000000000000",
+    handle: "daveshoots",
+    nip05: "dave@shopstr.store",
+    about: "Serviced film cameras from Tokyo.",
+    picture: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200",
+    totalSales: 3100000,
+  },
+  pk_ekko: {
+    pubkey: "pk_ekko",
+    npub: "npub1ekko00000000000000000000000000000000000000000000000000",
+    handle: "ekko",
+    nip05: "ekko@shopstr.store",
+    about: "Riso zines, vinyl stickers, and the odd ambient record. Berlin.",
+    picture: "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=200",
+    totalSales: 640000,
+  },
+  pk_mara: {
+    pubkey: "pk_mara",
+    npub: "npub1mara00000000000000000000000000000000000000000000000000",
+    handle: "mara.knits",
+    nip05: "mara@shopstr.store",
+    about: "Hand-knit wool and seasoned cast iron from Reykjavik.",
+    picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200",
+    totalSales: 1240000,
+  },
+  pk_nuno: {
+    pubkey: "pk_nuno",
+    npub: "npub1nuno00000000000000000000000000000000000000000000000000",
+    handle: "nuno",
+    nip05: "nuno@shopstr.store",
+    about: "Design + dev for Bitcoin/Nostr apps. Coffee on the side.",
+    picture: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200",
+    totalSales: 2050000,
+  },
+};
+
+export const MOCK_REVIEWS: Record<string, SellerReviews> = {
+  pk_alice: {
+    pubkey: "pk_alice",
+    scores: [5, 5, 4, 5, 5, 4, 5],
+    comments: [
+      {
+        id: "rev_a1",
+        authorPubkey: "pk_bob",
+        score: 5,
+        text: "Mug arrived perfectly packed. Beautiful glaze, even better in person.",
+        createdAt: 1717200000,
+      },
+      {
+        id: "rev_a2",
+        authorPubkey: "pk_mara",
+        score: 4,
+        text: "Lovely piece. Shipping took a little longer than expected.",
+        createdAt: 1716595200,
+      },
+    ],
+  },
+  pk_bob: {
+    pubkey: "pk_bob",
+    scores: [5, 4, 5, 5, 3, 4, 5, 5],
+    comments: [
+      {
+        id: "rev_b1",
+        authorPubkey: "pk_carol",
+        score: 5,
+        text: "Keyboard was spotless and the switches feel great. Fast DM replies.",
+        createdAt: 1717113600,
+      },
+    ],
+  },
+  pk_carol: {
+    pubkey: "pk_carol",
+    scores: [5, 5, 5, 4],
+  },
+  pk_dave: {
+    pubkey: "pk_dave",
+    scores: [5, 5, 5, 5, 5, 4],
+    comments: [
+      {
+        id: "rev_d1",
+        authorPubkey: "pk_ekko",
+        score: 5,
+        text: "Camera serviced exactly as described. Meter dead accurate.",
+        createdAt: 1716940800,
+      },
+    ],
+  },
+  pk_ekko: {
+    pubkey: "pk_ekko",
+    scores: [5, 5, 4, 5, 5],
+  },
+  pk_mara: {
+    pubkey: "pk_mara",
+    scores: [5, 5, 5, 4, 5, 5, 4],
+  },
+  pk_nuno: {
+    pubkey: "pk_nuno",
+    scores: [5, 5, 5, 5, 5, 5, 4, 5],
+  },
+};
+
+export const MOCK_CHATS: ChatThread[] = [
+  {
+    id: "chat_001",
+    counterpartyPubkey: "pk_alice",
+    counterpartyHandle: "alice",
+    counterpartyPicture:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200",
+    productId: "lst_001",
+    lastMessage: "Yes, I can ship two mugs together to save on postage.",
+    lastMessageAt: 1717286400,
+    unread: 2,
+  },
+  {
+    id: "chat_002",
+    counterpartyPubkey: "pk_dave",
+    counterpartyHandle: "daveshoots",
+    counterpartyPicture:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200",
+    productId: "lst_005",
+    lastMessage: "The light meter was recalibrated last month.",
+    lastMessageAt: 1717200000,
+    unread: 0,
+  },
+];

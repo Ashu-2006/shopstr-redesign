@@ -1,0 +1,55 @@
+import { useState } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { useOrders } from "@/data/hooks";
+import { MOCK_LISTINGS } from "@/data/mock/listings";
+import { SheetHeader } from "@/components/ui/SheetHeader";
+import { BottomNav } from "@/components/ui/BottomNav";
+import { Pill } from "@/components/ui/Pill";
+import type { OrderStatus } from "@/data/mock/extras";
+
+const CHIP: Record<OrderStatus, { label: string; tone: "green" | "blue" | "ink" }> = {
+  paid: { label: "Paid", tone: "green" },
+  shipped: { label: "Shipped", tone: "blue" },
+  delivered: { label: "Delivered", tone: "ink" },
+};
+const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id)!;
+
+export default function Orders() {
+  const { data: orders } = useOrders();
+  const [filter, setFilter] = useState<string>("All");
+  const FILTERS = ["All", "Paid", "Shipped", "Delivered"];
+  const shown = filter === "All" ? orders : orders.filter((o) => CHIP[o.status].label === filter);
+
+  return (
+    <>
+      <Head><title>Orders · Shopstr</title></Head>
+      <SheetHeader title="Your orders" backTo="/marketplace" />
+      <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
+        <div className="no-scrollbar mb-3 flex gap-2 overflow-x-auto">
+          {FILTERS.map((f) => (
+            <Pill key={f} interactive active={filter === f} onClick={() => setFilter(f)}>{f}</Pill>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {shown.map((o) => {
+            const p = byId(o.productId);
+            const chip = CHIP[o.status];
+            return (
+              <Link key={o.id} href={`/orders/${o.id}`} className="ds-press flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.images[0]} alt="" className="h-14 w-14 shrink-0 rounded-md border-2 border-ink object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-bold">{p.title}</div>
+                  <div className="font-mono text-[0.66rem] text-text-subtle">Order #{o.id} · @{o.sellerHandle} · {o.placed}</div>
+                </div>
+                <Pill tone={chip.tone} className="!px-2.5 !py-1 !text-xs">{chip.label}</Pill>
+              </Link>
+            );
+          })}
+        </div>
+      </main>
+      <BottomNav active="/orders" />
+    </>
+  );
+}

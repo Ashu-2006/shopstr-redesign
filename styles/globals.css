@@ -1,0 +1,248 @@
+/* Font @import MUST come first — CSS requires all @import rules to precede other
+   rules, and `@import "tailwindcss"` expands into rules. Three OFL families:
+   Archivo Black (display), Space Grotesk (body), Space Mono (numbers). Self-host
+   the .woff2 files before production. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+@import "tailwindcss";
+@import "./design-system.css";
+
+/* -----------------------------------------------------------------------------
+   Tailwind v4 CSS-first theme — map `--ds-*` into Tailwind's namespaced theme
+   variables so they become utilities (bg-paper, text-ink, text-purple,
+   rounded-pill, font-display, ...). Components may use these OR var(--ds-*).
+   -------------------------------------------------------------------------- */
+@theme inline {
+  /* neutrals */
+  --color-ink: var(--ds-ink);
+  --color-ink-soft: var(--ds-ink-soft);
+  --color-paper: var(--ds-paper);
+  --color-paper-pure: var(--ds-paper-pure);
+  --color-paper-warm: var(--ds-paper-warm);
+  --color-paper-2: var(--ds-paper-2);
+  --color-line: var(--ds-line);
+
+  /* text */
+  --color-text: var(--ds-text);
+  --color-text-muted: var(--ds-text-muted);
+  --color-text-subtle: var(--ds-text-subtle);
+  --color-text-on-dark: var(--ds-text-on-dark);
+
+  /* purple (primary accent) */
+  --color-purple: var(--ds-purple);
+  --color-purple-press: var(--ds-purple-press);
+  --color-purple-soft: var(--ds-purple-soft);
+  --color-on-purple: var(--ds-on-purple);
+
+  /* playful accents — the only six */
+  --color-orange: var(--ds-orange);
+  --color-yellow: var(--ds-yellow);
+  --color-red: var(--ds-red);
+  --color-green: var(--ds-green);
+  --color-blue: var(--ds-blue);
+  --color-pink: var(--ds-pink);
+  --color-yellow-soft: var(--ds-yellow-soft);
+  --color-green-soft: var(--ds-green-soft);
+  --color-pink-soft: var(--ds-pink-soft);
+  --color-blue-soft: var(--ds-blue-soft);
+
+  /* type */
+  --font-display: var(--ds-font-display);
+  --font-body: var(--ds-font-body);
+  --font-mono: var(--ds-font-mono);
+
+  /* radius */
+  --radius-sm: var(--ds-radius-sm);
+  --radius-md: var(--ds-radius-md);
+  --radius-lg: var(--ds-radius-lg);
+  --radius-xl: var(--ds-radius-xl);
+  --radius-2xl: var(--ds-radius-2xl);
+  --radius-pill: var(--ds-radius-pill);
+
+  /* motion easings */
+  --ease-out: var(--ds-ease-out);
+  --ease-fluid: var(--ds-ease-fluid);
+}
+
+/* ------------------------------------------------------------------ BASE -- */
+html,
+body {
+  background: var(--ds-paper);
+  color: var(--ds-text);
+  font-family: var(--ds-font-body);
+  font-size: 16px;
+  line-height: var(--ds-leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings: uppercase Archivo Black, tight tracking, balanced wrap. */
+.ds-display {
+  font-family: var(--ds-font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--ds-tracking-display);
+  line-height: var(--ds-leading-tight);
+  text-wrap: balance;
+}
+
+/* Any number that represents value: Space Mono, tabular figures. */
+.ds-value {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Tactile press for interactive elements. Always 0.96. */
+.ds-press {
+  transition-property: scale;
+  transition-duration: var(--ds-dur-fast);
+  transition-timing-function: var(--ds-ease-out);
+}
+.ds-press:active {
+  scale: var(--ds-press-scale);
+}
+
+/* Hide scrollbars on horizontal rails / disclosure scrollers. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  height: 0;
+  width: 0;
+}
+
+/* Staggered enter for feed children. Apply `.stagger` to a parent and give each
+   child `animation-delay`. Pairs with the `ds-rise` keyframe. */
+@keyframes ds-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stagger > * {
+  animation: ds-rise 0.5s var(--ds-ease-out) both;
+}
+
+/* Colored category hero pop-in. */
+@keyframes ds-catpop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cat-pop {
+  animation: ds-catpop 0.42s var(--ds-ease-out) both;
+}
+
+/* Slow spin for decorative stickers. */
+@keyframes ds-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: ds-spin 20s linear infinite;
+}
+
+/* Cart-badge bump when the count changes. */
+@keyframes ds-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.bump {
+  animation: ds-pop 0.35s var(--ds-ease-out);
+}
+
+/* Success check stroke-draw (paid screen). */
+.check-draw path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: ds-draw 0.55s var(--ds-ease-out) 0.15s forwards;
+}
+@keyframes ds-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Dual-thumb price range — two overlaid native sliders, brutalist thumbs. */
+.range-dual {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  accent-color: transparent; /* kill the native filled track (default red on some OSes) */
+  pointer-events: none;
+}
+.range-dual::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  height: 100%;
+}
+.range-dual::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+.range-dual::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #121212;
+  cursor: pointer;
+}
+.range-dual::-moz-range-thumb {
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #121212;
+  cursor: pointer;
+}
+
+/* Hover-lift on cards (desktop pointers only). */
+@media (hover: hover) {
+  .lift {
+    transition: transform 0.25s var(--ds-ease-out);
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

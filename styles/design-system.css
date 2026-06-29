@@ -1,0 +1,139 @@
+/* =============================================================================
+   SHOPSTR DESIGN SYSTEM
+   -----------------------------------------------------------------------------
+   Bold, playful, geometric. Light theme primary. Neutral surfaces + near-black
+   text. Purple #5A51E5 is the structural accent; a wider playful accent set is
+   used liberally (and sometimes full-bleed as a "mode" background).
+
+   Hard rules encoded here:
+   - NO shadows. Separation via spacing first, 1-2px stroke only when needed.
+   - Display type is UPPERCASE Archivo Black, tight tracking.
+   - Body is Space Grotesk. Every value/number uses Space Mono, tabular figures.
+   - Shapes (circle / square / triangle / semicircle / arrow) are first-class
+     decorative + functional assets.
+
+   Tokens are `--ds-*`. globals.css maps a subset into Tailwind v4 `@theme`.
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------- COLOR --
+     Neutral is PRIMARY. Primary button + primary bg are neutral (ink / paper).
+     Purple is the accent for secondary actions and structural emphasis. */
+
+  /* Neutrals (the workhorses) */
+  --ds-ink: #121212;          /* near-black: text, primary buttons, strokes */
+  --ds-ink-soft: #3a3a3a;
+  --ds-paper: #f4f3ef;        /* off-white app background */
+  --ds-paper-pure: #ffffff;   /* card / sheet surfaces */
+  --ds-paper-warm: #efe9df;   /* warm tinted surface */
+  --ds-paper-2: #ece9e1;      /* subtle sunken surface */
+  --ds-line: #121212;         /* stroke color = ink (used at low width) */
+  --ds-line-soft: rgba(18, 18, 18, 0.12);
+
+  /* Text */
+  --ds-text: #121212;         /* mostly black */
+  --ds-text-muted: #5c5b55;
+  --ds-text-subtle: #8a897f;
+  --ds-text-on-dark: #f4f3ef; /* over ink + over purple, text is white-ish */
+
+  /* Primary accent — purple */
+  --ds-purple: #5a51e5;
+  --ds-purple-press: #4a42c9;
+  --ds-purple-soft: #e7e5fb;
+  --ds-on-purple: #ffffff;
+
+  /* Playful accent set — the ONLY six accents. Use them EVERY chance, be
+     creative. Some double as full-bleed "mode" backgrounds. */
+  --ds-orange: #ff8336;
+  --ds-yellow: #ffc313;
+  --ds-red: #ff4040;
+  --ds-green: #25c26e;
+  --ds-blue: #00aeff;   /* bright sky blue */
+  --ds-pink: #ff3dac;
+
+  /* Tints (soft fills / chips) */
+  --ds-yellow-soft: #fff1cc;
+  --ds-green-soft: #d3f5e3;
+  --ds-pink-soft: #ffdcef;
+  --ds-blue-soft: #cdeeff;
+
+  /* Text color to sit ON each accent (contrast-checked) — black on all six */
+  --ds-on-orange: #121212;
+  --ds-on-yellow: #121212;
+  --ds-on-red: #121212;
+  --ds-on-green: #121212;
+  --ds-on-blue: #121212;
+  --ds-on-pink: #121212;
+
+  /* Semantic (mapped to the playful set) */
+  --ds-success: var(--ds-green);
+  --ds-warning: var(--ds-yellow);
+  --ds-danger: var(--ds-red);
+
+  /* ----------------------------------------------------------- TYPOGRAPHY --
+     Three OFL families, three jobs. Loaded via @font-face in globals.css. */
+  --ds-font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  --ds-font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --ds-font-mono: "Space Mono", ui-monospace, "Cascadia Code", monospace;
+
+  /* Display = uppercase + tight tracking. Body = normal. Mono = tabular. */
+  --ds-tracking-display: -0.02em;
+  --ds-tracking-tight: -0.01em;
+
+  --ds-text-xs: 0.75rem;
+  --ds-text-sm: 0.875rem;
+  --ds-text-base: 1rem;
+  --ds-text-lg: 1.25rem;
+  --ds-text-xl: 1.625rem;
+  --ds-text-2xl: 2.25rem;
+  --ds-text-3xl: 3.25rem;
+  --ds-text-4xl: 4.5rem;
+  --ds-text-5xl: 6rem;
+
+  --ds-leading-tight: 0.95;
+  --ds-leading-snug: 1.1;
+  --ds-leading-body: 1.5;
+
+  /* --------------------------------------------------------------- SPACE --
+     Spacing carries separation. 4px base. */
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.25rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-8: 2rem;
+  --ds-space-10: 2.5rem;
+  --ds-space-12: 3rem;
+  --ds-space-16: 4rem;
+  --ds-space-20: 5rem;
+  --ds-space-24: 6rem;
+
+  /* -------------------------------------------------------------- RADIUS --
+     The chunky-squircle + pill language. Big radii are the brand. */
+  --ds-radius-sm: 0.5rem;
+  --ds-radius-md: 0.875rem;
+  --ds-radius-lg: 1.25rem;
+  --ds-radius-xl: 1.75rem;
+  --ds-radius-2xl: 2.25rem;
+  --ds-radius-pill: 999px;
+  --ds-radius-circle: 50%;
+
+  /* --------------------------------------------------------------- LINE --
+     Stroke widths. Used sparingly; spacing is the default separator. */
+  --ds-stroke: 1.5px;
+  --ds-stroke-bold: 2.5px;
+
+  /* -------------------------------------------------------------- MOTION --
+     Shared by Framer Motion / GSAP / CSS. Springs feel bouncy-but-controlled;
+     bounce stays 0 per the make-interfaces rules. */
+  --ds-dur-fast: 140ms;
+  --ds-dur-base: 240ms;
+  --ds-dur-slow: 420ms;
+  --ds-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ds-ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ds-press-scale: 0.96;
+
+  /* -------------------------------------------------------------- LAYOUT --*/
+  --ds-container-max: 1240px;
+}

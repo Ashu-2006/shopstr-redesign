@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Shopstr — Working Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+<style>
+:root{
+  --ink:#121212; --paper:#f4f3ef; --pp:#fff; --p2:#ece9e1;
+  --muted:#5c5b55; --subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-press:#4a42c9; --purple-soft:#e7e5fb;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e; --blue:#00aeff; --pink:#ff3dac;
+  --ys:#fff1cc; --gs:#d3f5e3; --ps:#ffdcef; --bs:#cdeeff;
+  --fd:"Archivo Black",system-ui,sans-serif; --fb:"Space Grotesk",system-ui,sans-serif; --fm:"Space Mono",monospace;
+  --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --st:2px; --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--p2);color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;min-height:100vh}
+img{display:block}
+.display{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;line-height:.92}
+.val{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- device frame (phone on desktop, full-bleed on small screens) ---- */
+.device{width:420px;height:880px;max-height:96vh;border-radius:46px;border:3px solid var(--ink);background:var(--pp);overflow:hidden;position:relative;display:flex;flex-direction:column}
+@media(max-width:480px){body{align-items:stretch}.device{width:100%;height:100dvh;max-height:none;border:none;border-radius:0}}
+
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-family:var(--fm);font-size:.72rem;font-weight:700;flex:0 0 auto;z-index:30;background:transparent}
+.statusbar .dots{display:flex;gap:5px}.statusbar .dots i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+
+/* ---- screen system ---- */
+.stage{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:var(--paper);opacity:0;visibility:hidden;transform:translateX(12px);transition:opacity .26s var(--ease),transform .26s var(--ease),visibility .26s}
+.screen.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.screen.leaving{opacity:0;transform:translateX(-10px);z-index:1}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{width:0}
+.pad{padding:16px}.pb{padding-bottom:108px}
+
+/* ---- atoms ---- */
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.8rem;padding:8px 14px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);background:var(--pp);white-space:nowrap;cursor:pointer}
+.pill.sm{font-size:.7rem;padding:5px 11px}
+.pill.ink{background:var(--ink);color:var(--on-dark)}
+.pill.y{background:var(--yellow)}.pill.g{background:var(--green)}.pill.p{background:var(--pink)}.pill.b{background:var(--blue)}.pill.o{background:var(--orange)}.pill.pu{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:1rem;padding:16px 24px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);cursor:pointer;font-family:var(--fb);background:var(--ink);color:var(--on-dark)}
+.btn.pu{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn.w{background:var(--pp);color:var(--ink)}
+.btn.full{width:100%}
+.press{transition:scale .13s var(--ease)}.press:active{scale:.95}
+.ic{width:42px;height:42px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.muted{color:var(--muted)}.subtle{color:var(--subtle)}
+.imgwrap{position:relative;overflow:hidden}.imgwrap img{width:100%;height:100%;object-fit:cover}
+.kick{font-family:var(--fm);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* ---- top bar (progressive disclosure search) ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:var(--st) solid var(--ink)}
+.bar .row{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.brand{font-family:var(--fd);text-transform:uppercase;font-size:1.1rem;letter-spacing:-.02em;display:flex;align-items:center;margin-right:auto;cursor:pointer}
+.brand img{height:.78em;vertical-align:-.12em;margin:0 .02em}
+.cart{position:relative;background:var(--yellow)}
+.cart b{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;font-family:var(--fm);font-size:.58rem;min-width:18px;height:18px;padding:0 4px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.disc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--ease)}
+.disc.open{grid-template-rows:1fr}
+.disc>div{overflow:hidden}
+.search{display:flex;align-items:center;gap:8px;margin:0 16px 12px;padding:11px 15px;border:var(--st) solid var(--ink);border-radius:var(--r-pill);background:var(--pp)}
+.search input{border:none;outline:none;font-family:var(--fb);font-size:.9rem;width:100%;background:none}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px}.filters::-webkit-scrollbar{height:0}
+
+/* ---- bottom nav ---- */
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:25;padding:12px 16px calc(12px + env(safe-area-inset-bottom));}
+.navbar{display:flex;align-items:center;justify-content:space-between;gap:4px;background:var(--ink);border-radius:var(--r-pill);padding:7px}
+.navbtn{flex:0 0 auto;height:48px;border-radius:var(--r-pill);display:flex;align-items:center;gap:8px;padding:0 12px;border:none;background:transparent;color:#fff;cursor:pointer;transition:background .2s var(--ease),color .2s var(--ease)}
+.navbtn.on{background:var(--yellow);color:var(--ink)}
+.navbtn .lbl{font-family:var(--fd);text-transform:uppercase;font-size:.82rem;display:none}
+.navbtn.on .lbl{display:inline}
+
+/* ---- editorial marketplace ---- */
+.hero{position:relative;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;height:300px;color:#fff;cursor:pointer}
+.hero .imgwrap{position:absolute;inset:0}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 38%,rgba(0,0,0,.8))}
+.hero .num{position:absolute;top:14px;left:16px;z-index:2;font-family:var(--fd);font-size:2.4rem;mix-blend-mode:difference}
+.hero .chips{position:absolute;top:16px;right:14px;z-index:2;display:flex;gap:6px}
+.hero .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px}
+.hero .cap h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em}
+.hero .cap .r{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.hero .cap .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+.hero .cap .loc{font-family:var(--fm);font-size:.74rem;opacity:.85}
+.hero .stk{position:absolute;z-index:2;width:52px;height:52px;top:54px;right:16px}
+
+.sectitle{display:flex;align-items:baseline;justify-content:space-between;margin:22px 2px 12px}
+.sectitle .h{font-family:var(--fd);text-transform:uppercase;font-size:1.2rem}
+.sectitle .c{font-family:var(--fm);font-size:.72rem;color:var(--subtle)}
+
+/* pair grid (the improved cards) */
+.pairgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pcard{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp);cursor:pointer;display:flex;flex-direction:column}
+.pcard .imgwrap{height:140px}
+.pcard .b{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pcard .t{font-weight:700;font-size:.9rem;line-height:1.12}
+.pcard .r{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:6px}
+.pcard .pr{font-family:var(--fm);font-weight:700;font-size:.88rem}
+.pcard .loc{font-family:var(--fm);font-size:.62rem;color:var(--subtle)}
+.pcard .tag{position:absolute;top:8px;left:8px;z-index:2}
+
+/* horizontal scroller row */
+.hrow{display:flex;gap:12px;overflow-x:auto;padding:2px 0 6px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.hrow::-webkit-scrollbar{height:0}
+.hmini{flex:0 0 150px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp);cursor:pointer}
+.hmini .imgwrap{height:120px}
+.hmini .b{padding:10px}
+.hmini .t{font-weight:700;font-size:.82rem;line-height:1.1}
+.hmini .pr{font-family:var(--fm);font-weight:700;font-size:.8rem;margin-top:6px}
+
+/* category band */
+.catband{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.catt{border-radius:var(--r-lg);border:var(--st) solid var(--ink);padding:16px;min-height:84px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;cursor:pointer}
+.catt .l{font-family:var(--fd);text-transform:uppercase;font-size:1.05rem;line-height:.95}
+.catt.g{background:var(--green)}.catt.y{background:var(--yellow)}.catt.b{background:var(--blue)}.catt.p{background:var(--pink)}
+.catt .stk{position:absolute;right:-6px;bottom:-6px;width:48px;height:48px}
+
+/* ---- listing detail ---- */
+.lhead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.gallery{position:relative;margin:0 16px;border-radius:var(--r-2xl);border:var(--st) solid var(--ink);overflow:hidden;aspect-ratio:1;background:var(--p2)}
+.gallery .stk{position:absolute;top:12px;right:12px;width:50px;height:50px;z-index:2}
+.gallery .tag{position:absolute;top:12px;left:12px;z-index:2}
+.thumbs{display:flex;gap:10px;margin:12px 16px 0}
+.thumb{width:58px;height:58px;border-radius:var(--r-md);border:var(--st) solid var(--ink);overflow:hidden;cursor:pointer;opacity:.6}
+.thumb.on{opacity:1;border-color:var(--purple)}
+.linfo{padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.linfo h1{font-family:var(--fd);text-transform:uppercase;font-size:1.9rem;line-height:.94;letter-spacing:-.02em}
+.priceblock{display:flex;align-items:flex-end;gap:8px}
+.priceblock .n{font-family:var(--fm);font-weight:700;font-size:2.4rem;line-height:.9}
+.priceblock .u{font-family:var(--fm);font-size:.9rem;color:var(--muted);padding-bottom:3px}
+.metarow{display:flex;flex-wrap:wrap;gap:8px}
+.desc{color:var(--muted);font-size:.95rem;line-height:1.5}
+.detail{display:grid;grid-template-columns:1fr 1fr;gap:var(--st);overflow:hidden;border-radius:var(--r-lg);border:var(--st) solid var(--ink);background:var(--ink)}
+.detail>div{background:var(--pp);padding:12px}
+.detail dt{font-family:var(--fm);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--subtle)}
+.detail dd{font-weight:600;margin-top:3px;font-size:.9rem}
+.seller{display:flex;align-items:center;gap:11px;background:var(--ink);color:var(--on-dark);border-radius:var(--r-lg);padding:12px;cursor:pointer}
+.seller .av{width:42px;height:42px;border-radius:11px;background:var(--yellow);color:var(--ink);font-family:var(--fd);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.seller .h{font-weight:700;display:flex;align-items:center;gap:5px}
+.seller .m{font-family:var(--fm);font-size:.7rem;color:#bdbcb4}
+.seller .v{margin-left:auto;background:var(--pp);color:var(--ink);border:none;border-radius:var(--r-pill);padding:8px 14px;font-weight:700;font-family:var(--fb);cursor:pointer}
+.review{border-radius:var(--r-lg);border:var(--st) solid var(--ink);background:var(--pp);padding:13px}
+.review .r{display:flex;justify-content:space-between}
+.review .s{font-family:var(--fm);font-weight:700}
+.review .t{font-family:var(--fm);font-size:.68rem;color:var(--subtle)}
+
+/* sticky buy bar (within listing) */
+.buybar{position:absolute;left:0;right:0;bottom:0;z-index:24;padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.buybar .inner{display:flex;align-items:center;gap:10px;background:var(--ink);border-radius:var(--r-2xl);padding:11px}
+.buybar .pr{display:flex;flex-direction:column;padding:0 6px 0 8px;color:#fff}
+.buybar .pr .k{font-family:var(--fm);font-size:.56rem;text-transform:uppercase;color:#bdbcb4}
+.buybar .pr .n{font-family:var(--fm);font-weight:700;font-size:1.05rem;line-height:1}
+.buybar .buy{flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:15px;font-weight:700;font-family:var(--fb);font-size:1rem;cursor:pointer}
+.buybar .cc{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;padding:0;background:none;flex:0 0 auto}
+.buybar .cc img{width:50px;height:50px}
+.walletnote{position:absolute;left:16px;right:16px;bottom:84px;z-index:23;background:var(--purple-soft);border:var(--st) solid var(--purple);color:var(--purple-press);border-radius:var(--r-pill);padding:8px 14px;font-family:var(--fm);font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:7px;justify-content:center}
+
+/* ---- generic sheet header ---- */
+.shead{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:var(--st) solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:10}
+.shead .t{font-family:var(--fd);text-transform:uppercase;font-size:1.15rem}
+.shead .sp{flex:1}
+
+/* ---- cart ---- */
+.citem{display:flex;align-items:center;gap:12px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);background:var(--pp);padding:11px;margin-bottom:10px}
+.citem .th{width:54px;height:54px;border-radius:var(--r-md);border:var(--st) solid var(--ink);object-fit:cover;flex:0 0 auto}
+.citem .t{font-weight:700;font-size:.9rem;line-height:1.1}
+.citem .pr{font-family:var(--fm);font-size:.78rem;color:var(--muted);margin-top:3px}
+.qty{display:flex;align-items:center;gap:8px;margin-left:auto}
+.qty button{width:30px;height:30px;border-radius:9px;border:var(--st) solid var(--ink);background:var(--pp);font-weight:700;cursor:pointer;font-size:1rem;line-height:1}
+.qty .n{font-family:var(--fm);font-weight:700;min-width:18px;text-align:center}
+.summary{border-radius:var(--r-lg);border:var(--st) solid var(--ink);background:var(--purple);color:#fff;padding:16px;margin-top:6px}
+.summary .ln{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-family:var(--fm);font-size:.85rem}
+.summary .ln.big{font-size:1.05rem;font-weight:700;margin-bottom:14px}
+.summary .ln.big .n{font-size:1.5rem}
+
+/* ---- checkout / payment ---- */
+.payseg{display:flex;gap:0;border:var(--st) solid var(--ink);border-radius:var(--r-pill);overflow:hidden;background:var(--pp)}
+.payseg button{flex:1;border:none;background:none;padding:12px;font-weight:700;font-family:var(--fb);cursor:pointer}
+.payseg button.on{background:var(--ink);color:#fff}
+.qr{width:200px;height:200px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);margin:6px auto;background:
+  conic-gradient(from 0deg,#121212 0 25%,#fff 0 50%,#121212 0 75%,#fff 0)
+  ,repeating-conic-gradient(#121212 0 12.5%,#fff 0 25%);background-size:24px 24px;display:flex;align-items:center;justify-content:center}
+.qr .mid{width:50px;height:50px;background:#fff;border:var(--st) solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);color:var(--purple)}
+.countdown{font-family:var(--fm);font-weight:700;text-align:center;margin-top:10px}
+.tokenbox{width:100%;min-height:90px;border-radius:var(--r-lg);border:var(--st) dashed var(--ink);background:var(--pp);padding:13px;font-family:var(--fm);font-size:.8rem;color:var(--muted);resize:none}
+
+/* ---- paid success ---- */
+.paid{background:var(--green);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px;position:relative;overflow:hidden}
+.paid .stk{position:absolute;width:56px;height:56px}
+.paid .check{width:118px;height:118px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:2}
+.paid .check svg path{stroke-dasharray:40;stroke-dashoffset:40}
+.paid.go .check svg path{animation:draw .55s var(--ease) .15s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.paid h2{font-family:var(--fd);text-transform:uppercase;font-size:2rem;line-height:.95;z-index:2}
+.paid .amt{font-family:var(--fm);font-weight:700;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:9px 18px;z-index:2}
+.paid .receipt{background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-lg);padding:15px;width:100%;z-index:2;font-family:var(--fm);font-size:.82rem;display:flex;flex-direction:column;gap:9px}
+.paid .receipt .ln{display:flex;justify-content:space-between}
+.paid .loop{display:flex;gap:10px;width:100%;z-index:2;margin-top:4px}
+
+/* ---- messages ---- */
+.thread-item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:var(--st) solid var(--ink);cursor:pointer}
+.thread-item .av{width:46px;height:46px;border-radius:13px;object-fit:cover;flex:0 0 auto;border:var(--st) solid var(--ink)}
+.thread-item .t{font-weight:700}
+.thread-item .last{font-size:.84rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.thread-item .meta{margin-left:auto;text-align:right;flex:0 0 auto}
+.thread-item .time{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+.thread-item .unread{display:inline-block;margin-top:5px;background:var(--purple);color:#fff;font-family:var(--fm);font-size:.6rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;line-height:18px}
+.msgs{display:flex;flex-direction:column;gap:10px;padding:16px}
+.msg{max-width:78%;padding:11px 14px;border-radius:var(--r-lg);font-size:.9rem;line-height:1.35}
+.msg.them{background:var(--pp);border:var(--st) solid var(--ink);align-self:flex-start;border-bottom-left-radius:5px}
+.msg.me{background:var(--purple);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+.msg .ctx{display:flex;gap:9px;align-items:center;background:rgba(0,0,0,.06);border-radius:10px;padding:7px;margin-bottom:7px}
+.msg.me .ctx{background:rgba(255,255,255,.15)}
+.msg .ctx img{width:34px;height:34px;border-radius:7px;object-fit:cover}
+.composer{display:flex;gap:9px;padding:12px 16px;border-top:var(--st) solid var(--ink);background:var(--paper)}
+.composer input{flex:1;border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:11px 16px;font-family:var(--fb);outline:none}
+
+/* ---- wallet ---- */
+.balance{background:var(--ink);color:#fff;border-radius:var(--r-2xl);padding:22px;position:relative;overflow:hidden}
+.balance .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:#bdbcb4}
+.balance .big{font-family:var(--fm);font-weight:700;font-size:3rem;line-height:.95;margin-top:6px}
+.balance .big span{font-size:1rem;color:#bdbcb4}
+.balance .stk{position:absolute;right:14px;top:14px;width:54px;height:54px}
+.wbtns{display:flex;gap:10px;margin-top:14px}
+.tx{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:var(--st) solid var(--ink)}
+.tx .d{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);flex:0 0 auto}
+.tx .d.out{background:var(--pink)}.tx .d.in{background:var(--green)}
+.tx .t{font-weight:700;font-size:.9rem}
+.tx .s{font-family:var(--fm);font-size:.66rem;color:var(--subtle)}
+.tx .amt{margin-left:auto;font-family:var(--fm);font-weight:700}
+
+/* ---- profile ---- */
+.phead{background:var(--yellow);padding:24px 16px 18px;border-bottom:var(--st) solid var(--ink);position:relative;overflow:hidden}
+.phead .av{width:78px;height:78px;border-radius:20px;border:var(--st) solid var(--ink);object-fit:cover}
+.phead h2{font-family:var(--fd);text-transform:uppercase;font-size:1.9rem;margin-top:12px;display:flex;align-items:center;gap:8px}
+.phead .npub{font-family:var(--fm);font-size:.7rem;color:#6b5e16;margin-top:4px}
+.phead .stk{position:absolute;right:14px;top:14px;width:60px;height:60px}
+.pstats{display:flex;gap:10px;margin-top:14px}
+.pstat{flex:1;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-lg);padding:11px;text-align:center}
+.pstat .n{font-family:var(--fm);font-weight:700;font-size:1.2rem}
+.pstat .k{font-family:var(--fm);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px}
+.menu{display:flex;flex-direction:column;gap:10px;padding:16px}
+.menuitem{display:flex;align-items:center;gap:12px;border:var(--st) solid var(--ink);border-radius:var(--r-lg);background:var(--pp);padding:15px;font-weight:700;cursor:pointer}
+.menuitem .chev{margin-left:auto;color:var(--subtle)}
+.menuitem.tilt:nth-child(odd){transform:rotate(-1deg)}
+.menuitem.tilt:nth-child(even){transform:rotate(1deg)}
+
+/* toast */
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);z-index:40;background:var(--ink);color:#fff;font-weight:700;font-size:.86rem;padding:12px 18px;border-radius:var(--r-pill);display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast img{width:24px;height:24px}
+
+/* ============================ B1 STICKER PROFILE ============================ */
+.profile-screen{background:var(--yellow);height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.profile-screen .ptop{display:flex;align-items:center;justify-content:space-between;padding:18px 20px}
+.profile-screen .ptop .x,.profile-screen .ptop .gear{width:40px;height:40px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer}
+.profile-screen .ptop .ttl{font-family:var(--fm);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase}
+.profile-screen .pstk{position:absolute;top:62px;right:22px;width:78px;height:78px;z-index:1;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tilts{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:18px 22px 0;position:relative;z-index:2}
+.tilt{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.01em;font-size:1.7rem;padding:14px 30px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);cursor:pointer;transition:transform .28s var(--ease)}
+.tilt:nth-child(1){transform:rotate(-4deg);background:var(--pink)}
+.tilt:nth-child(2){transform:rotate(2.5deg);background:var(--green);margin-left:24px}
+.tilt:nth-child(3){transform:rotate(-2deg);background:var(--pp);margin-left:8px}
+.tilt:nth-child(4){transform:rotate(3deg);background:var(--blue);margin-left:40px}
+.tilt:nth-child(5){transform:rotate(-3deg);background:var(--pp);margin-left:14px}
+@media(hover:hover){.tilt:hover{transform:rotate(0) scale(1.04)}}
+.tilt:active{transform:rotate(0) scale(.97)}
+.qsheet{background:var(--pp);border-top-left-radius:var(--r-2xl);border-top-right-radius:var(--r-2xl);border-top:var(--st) solid var(--ink);border-left:var(--st) solid var(--ink);border-right:var(--st) solid var(--ink);margin:0 14px;padding:16px;display:flex;gap:12px}
+.qsheet .qa{flex:1;border-radius:var(--r-lg);border:var(--st) solid var(--ink);padding:15px;min-height:118px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;overflow:hidden}
+.qsheet .qa .qi{font-size:1.2rem}
+.qsheet .qa .qn{font-weight:700;font-size:.95rem;line-height:1.1}
+.qsheet .qa.pink{background:var(--pink)}
+.qsheet .qa.purple{background:var(--purple);color:#fff}
+
+/* ============================ CHOICE MODAL (B3) ============================ */
+.overlay{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(18,18,18,.001);opacity:0;visibility:hidden;transition:opacity .26s var(--ease),visibility .26s}
+.overlay.fill{background:var(--purple)} /* full-bleed accent behind modal */
+.overlay.fill-green{background:var(--green)}
+.overlay.scrim{background:rgba(18,18,18,.5)}
+.overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-2xl);padding:24px 20px;width:100%;max-width:340px;text-align:center;position:relative;transform:scale(.94);transition:transform .26s var(--ease)}
+.overlay.open .modal{transform:scale(1)}
+.modal .bub{display:flex;justify-content:center;margin-bottom:6px}
+.modal .bub img{width:64px;height:64px;margin-top:-46px}
+.modal h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.95;letter-spacing:-.02em}
+.modal p{color:var(--muted);font-size:.92rem;margin-top:8px;margin-bottom:18px}
+.modal .opts{display:flex;flex-direction:column;gap:10px}
+.modal .opts .ghost{background:none;border:none;color:var(--muted);font-weight:700;font-family:var(--fb);padding:6px;cursor:pointer}
+.modal .ovstk{position:absolute;z-index:1;width:64px;height:64px}
+
+/* ============================ ONE-WAY FLOW (checkout / create) ============================ */
+.oneway{height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.oneway.pu{background:var(--purple);color:#fff}
+.oneway.ye{background:var(--yellow)}
+.oneway.gr{background:var(--green)}
+.oneway .owtop{display:flex;align-items:center;gap:12px;padding:16px 20px}
+.oneway .owtop .x{width:38px;height:38px;border-radius:50%;border:var(--st) solid currentColor;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;color:inherit}
+.oneway.pu .owtop .x{border-color:rgba(255,255,255,.5)}
+.oneway .owtop .step{font-family:var(--fm);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;opacity:.9}
+.oneway .owtop .prog{margin-left:auto;display:flex;gap:5px}
+.oneway .owtop .prog i{width:22px;height:5px;border-radius:3px;background:currentColor;opacity:.3}
+.oneway .owtop .prog i.on{opacity:1}
+.owstk{position:absolute;z-index:1;width:64px;height:64px}
+.owcard{background:var(--pp);color:var(--ink);border:var(--st) solid var(--ink);border-radius:var(--r-2xl);margin:auto 20px;padding:24px 22px;position:relative;z-index:2;display:flex;flex-direction:column;gap:14px;max-height:calc(100% - 200px);overflow-y:auto}
+.owcard::-webkit-scrollbar{width:0}
+.owcard .lead{font-family:var(--fm);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.owcard h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.95;letter-spacing:-.02em}
+.owcard p{color:var(--muted);font-size:.92rem}
+.owcard .ownav{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.owcard .ownav .n{font-family:var(--fm);font-size:.8rem;color:var(--muted)}
+.owcard .next{width:54px;height:54px;border-radius:50%;background:var(--ink);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.owcard .nextwide{background:var(--ink);color:#fff;border:none;border-radius:var(--r-pill);padding:15px 24px;font-weight:700;font-family:var(--fb);cursor:pointer;width:100%}
+.optcard{display:flex;align-items:center;gap:12px;border:var(--st) solid var(--ink);border-radius:var(--r-lg);padding:14px;cursor:pointer;text-align:left;background:var(--pp);font-family:var(--fb)}
+.optcard.sel{background:var(--ink);color:#fff}
+.optcard .oi{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:1.1rem;border:var(--st) solid currentColor}
+.optcard .ot{font-weight:700}.optcard .od{font-size:.76rem;opacity:.7;font-family:var(--fm)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-family:var(--fm);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea{border:var(--st) solid var(--ink);border-radius:var(--r-md);padding:12px 14px;font-family:var(--fb);font-size:.92rem;outline:none;background:var(--pp);width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--purple)}
+.warn{display:flex;gap:9px;align-items:flex-start;background:var(--ys);border:var(--st) solid var(--ink);border-radius:var(--r-md);padding:11px;font-size:.8rem}
+.reviewline{display:flex;justify-content:space-between;font-size:.9rem;padding:9px 0;border-bottom:var(--st) solid var(--p2)}
+.reviewline .k{color:var(--muted)}
+
+/* ============================ ORDERS / TIMELINE / REVIEW ============================ */
+.orow{display:flex;align-items:center;gap:12px;border:var(--st) solid var(--ink);border-radius:var(--r-lg);background:var(--pp);padding:12px;margin-bottom:10px;cursor:pointer}
+.orow .th{width:54px;height:54px;border-radius:var(--r-md);border:var(--st) solid var(--ink);object-fit:cover;flex:0 0 auto}
+.orow .t{font-weight:700;font-size:.9rem;line-height:1.1}
+.orow .sub{font-family:var(--fm);font-size:.66rem;color:var(--subtle);margin-top:3px}
+.statuschip{font-family:var(--fm);font-size:.6rem;font-weight:700;text-transform:uppercase;padding:4px 9px;border-radius:var(--r-pill);border:var(--st) solid var(--ink)}
+.statuschip.paid{background:var(--green)}.statuschip.ship{background:var(--blue)}.statuschip.done{background:var(--ink);color:#fff}.statuschip.pend{background:var(--yellow)}
+.timeline{position:relative;padding-left:30px;margin:8px 0}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--ink)}
+.tnode{position:relative;margin-bottom:18px}
+.tnode::before{content:"";position:absolute;left:-26px;top:2px;width:16px;height:16px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp)}
+.tnode.on::before{background:var(--green)}
+.tnode .tt{font-weight:700;font-size:.9rem}
+.tnode .td{font-family:var(--fm);font-size:.66rem;color:var(--subtle);margin-top:2px}
+.stars{display:flex;gap:8px;justify-content:center;font-size:2rem;margin:8px 0}
+.stars button{background:none;border:none;cursor:pointer;color:var(--ink);opacity:.25;transition:opacity .15s,transform .15s}
+.stars button.on{opacity:1;color:var(--yellow);transform:scale(1.1)}
+
+/* ============================ SHOP / COMMUNITY ============================ */
+.shopbanner{height:120px;position:relative;border-bottom:var(--st) solid var(--ink)}
+.shopbanner img{width:100%;height:100%;object-fit:cover}
+.shopav{width:74px;height:74px;border-radius:18px;border:var(--st) solid var(--ink);object-fit:cover;margin-top:-44px;position:relative;background:var(--yellow)}
+.followbtn{border:var(--st) solid var(--ink);background:var(--purple);color:#fff;border-radius:var(--r-pill);padding:10px 22px;font-weight:700;font-family:var(--fb);cursor:pointer}
+.followbtn.on{background:var(--pp);color:var(--ink)}
+.tabs{display:flex;gap:8px;border-bottom:var(--st) solid var(--ink);padding:0 16px}
+.tabs button{background:none;border:none;padding:12px 4px;font-weight:700;font-family:var(--fb);cursor:pointer;border-bottom:3px solid transparent;color:var(--muted)}
+.tabs button.on{color:var(--ink);border-color:var(--purple)}
+.commrow{display:flex;align-items:center;gap:12px;border:var(--st) solid var(--ink);border-radius:var(--r-lg);background:var(--pp);padding:13px;margin-bottom:10px;cursor:pointer}
+.commrow .ci{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex:0 0 auto;border:var(--st) solid var(--ink)}
+
+/* empty / loading */
+.empty{text-align:center;padding:70px 24px}
+.empty img{width:80px;margin:0 auto 16px}
+.skel{background:linear-gradient(90deg,var(--p2) 25%,#e3e0d8 50%,var(--p2) 75%);background-size:200% 100%;animation:sh 1.2s linear infinite;border-radius:var(--r-md)}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* ============================ CHOSEN CARDS (from explorations) ============================ */
+i[class^="ph"],i[class*=" ph"]{line-height:1;display:inline-block}
+
+/* H1 — overlay-bottom + numeral (featured carousel item) */
+.h1c{position:relative;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;height:300px;color:#fff;cursor:pointer}
+.h1c .imgwrap{position:absolute;inset:0}.h1c .imgwrap img{width:100%;height:100%;object-fit:cover}
+.h1c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.82))}
+.h1c .num{position:absolute;top:14px;left:16px;z-index:2;font-family:var(--fd);font-size:2.4rem;mix-blend-mode:difference}
+.h1c .chips{position:absolute;top:16px;right:14px;z-index:2;display:flex;gap:6px}
+.h1c .stk{position:absolute;z-index:2;width:48px;height:48px;top:52px;right:16px}
+.h1c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px}
+.h1c .cap h3{font-family:var(--fd);text-transform:uppercase;font-size:1.6rem;line-height:.92;letter-spacing:-.02em}
+.h1c .cap .meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.h1c .cap .pr{font-family:var(--fm);font-weight:700;font-size:1.1rem}
+.h1c .cap .loc{font-family:var(--fm);font-size:.74rem;opacity:.85}
+/* carousel rail */
+.carousel{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 4px;scroll-behavior:smooth}
+.carousel::-webkit-scrollbar{height:0}
+.carousel>*{flex:0 0 86%;scroll-snap-align:center}
+
+/* H2 — split, text on purple (category feature) */
+.h2c{display:grid;grid-template-columns:1fr 1.05fr;height:220px;background:var(--purple);color:#fff;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;cursor:pointer;position:relative}
+.h2c .imgwrap{height:100%}.h2c .imgwrap img{width:100%;height:100%;object-fit:cover}
+.h2c .side{padding:18px;display:flex;flex-direction:column;justify-content:space-between}
+.h2c .side .k{font-family:var(--fm);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:#cfcbff}
+.h2c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.92;letter-spacing:-.02em;margin-top:auto}
+.h2c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.05rem;margin-top:8px}
+.h2c .side .go{margin-top:12px;align-self:flex-start;background:#fff;color:var(--purple);border:none;border-radius:var(--r-pill);padding:9px 18px;font-weight:700;font-family:var(--fb);display:inline-flex;align-items:center;gap:6px}
+
+/* H4 — full-bleed accent, inset photo (break card, centered) */
+.h4c{background:var(--green);padding:16px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);display:flex;flex-direction:column;cursor:pointer}
+.h4c .top{display:flex;justify-content:space-between;align-items:center}
+.h4c .top .k{font-family:var(--fm);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase}
+.h4c .imgwrap{height:190px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);margin:14px 0;overflow:hidden}
+.h4c .imgwrap img{width:100%;height:100%;object-fit:cover}
+.h4c h3{font-family:var(--fd);text-transform:uppercase;font-size:1.4rem;line-height:.92;letter-spacing:-.02em}
+.h4c .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:5px}
+.h4c .pr{font-family:var(--fm);font-weight:700;font-size:1.1rem}
+
+/* H5 — wide editorial w/ description (DEFAULT list card) */
+.h5c{display:grid;grid-template-columns:42% 1fr;background:var(--pp);border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;cursor:pointer;min-height:158px}
+.h5c .imgwrap{border-right:var(--st) solid var(--ink);overflow:hidden}
+.h5c .imgwrap img{width:100%;height:100%;object-fit:cover}
+.h5c .side{padding:15px;display:flex;flex-direction:column}
+.h5c .side .tagrow{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+.h5c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.12rem;line-height:.95;letter-spacing:-.02em}
+.h5c .side p{color:var(--muted);font-size:.8rem;margin-top:7px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.h5c .side .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px}
+.h5c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+.h5c .side .loc{font-family:var(--fm);font-size:.66rem;color:var(--subtle)}
+
+/* P1 — roomy, price chip (near-you horizontal scroll) */
+.p1c{flex:0 0 200px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp);cursor:pointer;scroll-snap-align:start}
+.p1c .imgwrap{height:150px;overflow:hidden}.p1c .imgwrap img{width:100%;height:100%;object-fit:cover}
+.p1c .b{padding:13px}
+.p1c .t{font-weight:700;font-size:.92rem;line-height:1.12}
+.p1c .row{display:flex;align-items:center;justify-content:space-between;margin-top:11px}
+.p1c .pr{font-family:var(--fm);font-weight:700;font-size:.86rem;background:var(--yellow);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:5px 11px}
+.p1c .loc{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+
+/* Solid compact — hard color + text + element, full size (category tiles) */
+.solidc{border-radius:var(--r-lg);border:var(--st) solid var(--ink);padding:16px;min-height:120px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;cursor:pointer}
+.solidc .k{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.solidc .l{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;line-height:.95;letter-spacing:-.02em}
+.solidc .stk{position:absolute;right:-8px;bottom:-8px;width:58px;height:58px}
+.solidc.g{background:var(--green)}.solidc.y{background:var(--yellow)}.solidc.b{background:var(--blue)}.solidc.p{background:var(--pink)}.solidc.o{background:var(--orange)}.solidc.pu{background:var(--purple);color:#fff}
+
+/* PDF Issue 3: titles wrap to 2 lines, never truncate mid-word */
+.h5c .side h3{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* top-seller card (home rail) */
+.sellerc{flex:0 0 188px;scroll-snap-align:start;border-radius:var(--r-lg);border:var(--st) solid var(--ink);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.sellerc.p{background:var(--pink)}.sellerc.b{background:var(--blue)}.sellerc.g{background:var(--green)}.sellerc.y{background:var(--yellow)}.sellerc.o{background:var(--orange)}
+.sellerc .srow{display:flex;align-items:center;justify-content:space-between}
+.sellerc .sav{width:48px;height:48px;border-radius:13px;border:var(--st) solid var(--ink);object-fit:cover}
+.sellerc .srank{font-family:var(--fm);font-weight:700;font-size:.78rem;background:var(--ink);color:#fff;border-radius:var(--r-pill);padding:4px 9px}
+.sellerc .sname{font-family:var(--fd);text-transform:uppercase;font-size:1rem;line-height:.95;margin-top:8px}
+.sellerc .shandle{font-family:var(--fm);font-size:.68rem;opacity:.7}
+.sellerc .sfoot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-family:var(--fm);font-weight:700;font-size:.74rem}
+
+/* ============================ COLORED CATEGORY SCREEN ============================ */
+.catscreen{height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cathero{padding:16px 18px 22px;position:relative;border-bottom:var(--st) solid var(--ink);overflow:hidden;flex:0 0 auto}
+.cathero .ctop{display:flex;align-items:center;justify-content:space-between}
+.cathero .x{width:40px;height:40px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+.cathero .kk{font-family:var(--fm);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase}
+.cathero h1{font-family:var(--fd);text-transform:uppercase;font-size:3rem;line-height:.86;letter-spacing:-.03em;margin-top:18px}
+.cathero .sub{font-family:var(--fm);font-size:.82rem;margin-top:10px;opacity:.85}
+.cathero .bigstk{position:absolute;right:-14px;top:42px;width:120px;height:120px;opacity:.9;animation:spin 22s linear infinite}
+.cathero.on,.cathero.on .x{color:#fff}
+.cathero.on .x{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.6)}
+/* enter pop for the colored hero */
+@keyframes catpop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.screen.active .cathero{animation:catpop .42s var(--ease) both}
+
+/* ============================ COMMUNITY (creative bento) ============================ */
+.commhero{padding:18px 16px;position:relative;overflow:hidden}
+.commhero h1{font-family:var(--fd);text-transform:uppercase;font-size:2.4rem;line-height:.9;letter-spacing:-.02em}
+.commhero h1 .swap{display:inline-block;height:.74em;vertical-align:-.08em;animation:spin 9s linear infinite}
+.commhero p{color:var(--muted);font-size:.92rem;margin-top:10px;max-width:88%}
+.commbento{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
+.commtile{border-radius:var(--r-lg);border:var(--st) solid var(--ink);padding:15px;min-height:128px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;cursor:pointer}
+.commtile.wide{grid-column:1 / -1;min-height:96px;flex-direction:row;align-items:center;gap:14px}
+.commtile.p{background:var(--pink)}.commtile.y{background:var(--yellow)}.commtile.g{background:var(--green)}.commtile.b{background:var(--blue)}.commtile.pu{background:var(--purple);color:#fff}
+.commtile .emoji{font-size:1.7rem}
+.commtile .nm{font-family:var(--fd);text-transform:uppercase;font-size:1.15rem;line-height:.95;margin-top:auto}
+.commtile .mc{font-family:var(--fm);font-size:.66rem;margin-top:6px;opacity:.8}
+.commtile .stk{position:absolute;right:-10px;bottom:-10px;width:54px;height:54px;opacity:.85}
+.commtile.wide .avstack{display:flex;flex:0 0 auto}
+.commtile.wide .avstack img{width:34px;height:34px;border-radius:50%;border:var(--st) solid var(--ink);object-fit:cover;margin-left:-12px}
+.commtile.wide .avstack img:first-child{margin-left:0}
+/* community detail header */
+.commdhead{position:relative;border-bottom:var(--st) solid var(--ink)}
+.commdhead .banner{height:130px;position:relative;overflow:hidden}
+.commdhead .banner img{width:100%;height:100%;object-fit:cover}
+.commdhead .bd{padding:0 16px 14px}
+.commdhead .badge{width:64px;height:64px;border-radius:18px;border:var(--st) solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin-top:-34px;position:relative;background:var(--yellow)}
+.commdhead h1{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;margin-top:10px}
+.commstat{display:flex;gap:10px;margin-top:12px}
+.commstat .cs{flex:1;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-md);padding:9px;text-align:center}
+.commstat .cs .n{font-family:var(--fm);font-weight:700;font-size:1.05rem}
+.commstat .cs .k{font-family:var(--fm);font-size:.56rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px}
+
+/* two-group labeled filter (PDF: type vs category) */
+.filtergroup{padding:0 16px}
+.filterlbl{font-family:var(--fm);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle);margin:2px 0 7px}
+.filterbreak{height:var(--st);background:var(--p2);margin:12px 16px}
+
+/* in-thread system review prompt (PDF Issue 1) */
+.sysprompt{align-self:stretch;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px}
+.sysprompt .sp-h{display:flex;align-items:center;gap:8px;font-weight:700}
+.sysprompt .sp-h .badge{width:30px;height:30px;border-radius:9px;background:var(--yellow);border:var(--st) solid var(--ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sysprompt .sp-d{font-size:.84rem;color:var(--muted)}
+.sysprompt .sp-row{display:flex;gap:8px;flex-wrap:wrap}
+.sysprompt .sp-row .pill{cursor:pointer}
+
+/* claim / seller-to-buyer recs */
+.claimamt{background:var(--green);border:var(--st) solid var(--ink);border-radius:var(--r-2xl);padding:24px;text-align:center;position:relative;overflow:hidden}
+.claimamt .big{font-family:var(--fm);font-weight:700;font-size:2.6rem;line-height:.95}
+.claimamt .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.claimamt .stk{position:absolute;width:48px;height:48px}
+.recrow{display:flex;align-items:center;gap:12px;border:var(--st) solid var(--ink);border-radius:var(--r-lg);background:var(--pp);padding:11px;margin-bottom:10px;cursor:pointer}
+.recrow .th{width:50px;height:50px;border-radius:var(--r-md);border:var(--st) solid var(--ink);object-fit:cover;flex:0 0 auto}
+.recrow .t{font-weight:700;font-size:.9rem;line-height:1.1}
+.recrow .pr{font-family:var(--fm);font-weight:700;font-size:.82rem;margin-top:3px}
+.recrow .buyc{margin-left:auto;background:var(--ink);color:#fff;border:none;border-radius:var(--r-pill);padding:9px 13px;font-weight:700;font-family:var(--fb);font-size:.78rem;cursor:pointer;flex:0 0 auto}
+
+/* section title with optional "see all" */
+.sectitle .see{font-family:var(--fb);font-weight:700;font-size:.8rem;color:var(--purple);background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+
+/* ============================ PREMIUM TRANSITIONS ============================ */
+/* staggered enter for feed children */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.stagger>*{animation:rise .5s var(--ease) both}
+/* hover lift on desktop only */
+@media (hover:hover){
+  .h5c,.p1c,.h4c,.h2c,.h1c,.solidc{transition:transform .25s var(--ease)}
+  .h5c:hover,.p1c:hover,.h4c:hover,.h2c:hover,.h1c:hover,.solidc:hover{transform:translateY(-3px)}
+}
+/* sticky bar gains a hairline shadow-free separation when scrolled (stroke only) */
+.bar{transition:border-color .2s var(--ease)}
+/* number pop when cart badge changes */
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.bump{animation:pop .35s var(--ease)}
+</style>
+</head>
+<body>
+<div class="device" id="app">
+  <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+  <div class="stage" id="stage"><!-- screens injected --></div>
+  <div class="toast" id="toast"></div>
+  <nav class="nav" id="nav">
+    <div class="navbar">
+      <button class="navbtn on" data-go="market"><i class="ph-bold ph-squares-four" style="font-size:22px"></i><span class="lbl">Browse</span></button>
+      <button class="navbtn" data-go="communities"><i class="ph-bold ph-users-three" style="font-size:22px"></i><span class="lbl">Community</span></button>
+      <button class="navbtn" data-go="messages"><i class="ph-bold ph-chat-circle" style="font-size:22px"></i><span class="lbl">Inbox</span></button>
+      <button class="navbtn" data-go="wallet"><i class="ph-bold ph-wallet" style="font-size:22px"></i><span class="lbl">Wallet</span></button>
+      <button class="navbtn" data-go="profile"><i class="ph-bold ph-user" style="font-size:22px"></i><span class="lbl">You</span></button>
+    </div>
+  </nav>
+  <div class="overlay" id="overlay"><div class="modal" id="modalbox"></div></div>
+</div>
+
+<script>
+/* ============================ DATA ============================ */
+const U = (id,w=800)=>`https://images.unsplash.com/photo-${id}?w=${w}`;
+const L = [
+  {id:'lst_007',t:'Risograph zine — "Soft Static" no.4',pr:12000,tot:13500,loc:'Berlin',cat:'Art & Print',type:'Physical',cond:'New',img:'1544716278-ca5e3f4abd8c',tint:'ps',seller:'ekko',rating:4.8,nrev:81,desc:'32 pages, 2-color riso on recycled stock. Limited run of 100.'},
+  {id:'lst_001',t:'Hand-thrown stoneware mug',pr:18000,tot:20500,loc:'Lisbon',cat:'Ceramics',type:'Physical',cond:'New',img:'1514228742587-6b1558fcca3d',tint:'ys',seller:'alice',rating:4.8,nrev:7,desc:'Wheel-thrown, matte oatmeal glaze. Holds ~350ml. Batch of six.'},
+  {id:'lst_005',t:'Vintage 35mm rangefinder',pr:240000,tot:248000,loc:'Tokyo',cat:'Photography',type:'Resale',cond:'Used · Excellent',img:'1452780212940-6f5c0d14d848',tint:'gs',seller:'daveshoots',rating:4.9,nrev:6,desc:'Fully serviced, light meter recalibrated. Includes 40mm f/1.7 lens.'},
+  {id:'lst_003',t:'Organic cotton tee',pr:32000,tot:35000,loc:'Austin',cat:'Apparel',type:'Physical',cond:'New',img:'1521572163474-6864f9cf17ab',tint:'gs',seller:'carol.makes',rating:4.7,nrev:4,desc:'240gsm garment-dyed cotton, unisex boxy fit. Pre-shrunk.',sizes:['S','M','L','XL']},
+  {id:'lst_002',t:'Refurbished 65% keyboard',pr:95000,tot:99000,loc:'Berlin',cat:'Electronics',type:'Resale',cond:'Refurbished',img:'1587829741301-dc798b83add3',tint:'bs',seller:'bobbuilds',rating:4.6,nrev:8,desc:'Lubed tactile switches, PBT keycaps. Cleaned, tested, hard case.'},
+  {id:'lst_009',t:'Merino beanie, hand-knit',pr:26000,tot:28500,loc:'Reykjavik',cat:'Apparel',type:'Physical',cond:'New',img:'1576871337632-b9aef4c17ab9',tint:'ps',seller:'mara.knits',rating:4.9,nrev:7,desc:'Soft 100% merino, ribbed cuff. Three colorways.'},
+  {id:'lst_011',t:'Cast-iron skillet, seasoned',pr:42000,tot:47000,loc:'Reykjavik',cat:'Kitchen',type:'Resale',cond:'Used · Good',img:'1593618998160-e34014e67546',tint:'ys',seller:'mara.knits',rating:4.7,nrev:7,desc:'10-inch pre-seasoned lifetime piece. Light surface patina.'},
+  {id:'lst_013',t:'Glazed ramen bowl, pair',pr:33000,tot:36000,loc:'Lisbon',cat:'Ceramics',type:'Physical',cond:'New',img:'1578749556568-bc2c40e68b61',tint:'gs',seller:'alice',rating:4.8,nrev:7,desc:'Two deep bowls, reactive celadon glaze. Dishwasher safe.'},
+  {id:'lst_016',t:'Wool throw blanket',pr:78000,tot:84000,loc:'Reykjavik',cat:'Home',type:'Physical',cond:'New',img:'1580301762395-21ce84d00bc6',tint:'bs',seller:'mara.knits',rating:4.9,nrev:7,desc:'Lambswool herringbone, 130×170cm. Natural undyed.'},
+  {id:'lst_008',t:'Lightroom preset pack',pr:28000,tot:28000,loc:'Remote',cat:'Photography',type:'Digital',cond:'New',img:'1542038784456-1ea8e935640e',tint:'ys',seller:'daveshoots',rating:4.9,nrev:6,desc:'12 presets emulating classic film stocks. Instant download.'}
+];
+const byId = id => L.find(x=>x.id===id);
+const sats = n => n.toLocaleString('en-US');
+const AV = {ekko:'1521119989659-a83eee488004',alice:'1494790108377-be9c29b29330','daveshoots':'1507003211169-0a1dd7228f2d','carol.makes':'1438761681033-6461ffad8d80','bobbuilds':'1500648767791-00dcc994a43e','mara.knits':'1534528741775-53994a69daeb'};
+const TINT = {ys:'var(--ys)',gs:'var(--gs)',ps:'var(--ps)',bs:'var(--bs)'};
+// category → accent (drives the colored category screen + tiles). 'on' = needs white text.
+const CATC = {
+  'Ceramics':{c:'green',k:'g',sk:'shape-smiley.svg'},
+  'Apparel':{c:'pink',k:'p',sk:'shape-heart-circle.svg',on:false},
+  'Photography':{c:'blue',k:'b',sk:'shape-sunstar-purple.svg'},
+  'Electronics':{c:'orange',k:'o',sk:'shape-starburst.svg'},
+  'Art & Print':{c:'pink',k:'p',sk:'shape-sparkle-4pt.svg'},
+  'Coffee':{c:'yellow',k:'y',sk:'shape-daisy-yellow.svg'},
+  'Kitchen':{c:'yellow',k:'y',sk:'shape-sun-rays.svg'},
+  'Home':{c:'blue',k:'b',sk:'shape-hand.svg'},
+  'Photography ':{c:'blue',k:'b'}
+};
+const catMeta = c => CATC[c] || {c:'purple',k:'pu',sk:'shape-sparkle-4pt.svg',on:true};
+// PDF Issue 3: one price style; "Free"/"Contact" instead of "0 sats".
+const priceStr = l => l.pr>0 ? `${sats(l.pr)} sats` : (l.free==='contact'?'Contact for price':'Free');
+// PDF Issue 4 / wallet-aware buy: current Shopstr wallet balance (sats).
+const WALLET_BAL = 182400;
+// Top sellers (home section) — derived-looking mock.
+const SELLERS = [
+  {h:'ekko',n:'Riso & Print',rating:4.9,sales:312,k:'p',cat:'Art & Print'},
+  {h:'mara.knits',n:'Slow Textiles',rating:4.9,sales:204,k:'b',cat:'Apparel'},
+  {h:'alice',n:'Clay by Alice',rating:4.8,sales:178,k:'g',cat:'Ceramics'},
+  {h:'daveshoots',n:'Dave Shoots Film',rating:4.9,sales:96,k:'y',cat:'Photography'}
+];
+
+/* ============================ STATE ============================ */
+const state = { cart:[ {id:'lst_001',q:1}, {id:'lst_003',q:2,size:'M'} ], pay:'lightning', current:null, co:{type:'ship'}, msgCtx:null, msgFromListing:false, payout:'shopstr' };
+const cartCount = () => state.cart.reduce((n,c)=>n+c.q,0);
+const cartTotal = () => state.cart.reduce((n,c)=>n+byId(c.id).pr*c.q,0);
+
+/* ============================ ROUTER ============================ */
+const stage = document.getElementById('stage');
+const NAVMAP = {market:'market',communities:'communities',messages:'messages',wallet:'wallet',profile:'profile'};
+let activeEl=null;
+function go(name, arg){
+  if(!SCREENS[name]){ toast('Coming soon'); return; }
+  const html = SCREENS[name](arg);
+  const el = document.createElement('section');
+  el.className='screen'; el.dataset.name=name; if(arg!=null) el.dataset.arg=arg; el.innerHTML=html;
+  stage.appendChild(el);
+  // leave old
+  const old=activeEl;
+  requestAnimationFrame(()=>{ el.classList.add('active'); if(old){ old.classList.add('leaving'); old.classList.remove('active'); setTimeout(()=>old.remove(),300);} });
+  activeEl=el;
+  // hide the global bottom nav on screens that own their bottom bar / are immersive
+  const NAV_HIDDEN=['listing','thread','paid','co_type','co_ship','co_pickup','co_account','co_pay','co_review','sellerNew','review','onboard','profile','payoutSetup','walletSend','walletReceive','withdrawHold'];
+  document.getElementById('nav').style.display = NAV_HIDDEN.includes(name)?'none':'';
+  // nav highlight
+  const navName = NAVMAP[name] ? name
+    : (name==='listing'||name==='search'||name==='category'||name==='newfeed'||name==='nearme'||name==='following'||name==='cart'?'market'
+    : name==='community'?'communities'
+    : name==='thread'?'messages'
+    : name==='walletSend'||name==='walletReceive'||name==='claim'?'wallet':null);
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('on', b.dataset.go===navName));
+  el.querySelector('.scroll')?.scrollTo(0,0);
+  bind(el);
+}
+function toast(msg, sticker){
+  const t=document.getElementById('toast');
+  t.innerHTML=(sticker?`<img src="assets/${sticker}.svg" alt="">`:'')+msg;
+  t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ============================ SHARED PARTIALS ============================ */
+const bar = (active) => `
+<div class="bar">
+  <div class="row">
+    <span class="brand" data-go="market">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+    <button class="ic press" data-toggle="search" aria-label="Search"><i class="ph-bold ph-magnifying-glass" style="font-size:18px"></i></button>
+    <button class="ic cart press" data-go="cart" aria-label="Cart"><b data-cartbadge>${cartCount()}</b><i class="ph-bold ph-shopping-cart-simple" style="font-size:18px"></i></button>
+  </div>
+  <div class="disc" data-disc>
+    <div>
+      <div class="search"><i class="ph-bold ph-magnifying-glass" style="font-size:16px;color:var(--subtle)"></i><input placeholder="Search by name, price, or seller" data-search></div>
+      <div class="filtergroup"><div class="filterlbl">Type</div>
+        <div class="filters" style="padding:0 0 2px">${['Physical','Digital','Services','Resale','Exchange','Swap'].map((f,i)=>`<span class="pill sm ${i===0?'ink':''}" data-filter="type:${f}">${f}</span>`).join('')}</div>
+      </div>
+      <div class="filterbreak"></div>
+      <div class="filtergroup"><div class="filterlbl">Category</div>
+        <div class="filters" style="padding:0 0 12px">${['All','Ceramics','Apparel','Photography','Electronics','Art & Print','Home','Kitchen'].map((f,i)=>`<span class="pill sm ${i===0?'ink':''}" data-filter="cat:${f}">${f}</span>`).join('')}</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+const pcard = (l)=>`
+<div class="pcard press" data-go="listing" data-id="${l.id}">
+  <div class="imgwrap" style="background:${TINT[l.tint]}">${l.type!=='Physical'?`<span class="tag pill sm ink">${l.type}</span>`:''}<img src="${U(l.img,500)}" alt="" loading="lazy"></div>
+  <div class="b"><div class="t">${l.t}</div><div class="r"><span class="pr">${priceStr(l)}</span><span class="loc">${l.loc}</span></div></div>
+</div>`;
+
+/* ---- chosen card renderers ---- */
+const heroCard=(l,n)=>`
+<div class="h1c press" data-go="listing" data-id="${l.id}">
+  <span class="num">${String(n).padStart(2,'0')}</span>
+  <span class="chips"><span class="pill sm ink">${l.cat}</span></span>
+  <img class="stk" src="assets/badge-bff-star.svg" alt="">
+  <div class="imgwrap"><img src="${U(l.img,800)}" alt=""></div>
+  <div class="cap"><h3>${l.t}</h3><div class="meta"><span class="pr">${sats(l.pr)} sats</span><span class="loc">★ ${l.rating} · ${l.loc}</span></div></div>
+</div>`;
+const h2Card=(l,title,tag,toListing)=>`
+<div class="h2c press" data-go="${toListing?'listing':'category'}" data-${toListing?'id':'cat'}="${toListing?l.id:l.cat}">
+  <div class="imgwrap"><img src="${U(l.img,500)}" alt=""></div>
+  <div class="side"><span class="k">${tag}</span><h3>${title||l.cat}</h3><span class="pr">from ${priceStr(l)}</span><button class="go">${toListing?'View item':'Shop '+l.cat} <i class="ph-bold ph-arrow-right"></i></button></div>
+</div>`;
+const h4Card=(l,k)=>`
+<div class="h4c press" data-go="listing" data-id="${l.id}">
+  <div class="top"><span class="k">${k}</span><span class="pill sm ink">${l.cat}</span></div>
+  <div class="imgwrap"><img src="${U(l.img,700)}" alt=""></div>
+  <h3>${l.t}</h3><div class="row"><span class="pr">${priceStr(l)}</span><span class="val" style="font-size:.74rem">${l.loc}</span></div>
+</div>`;
+const h5Card=(l,attrs='')=>`
+<div class="h5c press" data-go="listing" data-id="${l.id}" ${attrs}>
+  <div class="imgwrap" style="background:${TINT[l.tint]}"><img src="${U(l.img,500)}" alt="" loading="lazy"></div>
+  <div class="side">
+    <div class="tagrow"><span class="pill sm ${l.type!=='Physical'?'ink':'g'}">${l.type!=='Physical'?l.type:l.cond}</span><span class="pill sm">${l.cat}</span></div>
+    <h3>${l.t}</h3>
+    <p>${l.desc}</p>
+    <div class="foot"><span class="pr">${priceStr(l)}</span><span class="loc">★ ${l.rating} · ${l.loc}</span></div>
+  </div>
+</div>`;
+const p1Card=(l)=>`
+<div class="p1c press" data-go="listing" data-id="${l.id}">
+  <div class="imgwrap" style="background:${TINT[l.tint]}"><img src="${U(l.img,400)}" alt="" loading="lazy"></div>
+  <div class="b"><div class="t">${l.t}</div><div class="row"><span class="pr">${priceStr(l)}</span><span class="loc">${l.loc}</span></div></div>
+</div>`;
+// Top-seller card (home horizontal rail)
+const sellerCard=(s)=>`
+<div class="sellerc press ${s.k}" data-go="shop" data-slug="${s.h}">
+  <div class="srow"><img class="sav" src="${U(AV[s.h]||AV.ekko,160)}" alt=""><span class="srank val">★ ${s.rating}</span></div>
+  <div class="sname">${s.n}</div>
+  <div class="shandle val">@${s.h}</div>
+  <div class="sfoot"><span class="val">${sats(s.sales)} sold</span><i class="ph-bold ph-arrow-up-right"></i></div>
+</div>`;
+
+/* ============================ SCREENS ============================ */
+const SCREENS = {
+  /* ---------- MARKETPLACE (editorial) ---------- */
+  market(){
+    const feat=[L[0],L[2],L[4]];           // H1 carousel
+    const near=L.slice(5,9);                // P1 near-you scroll
+    const feed=[L[1],L[3]];                 // H5 default feed (before break)
+    const breakItem=L[8];                   // H4 break card
+    const feed2=[L[6],L[5],L[7]];           // H5 feed (after break)
+    let di=0; const d=()=>`style="animation-delay:${(di++)*60}ms"`;
+    return `${bar('market')}
+    <div class="scroll pb">
+      <div class="pad stagger">
+        <div class="filters" style="padding:0 0 14px;margin:0 -16px;padding-left:16px;padding-right:16px;animation-delay:0ms">
+          <span class="pill sm press" data-go="search"><i class="ph-bold ph-magnifying-glass"></i> Search</span>
+          <span class="pill sm press" data-go="newfeed"><i class="ph-bold ph-sparkle"></i> New</span>
+          <span class="pill sm press" data-go="nearme"><i class="ph-bold ph-map-pin"></i> Near me</span>
+          <span class="pill sm press" data-go="following"><i class="ph-bold ph-heart"></i> Following</span>
+          <span class="pill sm press" data-go="communities"><i class="ph-bold ph-users-three"></i> Communities</span>
+        </div>
+
+        <div class="sectitle" ${d()}><span class="h">Featured</span><span class="c">Swipe →</span></div>
+        <div class="carousel" data-carousel ${d()}>${feat.map((l,i)=>heroCard(l,i+1)).join('')}</div>
+
+        <div class="sectitle" ${d()}><span class="h">Browse categories</span></div>
+        <div class="catband" ${d()}>
+          <div class="solidc g press" data-go="category" data-cat="Ceramics"><span class="k">Shop</span><span class="l">Ceramics</span><img class="stk" src="assets/shape-smiley.svg" alt=""></div>
+          <div class="solidc p press" data-go="category" data-cat="Art & Print"><span class="k">Shop</span><span class="l">Zines &amp; print</span><img class="stk" src="assets/shape-sparkle-4pt.svg" alt=""></div>
+          <div class="solidc b press" data-go="category" data-cat="Photography"><span class="k">Shop</span><span class="l">Photography</span><img class="stk" src="assets/shape-sunstar-purple.svg" alt=""></div>
+          <div class="solidc o press" data-go="category" data-cat="Electronics"><span class="k">Shop</span><span class="l">Electronics</span><img class="stk" src="assets/shape-starburst.svg" alt=""></div>
+        </div>
+
+        <div class="sectitle" ${d()}><span class="h">Top sellers</span><span class="c">This week</span></div>
+        <div class="carousel" style="scroll-snap-type:none" ${d()}>${SELLERS.map(sellerCard).join('')}</div>
+
+        <div class="sectitle" ${d()}><span class="h">For you</span><button class="see" data-go="newfeed">See all <i class="ph-bold ph-arrow-right"></i></button></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${feed.map(l=>{const s=d();return h5Card(l,s)}).join('')}
+          <div ${d()}>${h4Card(breakItem,"Editor's pick")}</div>
+          ${feed2.map(l=>{const s=d();return h5Card(l,s)}).join('')}
+        </div>
+
+        <div class="sectitle" ${d()}><span class="h">Near you</span><span class="c">Berlin · 5km</span></div>
+        <div class="carousel" style="scroll-snap-type:none" ${d()}>${near.map(p1Card).join('')}</div>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- LISTING ---------- */
+  listing(id){
+    const l=byId(id)||L[0]; state.current=l.id;
+    const others=L.filter(x=>x.seller===l.seller && x.id!==l.id).slice(0,4);
+    return `
+    <div class="scroll pb" style="padding-bottom:120px">
+      <div class="lhead">
+        <button class="ic press" data-back><i class="ph-bold ph-arrow-left"></i></button>
+        <button class="ic press" data-fav style="background:var(--ink);color:#fff"><i class="ph-bold ph-heart"></i></button>
+      </div>
+      <div class="gallery">
+        <span class="tag pill sm ink">${l.cat}</span>
+        <img class="stk" src="assets/badge-bff-star.svg" alt="">
+        <div class="imgwrap" style="position:absolute;inset:0"><img src="${U(l.img)}" alt=""></div>
+      </div>
+      <div class="linfo">
+        <h1>${l.t}</h1>
+        <div class="priceblock"><span class="n">${sats(l.pr)}</span><span class="u">sats</span></div>
+        <div class="kick" style="margin-top:-8px">${sats(l.tot)} sats total with shipping</div>
+        <div class="metarow"><span class="pill sm g">${l.cond}</span><span class="pill sm">${l.loc}</span><span class="pill sm">${l.type}</span></div>
+        <p class="desc">${l.desc}</p>
+        ${l.sizes?`<div><div class="kick" style="margin-bottom:8px">Size</div><div class="metarow" data-sizes>${l.sizes.map((s,i)=>`<span class="pill sm ${i===0?'ink':''}" data-size="${s}">${s}</span>`).join('')}</div></div>`:''}
+        <dl class="detail">
+          <div><dt>Shipping</dt><dd>${l.tot===l.pr?'Free':sats(l.tot-l.pr)+' sats'}</dd></div>
+          <div><dt>Ships from</dt><dd>${l.loc}</dd></div>
+          <div><dt>Condition</dt><dd>${l.cond}</dd></div>
+          <div><dt>Category</dt><dd>${l.cat}</dd></div>
+        </dl>
+        <div class="seller" data-go="shop" data-slug="${l.seller}"><span class="av">${l.seller[0].toUpperCase()}</span><div><div class="h">@${l.seller} <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 1.8 3 .2.2 3L19.4 9.6l-1.8 2.4 1.8 2.4-1.8 2.6-.2 3-3 .2L12 22l-2.4-1.8-3-.2-.2-3L4.6 14.4l1.8-2.4-1.8-2.4 1.8-2.6.2-3 3-.2L12 2z" fill="#25c26e"/><path d="M9 12l2 2 4-4" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="m">★ ${l.rating} · ${l.nrev} reviews · ${l.loc}</div></div><button class="v">View →</button></div>
+        <div class="review"><div class="r"><span class="s val">★ 5.0</span><span class="t">2mo ago</span></div><p class="desc" style="margin-top:7px;font-size:.88rem">Exactly as described, beautifully packed. Fast replies over DM.</p></div>
+        ${others.length?`<div class="sectitle" style="margin-bottom:8px"><span class="h">More from @${l.seller}</span></div><div class="pairgrid">${others.map(pcard).join('')}</div>`:''}
+      </div>
+    </div>
+    ${l.pr<=WALLET_BAL?`<div class="walletnote"><i class="ph-bold ph-wallet"></i> Pay from your Shopstr wallet · ${sats(WALLET_BAL)} sats available</div>`:''}
+    <div class="buybar"><div class="inner">
+      <div class="pr"><span class="k">${l.pr<=WALLET_BAL?'From wallet':'Price'}</span><span class="n">${sats(l.pr)}</span></div>
+      <button class="buy press" data-buynow="${l.id}">${l.pr<=WALLET_BAL?'Buy with sats':'Buy now'}</button>
+      <button class="cc press" data-addcart="${l.id}" aria-label="Add to cart"><img src="assets/shape-daisy-yellow.svg" alt=""></button>
+      <button class="cc press" data-msg-listing="${l.id}" data-seller="${l.seller}" aria-label="Message"><img src="assets/shape-sunstar-purple.svg" alt=""></button>
+    </div></div>`;
+  },
+
+  /* ---------- CART ---------- */
+  cart(){
+    if(state.cart.length===0) return `${shead('Your cart')}<div class="scroll pb"><div class="pad" style="text-align:center;padding-top:80px"><img src="assets/shape-starburst.svg" style="width:80px;margin:0 auto 16px" alt=""><p class="display" style="font-size:1.6rem">Cart's empty</p><p class="muted" style="margin-top:8px">Go find something worth keeping.</p><button class="btn pu press" style="margin-top:20px" data-go="market">Browse the market</button></div></div>`;
+    const total=cartTotal(), ship=4000;
+    return `${shead('Your cart')}
+    <div class="scroll pb"><div class="pad">
+      ${state.cart.map(c=>{const l=byId(c.id);return `
+        <div class="citem">
+          <img class="th" src="${U(l.img,150)}" alt="">
+          <div style="flex:1;min-width:0"><div class="t">${l.t}</div><div class="pr">${sats(l.pr)} sats${c.size?` · ${c.size}`:''}</div></div>
+          <div class="qty"><button data-dec="${c.id}">−</button><span class="n val">${c.q}</span><button data-inc="${c.id}">+</button></div>
+        </div>`}).join('')}
+      <div class="summary">
+        <div class="ln"><span>Subtotal</span><span class="val">${sats(total)} sats</span></div>
+        <div class="ln"><span>Shipping</span><span class="val">${sats(ship)} sats</span></div>
+        <div class="ln big"><span>Total</span><span class="n val">${sats(total+ship)} sats</span></div>
+        <button class="btn w full press" data-go="co_type">Checkout · pay with sats ⚡</button>
+      </div>
+    </div></div>`;
+  },
+
+  /* ---------- CHECKOUT MACHINE (one-way flow, full-bleed) ---------- */
+  // shared one-way frame: owtop with step + progress dots
+  co_type(){ return owFrame(1,`
+      <div class="lead">Step 1 of 5 · how do you want it</div>
+      <h3>Ship it or<br>pick it up?</h3>
+      <button class="optcard ${state.co.type==='ship'?'sel':''}" data-cotype="ship"><span class="oi">📦</span><span><span class="ot">Ship to me</span><br><span class="od">Enter an address · tracked delivery</span></span></button>
+      <button class="optcard ${state.co.type==='pickup'?'sel':''}" data-cotype="pickup"><span class="oi">📍</span><span><span class="ot">Local pickup</span><br><span class="od">Arrange a spot over DM</span></span></button>
+      <div class="ownav"><span class="n">01 / 05</span><button class="next press" data-conext>${arrowSvg()}</button></div>
+  `); },
+
+  co_ship(){ return owFrame(2,`
+      <div class="lead">Step 2 of 5 · where to</div>
+      <h3>Shipping<br>address</h3>
+      <div class="field"><label>Full name</label><input value="Ekko R." data-cofield="name"></div>
+      <div class="field"><label>Address</label><input value="Skalitzer Str. 12" data-cofield="addr"></div>
+      <div class="field" style="flex-direction:row;gap:10px"><div class="field" style="flex:1"><label>City</label><input value="Berlin" data-cofield="city"></div><div class="field" style="width:110px"><label>Postcode</label><input value="10997" data-cofield="zip"></div></div>
+      <div class="warn"><span>🔒</span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
+      <div class="ownav"><span class="n">02 / 05</span><button class="next press" data-go="co_account">${arrowSvg()}</button></div>
+  `); },
+
+  co_pickup(){ return owFrame(2,`
+      <div class="lead">Step 2 of 5 · pickup details</div>
+      <h3>How to<br>reach you</h3>
+      <div class="field"><label>Display name</label><input value="@ekko" data-cofield="name"></div>
+      <div class="field"><label>Note to seller (optional)</label><textarea rows="3" data-cofield="note">Can pick up evenings near Görlitzer Park.</textarea></div>
+      <div class="warn"><span>✦</span><span>You'll agree a time and place with the seller in an encrypted DM after payment.</span></div>
+      <div class="ownav"><span class="n">02 / 05</span><button class="next press" data-go="co_account">${arrowSvg()}</button></div>
+  `); },
+
+  // DELAYED AUTH WALL — sits here, before payment, after shipping
+  co_account(){ return owFrame(3,`
+      <div class="lead">Step 3 of 5 · secure your account</div>
+      <h3>Save your<br>account</h3>
+      <p>A key was created for you in the background. Set a passphrase so you can get back to your orders and sats on any device.</p>
+      <div class="field"><label>Passphrase</label><input type="password" value="············" data-cofield="pass"></div>
+      <button class="nextwide press" data-go="co_pay">Save &amp; continue →</button>
+      <button class="optcard" style="justify-content:center" data-signin><span class="ot">Already have an account? Sign in</span></button>
+      <div class="ownav"><span class="n">03 / 05</span><span class="n">npub1ekko…q8r7</span></div>
+  `); },
+
+  co_pay(){
+    const total=cartTotal()+4000;
+    return owFrame(4,`
+      <div class="lead">Step 4 of 5 · pay ${sats(total)} sats</div>
+      <div class="payseg" data-payseg style="margin-bottom:4px"><button class="on" data-pay="lightning">Lightning ⚡</button><button data-pay="cashu">Cashu token</button></div>
+      <div data-paybody></div>
+      <button class="nextwide press" data-go="co_review">I've paid →</button>
+      <div class="ownav"><span class="n">04 / 05</span><span class="n">${sats(total)} sats</span></div>
+    `);
+  },
+
+  co_review(){
+    const total=cartTotal()+4000; const seller=byId(state.cart[0]?.id||'lst_007').seller;
+    return owFrame(5,`
+      <div class="lead">Step 5 of 5 · confirm</div>
+      <h3>Review &amp;<br>confirm</h3>
+      <div>
+        <div class="reviewline"><span class="k">Seller</span><span>@${seller}</span></div>
+        <div class="reviewline"><span class="k">Items</span><span>${cartCount()}</span></div>
+        <div class="reviewline"><span class="k">Fulfilment</span><span>${state.co.type==='pickup'?'Local pickup':'Shipping'}</span></div>
+        <div class="reviewline"><span class="k">Payment</span><span>${state.pay==='cashu'?'Cashu':'Lightning'}</span></div>
+        <div class="reviewline" style="border:none"><span class="k">Total</span><span class="val" style="font-weight:700">${sats(total)} sats</span></div>
+      </div>
+      <button class="nextwide press" data-go="paid">Place order ✦</button>
+      <div class="ownav"><span class="n">05 / 05</span></div>
+    `);
+  },
+
+  /* ---------- PAID ---------- */
+  paid(){
+    const total=cartTotal()+4000; const seller=byId(state.cart[0].id).seller;
+    return `<div class="paid" data-paid>
+      <img class="stk" src="assets/shape-sparkle-4pt.svg" style="top:70px;left:34px" alt="">
+      <img class="stk" src="assets/shape-daisy-yellow.svg" style="top:120px;right:34px" alt="">
+      <div class="check"><svg width="54" height="54" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#25c26e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2>Paid in<br>full ⚡</h2>
+      <div class="amt val">− ${sats(total)} sats</div>
+      <div class="receipt">
+        <div class="ln"><span class="muted">To</span><span>@${seller}</span></div><div class="ln"><span class="muted">Items</span><span>${cartCount()}</span></div><div class="ln"><span class="muted">Network</span><span>Lightning</span></div>
+        <div class="ln" style="border-top:var(--st) solid var(--p2);padding-top:9px;margin-top:2px"><span class="muted"><i class="ph-bold ph-key" style="vertical-align:-2px"></i> Your key</span><button class="press" data-act="savekey" style="background:none;border:none;color:var(--purple);font-weight:700;font-family:var(--fb);cursor:pointer;text-decoration:underline">Back it up</button></div>
+      </div>
+      <p class="kick" style="z-index:2;color:#0b3d22">This same key is how @${seller} reaches you about the order. Save it before you close.</p>
+      <div class="loop" style="flex-direction:column"><button class="btn full press" data-go="review" data-id="${state.cart[0]?.id||'lst_007'}" style="background:var(--ink)"><i class="ph-bold ph-star"></i> Leave a review</button>
+        <div style="display:flex;gap:10px;width:100%"><button class="btn w full press" data-go="market">Keep browsing</button><button class="btn w full press" data-go="orders">View order</button></div>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- MESSAGES ---------- */
+  messages(){
+    const threads=[
+      {s:'ekko',last:'Yes — I can ship two zines together to save on postage.',time:'2m',unread:2,pid:'lst_007'},
+      {s:'daveshoots',last:'The light meter was recalibrated last month.',time:'1h',unread:0,pid:'lst_005'},
+      {s:'mara.knits',last:'Beanie ships tomorrow, tracking to follow ✦',time:'3h',unread:0,pid:'lst_009'}
+    ];
+    return `${shead('Inbox')}
+    <div class="scroll pb"><div class="pad" style="padding-top:4px">
+      ${threads.map(t=>`<div class="thread-item" data-go="thread" data-seller="${t.s}"><img class="av" src="${U(AV[t.s],120)}" alt=""><div style="min-width:0"><div class="t">@${t.s}</div><div class="last">${t.last}</div></div><div class="meta"><div class="time">${t.time}</div>${t.unread?`<span class="unread val">${t.unread}</span>`:''}</div></div>`).join('')}
+    </div></div>`;
+  },
+
+  /* ---------- THREAD ---------- */
+  thread(seller){
+    const s=seller||'ekko';
+    // PDF Issue 2: opened from a listing → start grounded with a quoted product card + a draft.
+    const fromListing = state.msgFromListing; state.msgFromListing=false;
+    const l=(fromListing&&byId(state.msgCtx))||L.find(x=>x.seller===s)||L[0];
+    const ctxCard=`<div class="ctx"><img src="${U(l.img,120)}" alt=""><div><div style="font-weight:700;font-size:.8rem">${l.t}</div><div class="val" style="font-size:.72rem">${priceStr(l)}</div></div></div>`;
+    const reviewPrompt = s==='ekko' && !fromListing ? `
+        <div class="kick" style="text-align:center;margin:6px 0">Today</div>
+        <div class="sysprompt">
+          <div class="sp-h"><span class="badge">★</span> Did your order arrive?</div>
+          <div class="sp-d">It's been 7 days since @${s} shipped your ${l.t}. A quick review helps the next buyer trust them.</div>
+          <div class="sp-row">
+            <span class="pill sm ink press" data-go="review" data-id="${l.id}">✓ Yes, leave a review</span>
+            <span class="pill sm press" data-review-snooze>Not yet</span>
+            <span class="pill sm p press" data-review-problem>There's a problem</span>
+          </div>
+        </div>` : '';
+    return `${shead('@'+s, null, true)}
+    <div class="scroll" style="padding-bottom:8px">
+      <div class="msgs">
+        ${fromListing ? `<div class="msg me">${ctxCard}Hi! Is this still available?</div>
+        <div class="kick" style="text-align:center">Draft ready — your question is grounded in the listing.</div>`
+          : `<div class="msg them">${ctxCard}Hey! Thanks for your interest 👋</div>
+        <div class="msg me">Hi! Is this still available? Could you combine shipping if I take two?</div>
+        <div class="msg them">Yes — I can ship two together to save on postage. Want me to send an updated invoice?</div>
+        <div class="msg me">Perfect, yes please.</div>`}
+        ${reviewPrompt}
+      </div>
+    </div>
+    <div class="composer"><input placeholder="Message @${s}…" data-msg-input ${fromListing?`value="Hi! Is the ${l.t} still available?"`:''}><button class="ic press" style="background:var(--purple);border-color:var(--purple)" data-msg-send><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12h15M13 6l6 6-6 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
+  },
+
+  /* ---------- WALLET ---------- */
+  wallet(){
+    const txs=[
+      {dir:'out',t:'Risograph zine no.4',s:'To @ekko · Lightning',amt:'−12,000'},
+      {dir:'in',t:'Received',s:'From @nuno · Cashu',amt:'+50,000'},
+      {dir:'out',t:'Cold-brew concentrate',s:'To @alice · Lightning',amt:'−14,000'},
+      {dir:'in',t:'Claimed token',s:'Cashu mint','amt':'+8,000'}
+    ];
+    return `${shead('Wallet')}
+    <div class="scroll pb"><div class="pad">
+      <div class="recrow press" data-go="claim" style="background:var(--green);border-radius:var(--r-lg);margin-bottom:12px"><span class="d in" style="width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd)">↓</span><div style="min-width:0"><div class="t">New sale from @bagelmaker</div><div class="pr">45,000 sats ready to claim</div></div><button class="buyc" data-go="claim">Claim</button></div>
+      <div class="balance"><img class="stk" src="assets/shape-sunstar-yellow.svg" alt=""><div class="k">Spendable balance</div><div class="big">182,400 <span>sats</span></div>
+        <div class="wbtns"><button class="btn w full press" data-go="walletReceive">Receive</button><button class="btn full press" style="background:var(--purple);border-color:var(--purple);color:#fff" data-go="walletSend">Send</button></div>
+      </div>
+      <div class="sectitle"><span class="h">Activity</span><span class="c">NIP-60 · Cashu</span></div>
+      ${txs.map(x=>`<div class="tx"><span class="d ${x.dir}">${x.dir==='out'?'↑':'↓'}</span><div><div class="t">${x.t}</div><div class="s">${x.s}</div></div><span class="amt" style="color:${x.dir==='out'?'var(--ink)':'var(--green)'}">${x.amt}</span></div>`).join('')}
+    </div></div>`;
+  },
+
+  /* ---------- PROFILE (B1 sticker profile, faithful to ref) ---------- */
+  profile(){
+    return `
+    <div class="profile-screen">
+      <div class="ptop"><button class="x press" data-go="market">✕</button><span class="ttl">Profile</span><button class="gear press" data-go="settings">⚙</button></div>
+      <img class="pstk" src="assets/shape-starburst.svg" alt="">
+      <div class="tilts">
+        <button class="tilt press" data-go="shop">@ekko</button>
+        <button class="tilt press" data-go="mylistings">My listings</button>
+        <button class="tilt press" data-go="orders">Reviews</button>
+        <button class="tilt press" data-go="wallet">Wallet</button>
+        <button class="tilt press" data-go="settings">Support</button>
+      </div>
+      <div class="qsheet">
+        <div class="qa pink press" data-act="rate"><span class="qi">★</span><span class="qn">Rate Shopstr</span></div>
+        <div class="qa purple press" data-act="share"><span class="qi">↗</span><span class="qn">Share your shop</span></div>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- DISCOVERY FEEDS (shared renderer) ---------- */
+  search(){ return feedScreen('Search','Type to find anything', L, {openSearch:true}); },
+  // Tapping a category smart-opens into a screen tinted with that category's accent.
+  category(c){
+    const cat=c||'Ceramics'; const m=catMeta(cat);
+    let list=L.filter(l=>l.cat===cat); if(!list.length) list=L.slice(0,4);
+    const spot=list[0];
+    let di=0; const d=()=>`style="animation-delay:${(di++)*55}ms"`;
+    return `<div class="catscreen">
+      <div class="cathero ${m.on?'on':''}" style="background:var(--${m.c})">
+        <div class="ctop"><button class="x press" data-back><i class="ph-bold ph-arrow-left"></i></button><span class="kk">Category</span><button class="x press" data-go="search"><i class="ph-bold ph-magnifying-glass"></i></button></div>
+        ${m.sk?`<img class="bigstk" src="assets/${m.sk}" alt="">`:''}
+        <h1>${cat}</h1>
+        <div class="sub">${list.length} listing${list.length===1?'':'s'} · priced in sats</div>
+      </div>
+      <div class="scroll pb"><div class="pad stagger">
+        <div ${d()}>${h2Card(spot,spot.t,'Spotlight · '+cat,true)}</div>
+        <div class="sectitle" ${d()}><span class="h">All ${cat}</span><span class="c">${list.length} items</span></div>
+        <div style="display:flex;flex-direction:column;gap:12px">${list.map(l=>h5Card(l,d())).join('')}</div>
+      </div></div>
+    </div>`;
+  },
+  newfeed(){ return feedScreen('New this week','Freshest first', L.slice().reverse(), {chip:'NEW'}); },
+  nearme(){ return feedScreen('Near me','Within ~5km of Berlin', L.filter(l=>l.loc==='Berlin').concat(L.slice(0,3)), {chip:'2.4km'}); },
+  following(){ return feedScreen('Following','From sellers you follow', L.filter(l=>['ekko','mara.knits','alice'].includes(l.seller)), {chip:'✦'}); },
+
+  /* ---------- SHOP / SHOPFRONT ---------- */
+  shop(slug){
+    const s=slug||'ekko'; const items=L.filter(l=>l.seller===s); const list=items.length?items:L.slice(0,4);
+    return `
+    <div class="scroll pb">
+      <div class="lhead" style="position:absolute;z-index:5;left:0;right:0"><button class="ic press" data-back>←</button><button class="ic press" style="background:var(--ink);color:#fff">⋯</button></div>
+      <div class="shopbanner"><img src="${U('1441986300917-64674bd600d8',900)}" alt=""></div>
+      <div class="pad" style="padding-top:0">
+        <div style="display:flex;align-items:flex-end;gap:12px"><img class="shopav" src="${U(AV[s]||AV.ekko,200)}" alt=""><button class="followbtn press" data-follow style="margin-bottom:6px;margin-left:auto">+ Follow</button></div>
+        <h1 class="display" style="font-size:1.9rem;margin-top:12px">@${s}</h1>
+        <div class="kick" style="margin-top:4px">★ 4.8 · 81 reviews · ${list[0].loc} · ${s}@shopstr.store</div>
+        <p class="desc" style="margin-top:10px">Riso zines, vinyl stickers and the odd ambient record. Ships worldwide within 3 days.</p>
+        <div class="tabs" style="margin:14px -16px 0;padding:0 16px"><button class="on" data-tab="items">Items ${list.length}</button><button data-tab="reviews">Reviews</button><button data-tab="policies">Policies</button></div>
+        <div data-tabbody style="margin-top:14px"></div>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- COMMUNITIES (creative bento) ---------- */
+  communities(){
+    return `${bar('communities')}<div class="scroll pb"><div class="stagger">
+      <div class="commhero" style="animation-delay:0ms">
+        <h1>Find your<br>peo<img class="swap" src="assets/shape-smiley.svg" alt="">le.</h1>
+        <p>NIP-72 communities — curated corners of the market run by people who care about the craft.</p>
+      </div>
+      <div class="commbento">
+        <div class="commtile wide pu press" data-go="community" data-comm="riso" style="animation-delay:55ms">
+          <span class="emoji">🎨</span>
+          <div style="flex:1"><div class="nm">Riso &amp; Print Club</div><div class="mc">Most active this week · 84 new listings</div></div>
+          <div class="avstack">${['ekko','alice','daveshoots'].map(h=>`<img src="${U(AV[h],80)}" alt="">`).join('')}</div>
+        </div>
+        <div class="commtile y press" data-go="community" data-comm="coffee" style="animation-delay:110ms"><span class="emoji">☕</span><div class="nm">Specialty Coffee</div><div class="mc">940 members</div><img class="stk" src="assets/shape-daisy-yellow.svg" alt=""></div>
+        <div class="commtile g press" data-go="community" data-comm="film" style="animation-delay:165ms"><span class="emoji">📷</span><div class="nm">Film Shooters</div><div class="mc">2.3k members</div><img class="stk" src="assets/shape-sunstar-purple.svg" alt=""></div>
+        <div class="commtile b press" data-go="community" data-comm="textiles" style="animation-delay:220ms"><span class="emoji">🧶</span><div class="nm">Slow Textiles</div><div class="mc">610 members</div></div>
+        <div class="commtile p press" data-go="community" data-comm="ceramics" style="animation-delay:275ms"><span class="emoji">🏺</span><div class="nm">Clay Heads</div><div class="mc">1.1k members</div><img class="stk" src="assets/shape-heart-circle.svg" alt=""></div>
+      </div>
+      <div class="pad" style="padding-top:18px;animation-delay:330ms"><button class="btn w full press" data-act="newcomm"><i class="ph-bold ph-plus"></i> Start a community</button></div>
+    </div></div>`;
+  },
+  community(c){
+    const COMM={riso:{n:'Riso & Print Club',e:'🎨',cat:'Art & Print',m:'1,243',l:'84',on:'37',k:'pink'},coffee:{n:'Specialty Coffee',e:'☕',cat:'Coffee',m:'940',l:'51',on:'21',k:'yellow'},film:{n:'Film Shooters',e:'📷',cat:'Photography',m:'2,310',l:'120',on:'88',k:'green'},textiles:{n:'Slow Textiles',e:'🧶',cat:'Apparel',m:'610',l:'39',on:'12',k:'blue'},ceramics:{n:'Clay Heads',e:'🏺',cat:'Ceramics',m:'1,120',l:'46',on:'29',k:'pink'}};
+    const x=COMM[c]||COMM.riso;
+    let list=L.filter(l=>l.cat===x.cat); if(list.length<3) list=list.concat(L.slice(0,3));
+    let di=0; const d=()=>`style="animation-delay:${(di++)*55}ms"`;
+    return `<div class="scroll pb">
+      <div class="commdhead">
+        <div class="lhead" style="position:absolute;z-index:5;left:0;right:0"><button class="ic press" data-back><i class="ph-bold ph-arrow-left"></i></button><button class="ic press" style="background:var(--ink);color:#fff"><i class="ph-bold ph-share-network"></i></button></div>
+        <div class="banner"><img src="${U('1441986300917-64674bd600d8',900)}" alt=""></div>
+        <div class="bd">
+          <div class="badge" style="background:var(--${x.k})">${x.e}</div>
+          <h1>${x.n}</h1>
+          <div class="kick" style="margin-top:5px">NIP-72 community · curated by @ekko</div>
+          <div class="commstat">
+            <div class="cs"><div class="n val">${x.m}</div><div class="k">Members</div></div>
+            <div class="cs"><div class="n val">${x.l}</div><div class="k">Listings</div></div>
+            <div class="cs"><div class="n val">${x.on}</div><div class="k">Online</div></div>
+          </div>
+          <button class="btn pu full press" data-follow style="margin-top:12px">+ Join community</button>
+        </div>
+      </div>
+      <div class="pad stagger">
+        <div class="sectitle" ${d()}><span class="h">Pinned</span><span class="c">From moderators</span></div>
+        <div ${d()}>${h4Card(list[0],'Community pick')}</div>
+        <div class="sectitle" ${d()}><span class="h">Latest listings</span><span class="c">${list.length} items</span></div>
+        <div style="display:flex;flex-direction:column;gap:12px">${list.slice(1).map(l=>h5Card(l,d())).join('')}</div>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- ORDERS ---------- */
+  orders(){
+    const ords=[
+      {id:'lst_007',st:'ship',stl:'Shipped',sub:'Order #A1F2 · @ekko · 2d ago'},
+      {id:'lst_001',st:'done',stl:'Delivered',sub:'Order #9C3D · @alice · 1wk ago'},
+      {id:'lst_005',st:'paid',stl:'Paid',sub:'Order #77B0 · @daveshoots · 3wk ago'}
+    ];
+    return `${shead('Your orders')}<div class="scroll pb"><div class="pad">
+      <div class="filters" style="padding:0 0 12px"><span class="pill sm ink">All</span><span class="pill sm">Paid</span><span class="pill sm">Shipped</span><span class="pill sm">Delivered</span></div>
+      ${ords.map(o=>{const l=byId(o.id);return `<div class="orow press" data-go="orderDetail" data-id="${o.id}"><img class="th" src="${U(l.img,150)}" alt=""><div style="flex:1;min-width:0"><div class="t">${l.t}</div><div class="sub">${o.sub}</div></div><span class="statuschip ${o.st}">${o.stl}</span></div>`}).join('')}
+    </div></div>`;
+  },
+  orderDetail(id){
+    const l=byId(id||'lst_007');
+    return `${shead('Order #A1F2')}<div class="scroll pb"><div class="pad">
+      <div class="orow" style="cursor:default"><img class="th" src="${U(l.img,150)}" alt=""><div style="flex:1"><div class="t">${l.t}</div><div class="sub">${sats(l.pr)} sats · @${l.seller}</div></div><span class="statuschip ship">Shipped</span></div>
+      <div class="sectitle"><span class="h">Timeline</span></div>
+      <div class="timeline">
+        <div class="tnode on"><div class="tt">Order placed</div><div class="td">Paid 12,000 sats · Lightning · 2d ago</div></div>
+        <div class="tnode on"><div class="tt">Seller confirmed</div><div class="td">@${l.seller} accepted · 2d ago</div></div>
+        <div class="tnode on"><div class="tt">Shipped</div><div class="td">Tracking DHL · 1d ago</div></div>
+        <div class="tnode"><div class="tt">Delivered</div><div class="td">Estimated in 2 days</div></div>
+      </div>
+      <button class="btn full press" data-go="thread" data-seller="${l.seller}" style="margin-top:6px">✦ Message @${l.seller}</button>
+      <button class="btn pu full press" data-go="review" data-id="${l.id}" style="margin-top:10px">Leave a review</button>
+    </div></div>`;
+  },
+
+  /* ---------- REVIEW COMPOSER (one-way) ---------- */
+  review(id){
+    const l=byId(id||'lst_007');
+    return `<div class="oneway gr">
+      <div class="owtop" style="color:var(--ink)"><button class="x press" data-back>✕</button><span class="step">Leave a review</span></div>
+      <img class="owstk" src="assets/shape-daisy-yellow.svg" style="top:84px;right:30px" alt="">
+      <div class="owcard">
+        <div class="lead">Your purchase · @${l.seller}</div>
+        <h3>How was<br>it?</h3>
+        <div style="display:flex;align-items:center;gap:10px"><img src="${U(l.img,120)}" style="width:48px;height:48px;border-radius:10px;border:var(--st) solid var(--ink);object-fit:cover" alt=""><div style="font-weight:700;font-size:.9rem">${l.t}</div></div>
+        <div class="stars" data-stars>${[1,2,3,4,5].map(i=>`<button data-star="${i}" class="${i<=5?'on':''}">★</button>`).join('')}</div>
+        <div class="field"><label>Say more (optional)</label><textarea rows="3" placeholder="Beautifully packed, exactly as described…"></textarea></div>
+        <button class="nextwide press" data-go="orders">Publish review ✦</button>
+        <p class="kick" style="text-align:center">Signed to your key · published as NIP-85</p>
+      </div>
+    </div>`;
+  },
+
+  /* ---------- SELLER: CREATE LISTING (one-way) ---------- */
+  sellerNew(){
+    return `<div class="oneway ye">
+      <div class="owtop" style="color:var(--ink)"><button class="x press" data-back>✕</button><span class="step">New listing</span><span class="prog">${[1,2,3].map((i)=>`<i class="${i===1?'on':''}" style="background:var(--ink)"></i>`).join('')}</span></div>
+      <img class="owstk" src="assets/shape-sunstar-purple.svg" style="top:84px;right:30px" alt="">
+      <div class="owcard">
+        <div class="lead">Step 1 of 3 · the basics</div>
+        <h3>List an<br>item</h3>
+        <div style="border:var(--st) dashed var(--ink);border-radius:var(--r-lg);padding:24px;text-align:center;cursor:pointer"><div style="font-size:1.6rem">＋</div><div class="kick" style="margin-top:6px">Add photos</div></div>
+        <div class="field"><label>Title</label><input placeholder="e.g. Hand-thrown stoneware mug"></div>
+        <div class="field" style="flex-direction:row;gap:10px"><div class="field" style="flex:1"><label>Price (sats)</label><input value="18000"></div><div class="field" style="width:130px"><label>Quantity</label><input value="6"></div></div>
+        <div class="field"><label>Category</label><input value="Ceramics"></div>
+        <button class="nextwide press" data-go="market">Continue →</button>
+        <div class="ownav"><span class="n">01 / 03</span></div>
+      </div>
+    </div>`;
+  },
+  mylistings(){
+    const mine=L.filter(l=>l.seller==='ekko').concat(L.slice(0,3));
+    return `${shead('My listings')}<div class="scroll pb"><div class="pad">
+      <button class="btn pu full press" data-go="sellerNew" style="margin-bottom:14px">＋ New listing</button>
+      <div class="filters" style="padding:0 0 12px"><span class="pill sm ink">Active ${mine.length}</span><span class="pill sm">Sold</span><span class="pill sm">Drafts</span></div>
+      <div class="pairgrid">${mine.map(pcard).join('')}</div>
+    </div></div>`;
+  },
+
+  /* ---------- WALLET SEND / RECEIVE ---------- */
+  walletSend(){
+    return `<div class="oneway pu"><div class="owtop"><button class="x press" data-back>✕</button><span class="step">Send sats</span></div>
+      <img class="owstk" src="assets/shape-sparkle-4pt.svg" style="top:84px;right:30px" alt="">
+      <div class="owcard">
+        <div class="lead">From your Cashu balance · 182,400 sats</div>
+        <h3>Send</h3>
+        <div class="field"><label>Lightning address or invoice</label><input placeholder="name@walletofsatoshi.com"></div>
+        <div class="field"><label>Amount (sats)</label><input value="45000" style="font-family:var(--fm);font-size:1.4rem;font-weight:700"></div>
+        <button class="nextwide press" data-go="withdrawHold">Withdraw to Lightning ↗</button>
+      </div></div>`;
+  },
+  // asymmetric friction: a soft retention sheet before sats leave the economy
+  withdrawHold(){
+    const recs=L.filter(l=>l.pr<=45000).slice(0,3);
+    return `<div class="oneway gr"><div class="owtop" style="color:var(--ink)"><button class="x press" data-back>✕</button><span class="step">Before you go</span></div>
+      <div class="owcard">
+        <div class="lead">Withdraw 45,000 sats</div>
+        <h3>3 things under<br>your balance</h3>
+        <p>Spending keeps your sats in the circular economy. These are ready to buy right now — or continue the withdrawal.</p>
+        ${recs.map(l=>`<div class="recrow press" data-go="listing" data-id="${l.id}"><img class="th" src="${U(l.img,120)}" alt=""><div style="min-width:0"><div class="t">${l.t}</div><div class="pr">${priceStr(l)}</div></div><button class="buyc" data-buynow="${l.id}">Buy</button></div>`).join('')}
+        <button class="nextwide press" data-go="market">Stay &amp; browse</button>
+        <button class="press" data-go="wallet" style="background:none;border:none;color:var(--muted);font-weight:700;font-family:var(--fb);padding:8px;cursor:pointer;text-decoration:underline">Continue withdrawal</button>
+      </div></div>`;
+  },
+  walletReceive(){
+    return `<div class="oneway gr"><div class="owtop" style="color:var(--ink)"><button class="x press" data-back>✕</button><span class="step">Receive sats</span></div>
+      <div class="owcard">
+        <div class="lead">Show this to the sender</div>
+        <h3>Receive</h3>
+        <div class="qr" style="margin:4px auto"><div class="mid">⚡</div></div>
+        <div class="field"><label>Or request an amount</label><input value="" placeholder="Amount in sats"></div>
+        <button class="nextwide press" data-go="wallet">Copy invoice</button>
+      </div></div>`;
+  },
+
+  /* ---------- CLAIM (seller-to-buyer bridge, PDF Issue 4) ---------- */
+  claim(){
+    const amt=45000; const recs=L.filter(l=>l.pr<=amt).slice(0,3);
+    let di=0; const d=()=>`style="animation-delay:${(di++)*60}ms"`;
+    return `${shead('Sale claimed')}<div class="scroll pb"><div class="pad stagger">
+      <div class="claimamt" ${d()}>
+        <img class="stk" src="assets/shape-sparkle-4pt.svg" style="top:14px;left:18px" alt="">
+        <img class="stk" src="assets/shape-daisy-yellow.svg" style="bottom:14px;right:18px" alt="">
+        <div class="big val">+${sats(amt)}</div><div class="k">sats added to your Shopstr wallet</div>
+      </div>
+      <div class="sectitle" ${d()}><span class="h">Spend it here</span><span class="c">Under ${sats(amt)} sats</span></div>
+      <p class="desc" style="margin:-4px 0 12px" ${d()}>Three things you can buy with this, right now — keep the sats circulating.</p>
+      ${recs.map(l=>`<div class="recrow press" data-go="listing" data-id="${l.id}" ${d()}><img class="th" src="${U(l.img,120)}" alt=""><div style="min-width:0"><div class="t">${l.t}</div><div class="pr">${priceStr(l)}</div></div><button class="buyc" data-buynow="${l.id}">Buy</button></div>`).join('')}
+      <button class="btn w full press" data-go="market" style="margin-top:6px;animation-delay:${(di++)*60}ms">Or just browse the market</button>
+      <button class="btn full press" data-go="payoutSetup" style="margin-top:10px;animation-delay:${(di++)*60}ms;background:none;color:var(--purple);border-color:var(--purple)"><i class="ph-bold ph-gear"></i> Change where sats go after a sale</button>
+    </div></div>`;
+  },
+
+  /* ---------- PAYOUT SETUP (inverted default, PDF Issue 4) ---------- */
+  payoutSetup(){
+    return `<div class="oneway pu"><div class="owtop"><button class="x press" data-back>✕</button><span class="step">Payout</span></div>
+      <img class="owstk" src="assets/shape-sunstar-yellow.svg" style="top:84px;right:30px" alt="">
+      <div class="owcard">
+        <div class="lead">Seller setup</div>
+        <h3>Where do your<br>sats go?</h3>
+        <button class="optcard ${state.payout==='shopstr'?'sel':''}" data-payout="shopstr"><span class="oi" style="background:var(--green);border:none">⚡</span><span><span class="ot">Keep them in Shopstr <span class="pill sm pu" style="padding:2px 8px;font-size:.58rem">Recommended</span></span><br><span class="od">Land in your in-app wallet. Spend on the market with one tap.</span></span></button>
+        <button class="optcard ${state.payout==='lightning'?'sel':''}" data-payout="lightning"><span class="oi">↗</span><span><span class="ot">Send to my Lightning wallet</span><br><span class="od">Auto-melt to an external wallet on every sale.</span></span></button>
+        <button class="nextwide press" data-go="wallet">Continue →</button>
+        <p class="kick" style="text-align:center">You can change this any time in Wallet settings.</p>
+      </div></div>`;
+  },
+
+  /* ---------- SETTINGS ---------- */
+  settings(){
+    const items=[['👤','Profile &amp; identity','name, avatar, nip-05','shop'],['💸','Payouts','where sats land after a sale','payoutSetup'],['📍','Saved addresses','shipping details',''],['📡','Relays','NIP-65 outbox',''],['⚡','Nostr Wallet Connect','external wallet',''],['🎚','Preferences','theme · content filters',''],['🔑','Keys &amp; backup','export nsec',''],['🚪','Sign out','','']];
+    return `${shead('Settings')}<div class="scroll pb"><div class="menu" style="padding-top:8px">
+      ${items.map(([i,t,d,r])=>`<div class="menuitem press" ${r?`data-go="${r}"`:''} ${t==='Sign out'?'style="color:var(--red)"':''}><span style="font-size:1.1rem">${i}</span><div><div>${t}</div>${d?`<div class="kick" style="margin-top:2px">${d}</div>`:''}</div><span class="chev">→</span></div>`).join('')}
+    </div></div>`;
+  }
+};
+
+/* shared feed renderer for all discovery surfaces */
+function feedScreen(title, sub, list, opts={}){
+  const o=opts||{};
+  let di=0; const d=()=>`style="animation-delay:${(di++)*55}ms"`;
+  return `${bar('market')}
+  <div class="scroll pb"><div class="pad stagger">
+    <div class="sectitle" style="margin-top:6px" ${d()}><span class="h">${title}</span><span class="c">${sub}</span></div>
+    <div style="display:flex;flex-direction:column;gap:12px">${list.map(l=>h5Card(l,d())).join('')}</div>
+  </div></div>`;
+}
+
+/* shared sheet header */
+function shead(title, backTo, isThread){
+  return `<div class="shead"><button class="ic press" data-back><i class="ph-bold ph-arrow-left"></i></button><span class="t">${title}</span><span class="sp"></span>${isThread?'<button class="ic press"><i class="ph-bold ph-dots-three"></i></button>':''}</div>`;
+}
+function arrowSvg(){ return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#f4f3ef" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+/* one-way flow frame: full-bleed purple, X close, step progress dots, content card */
+function owFrame(step, inner){
+  const dots=[1,2,3,4,5].map(i=>`<i class="${i<=step?'on':''}"></i>`).join('');
+  return `<div class="oneway pu">
+    <div class="owtop"><button class="x press" data-back>✕</button><span class="step">Checkout</span><span class="prog">${dots}</span></div>
+    <img class="owstk" src="assets/shape-sparkle-4pt.svg" style="top:84px;right:30px" alt="">
+    <div class="owcard">${inner}</div>
+  </div>`;
+}
+/* ---- choice modal (B3) ---- */
+function openModal({sticker,fill,title,body,opts,scrim}){
+  const ov=document.getElementById('overlay'), box=document.getElementById('modalbox');
+  ov.className='overlay '+(scrim?'scrim':(fill||'fill'));
+  box.innerHTML=`${sticker?`<div class="bub"><img src="assets/${sticker}.svg" alt=""></div>`:''}
+    <h3>${title}</h3>${body?`<p>${body}</p>`:''}
+    <div class="opts">${opts.map((o,i)=>o.ghost?`<button class="ghost" data-mi="${i}">${o.label}</button>`:`<button class="btn ${o.tone||'pu'} full press" data-mi="${i}">${o.label}</button>`).join('')}</div>`;
+  box.querySelectorAll('[data-mi]').forEach(b=>b.addEventListener('click',()=>{ const o=opts[+b.dataset.mi]; closeModal(); o.act&&o.act(); }));
+  requestAnimationFrame(()=>ov.classList.add('open'));
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeModal(); });
+/* sign-in modal — existing account (extension / signer / nsec) */
+function openSignin(){
+  openModal({sticker:'badge-new-speech',title:'Sign in',body:'Use your existing Nostr identity.',opts:[
+    {label:'Browser extension',tone:'pu',act:()=>toast('Connecting NIP-07…','shape-sparkle-4pt')},
+    {label:'Remote signer (bunker)',tone:'w',act:()=>toast('Paste bunker URL…')},
+    {label:'Paste nsec / ncryptsec',tone:'w',act:()=>toast('Importing key…')},
+    {label:'Cancel',ghost:true}
+  ]});
+}
+
+/* ============================ INTERACTIONS ============================ */
+const history=[];
+function bind(el){
+  // navigation via data-go
+  el.querySelectorAll('[data-go]').forEach(n=>n.addEventListener('click',e=>{
+    e.stopPropagation();
+    const name=n.dataset.go;
+    const arg=n.dataset.id||n.dataset.slug||n.dataset.cat||n.dataset.seller||n.dataset.comm;
+    if(activeEl) history.push({name:activeEl.dataset.name, arg:activeEl.dataset.arg});
+    go(name,arg);
+  }));
+  // back
+  el.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>{ const prev=history.pop(); go(prev?prev.name:'market', prev?prev.arg:undefined); }));
+  // search toggle
+  el.querySelectorAll('[data-toggle="search"]').forEach(b=>b.addEventListener('click',()=>{
+    const d=el.querySelector('[data-disc]'); d.classList.toggle('open'); if(d.classList.contains('open')) d.querySelector('input')?.focus();
+  }));
+  // filters → pretend filter + toast
+  el.querySelectorAll('[data-filter]').forEach(f=>f.addEventListener('click',()=>{
+    const [grp,val]=f.dataset.filter.split(':');
+    // toggle selection within this filter's own group
+    f.closest('.filters').querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('ink',x===f));
+    if(grp==='cat'&&val!=='All'){ history.push({name:activeEl.dataset.name,arg:activeEl.dataset.arg}); go('category',val); }
+    else toast(grp==='type'?`Type · ${val}`:'Showing everything','shape-sparkle-4pt');
+  }));
+  // size select
+  el.querySelectorAll('[data-sizes] [data-size]').forEach(s=>s.addEventListener('click',()=>{ el.querySelectorAll('[data-size]').forEach(x=>x.classList.remove('ink')); s.classList.add('ink'); }));
+  // add to cart
+  el.querySelectorAll('[data-addcart]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); const id=b.dataset.addcart; const ex=state.cart.find(c=>c.id===id);
+    if(ex) ex.q++; else state.cart.push({id,q:1});
+    updateBadges(); pop(b); toast('Added to cart','shape-sparkle-4pt');
+  }));
+  // buy now → checkout machine (ensure item in cart context, skip cart)
+  el.querySelectorAll('[data-buynow]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); const id=b.dataset.buynow; if(!state.cart.find(c=>c.id===id)) state.cart.unshift({id,q:1}); updateBadges(); history.push({name:'listing'}); go('co_type');
+  }));
+  // checkout: order-type select
+  el.querySelectorAll('[data-cotype]').forEach(b=>b.addEventListener('click',()=>{ state.co.type=b.dataset.cotype; el.querySelectorAll('[data-cotype]').forEach(x=>x.classList.toggle('sel',x===b)); }));
+  // payout selection (inverted default)
+  el.querySelectorAll('[data-payout]').forEach(b=>b.addEventListener('click',()=>{ state.payout=b.dataset.payout; el.querySelectorAll('[data-payout]').forEach(x=>x.classList.toggle('sel',x===b)); }));
+  // checkout: next from order-type branches to ship or pickup
+  el.querySelectorAll('[data-conext]').forEach(b=>b.addEventListener('click',()=>{ history.push({name:'co_type'}); go(state.co.type==='pickup'?'co_pickup':'co_ship'); }));
+  // checkout field capture
+  el.querySelectorAll('[data-cofield]').forEach(f=>f.addEventListener('input',()=>{ state.co[f.dataset.cofield]=f.value; }));
+  // delayed-wall sign in
+  el.querySelectorAll('[data-signin]').forEach(b=>b.addEventListener('click',()=>openSignin()));
+  // PDF Issue 2: Message Seller from a listing carries product context into the thread
+  el.querySelectorAll('[data-msg-listing]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); state.msgCtx=b.dataset.msgListing; state.msgFromListing=true;
+    history.push({name:activeEl.dataset.name,arg:activeEl.dataset.arg}); go('thread', b.dataset.seller);
+  }));
+  // review-prompt branches (PDF Issue 1)
+  el.querySelectorAll('[data-review-snooze]').forEach(b=>b.addEventListener('click',()=>{ b.closest('.sysprompt').style.opacity='.5'; toast('Snoozed 3 days','shape-sparkle-4pt'); }));
+  el.querySelectorAll('[data-review-problem]').forEach(b=>b.addEventListener('click',()=>openModal({sticker:'badge-new-speech',scrim:true,title:'Report a problem',body:'This opens a dispute thread with @ekko. When escrow ships, refunds resolve here.',opts:[{label:'Open dispute',tone:'pu',act:()=>toast('Dispute opened')},{label:'Cancel',ghost:true}]})));
+  // save-key reminder (post-payment, first-class moment)
+  el.querySelectorAll('[data-act="savekey"]').forEach(b=>b.addEventListener('click',()=>openModal({sticker:'badge-bff-star',title:'Back up your key',body:'Save your nsec or set a passphrase. Lose it and the seller can no longer reach you about this order.',opts:[{label:'Save with passphrase',tone:'pu',act:()=>toast('Key secured ✦','badge-bff-star')},{label:'Copy nsec',tone:'w',act:()=>toast('nsec copied')},{label:'Later',ghost:true}]})));
+  // profile quick actions
+  el.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.act==='rate') openModal({sticker:'badge-new-speech',title:'Enjoying Shopstr?',body:'A quick rating helps other buyers find good sellers.',opts:[{label:'Rate 5 stars ★',tone:'pu',act:()=>toast('Thanks!','shape-sparkle-4pt')},{label:'Maybe later',ghost:true}]});
+    else if(b.dataset.act==='newcomm') openModal({sticker:'badge-bff-star',title:'Start a community',body:'Name a corner of the market and invite sellers. Published as a NIP-72 group you moderate.',opts:[{label:'Create community',tone:'pu',act:()=>toast('Community created ✦','badge-bff-star')},{label:'Maybe later',ghost:true}]});
+    else openModal({sticker:'badge-bff-star',fill:'fill-green',title:'Share your shop',body:'Copy your shopfront link and share it anywhere.',opts:[{label:'Copy link',tone:'pu',act:()=>toast('Link copied','shape-sparkle-4pt')},{label:'Close',ghost:true}]});
+  }));
+  // cart qty
+  el.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{ const c=state.cart.find(x=>x.id===b.dataset.inc); c.q++; go('cart'); }));
+  el.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{ const c=state.cart.find(x=>x.id===b.dataset.dec); c.q--; if(c.q<=0) state.cart=state.cart.filter(x=>x!==c); updateBadges(); go('cart'); }));
+  // payment segment
+  el.querySelectorAll('[data-payseg] [data-pay]').forEach(b=>b.addEventListener('click',()=>{
+    state.pay=b.dataset.pay; el.querySelectorAll('[data-pay]').forEach(x=>x.classList.toggle('on',x===b)); renderPay(el);
+  }));
+  if(el.querySelector('[data-paybody]')) renderPay(el);
+  // pay confirm → paid
+  el.querySelectorAll('[data-pay-confirm]').forEach(b=>b.addEventListener('click',()=>{ go('paid'); }));
+  // paid screen: clear cart + run check draw
+  if(el.querySelector('[data-paid]')){ requestAnimationFrame(()=>el.querySelector('.paid').classList.add('go')); state.cart=[]; updateBadges(); }
+  // thread send
+  el.querySelectorAll('[data-msg-send]').forEach(b=>b.addEventListener('click',()=>{
+    const inp=el.querySelector('[data-msg-input]'); if(!inp.value.trim())return; const m=document.createElement('div'); m.className='msg me'; m.textContent=inp.value; el.querySelector('.msgs').appendChild(m); inp.value=''; el.querySelector('.scroll').scrollTo(0,99999);
+  }));
+  // sticker buttons pop on tap
+  el.querySelectorAll('.cc, [data-addcart]').forEach(b=>b.addEventListener('click',()=>pop(b)));
+  // favourite toggle (heart fill)
+  el.querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click',()=>{ const i=b.querySelector('i'); const on=i.classList.toggle('ph-fill'); i.classList.toggle('ph-bold',!on); if(on){i.style.color='var(--pink)';pop2(b);} else i.style.color=''; }));
+  // featured carousel auto-advance (pauses on touch/hover)
+  const car=el.querySelector('[data-carousel]');
+  if(car){ let paused=false; car.addEventListener('pointerdown',()=>paused=true); car.addEventListener('pointerenter',()=>paused=true); car.addEventListener('pointerleave',()=>paused=false);
+    const iv=setInterval(()=>{ if(paused||!document.body.contains(car)){ if(!document.body.contains(car))clearInterval(iv); return; }
+      const w=car.firstElementChild?.offsetWidth+14||300; const max=car.scrollWidth-car.clientWidth-4;
+      car.scrollLeft = car.scrollLeft>=max ? 0 : car.scrollLeft+w; },2600); }
+  // shop tabs
+  const tb=el.querySelector('[data-tabbody]');
+  if(tb){ const slug=el.dataset.arg||'ekko'; renderShopTab(tb,'items',slug);
+    el.querySelectorAll('[data-tab]').forEach(t=>t.addEventListener('click',()=>{ el.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('on',x===t)); renderShopTab(tb,t.dataset.tab,slug); })); }
+  // follow toggle
+  el.querySelectorAll('[data-follow]').forEach(b=>b.addEventListener('click',()=>{ const on=b.classList.toggle('on'); b.textContent=on?'✓ Following':'+ Follow'; toast(on?'Following':'Unfollowed', on?'badge-bff-star':null); }));
+  // review stars
+  el.querySelectorAll('[data-stars] [data-star]').forEach(s=>s.addEventListener('click',()=>{ const v=+s.dataset.star; el.querySelectorAll('[data-star]').forEach(x=>x.classList.toggle('on',+x.dataset.star<=v)); }));
+  // auto-open search disclosure on the search screen
+  if(el.dataset.name==='search'){ const d=el.querySelector('[data-disc]'); d&&d.classList.add('open'); setTimeout(()=>el.querySelector('[data-search]')?.focus(),120); }
+}
+function renderShopTab(tb,tab,slug){
+  const items=L.filter(l=>l.seller===slug); const list=items.length?items:L.slice(0,4);
+  if(tab==='items') tb.innerHTML=`<div class="pairgrid">${list.map(pcard).join('')}</div>`;
+  else if(tab==='reviews') tb.innerHTML=['Beautifully packed, exactly as described.','Fast shipping and lovely DMs.','Will buy again — top seller.'].map((t,i)=>`<div class="review" style="margin-bottom:10px"><div class="r"><span class="s val">★ ${5-(i===2?1:0)}.0</span><span class="t">${i+1}mo ago</span></div><p class="desc" style="margin-top:7px;font-size:.88rem">${t}</p></div>`).join('');
+  else tb.innerHTML=`<div class="detail"><div><dt>Ships from</dt><dd>${list[0].loc}</dd></div><div><dt>Delivery</dt><dd>3–5 days</dd></div><div><dt>Returns</dt><dd>14 days</dd></div><div><dt>Payment</dt><dd>Lightning · Cashu</dd></div></div>`;
+}
+function renderPay(el){
+  const body=el.querySelector('[data-paybody]'); if(!body)return;
+  if(state.pay==='lightning'){
+    body.innerHTML=`<div class="qr"><div class="mid">⚡</div></div><div class="countdown val">Invoice expires in <span data-cd>04:58</span></div><p class="muted" style="text-align:center;font-size:.84rem;margin-top:6px">Scan with any Lightning wallet. Auto-confirms on payment.</p>`;
+    startCountdown(body.querySelector('[data-cd]'));
+  } else {
+    body.innerHTML=`<textarea class="tokenbox" placeholder="Paste your Cashu token (cashuA…)" ></textarea><p class="muted" style="font-size:.84rem;margin-top:8px">We'll redeem the token at the seller's mint and confirm instantly.</p>`;
+  }
+}
+let cdT;
+function startCountdown(node){
+  clearInterval(cdT); if(!node)return; let s=298;
+  cdT=setInterval(()=>{ s--; if(s<0){clearInterval(cdT);node.textContent='expired';return;} node.textContent=`0${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; },1000);
+}
+function updateBadges(){ document.querySelectorAll('[data-cartbadge]').forEach(b=>{ b.textContent=cartCount(); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }); }
+function pop(el){ const img=el.querySelector('img'); if(!img)return; img.animate([{transform:'rotate(0) scale(1)'},{transform:'rotate(-12deg) scale(1.18)'},{transform:'rotate(0) scale(1)'}],{duration:380,easing:'cubic-bezier(.22,1,.36,1)'}); }
+function pop2(el){ el.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:340,easing:'cubic-bezier(.22,1,.36,1)'}); }
+
+// bottom nav
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>{ history.length=0; go(b.dataset.go); }));
+
+// boot
+go('market');
+</script>
+</body>
+</html>

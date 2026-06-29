@@ -1,0 +1,98 @@
+import Head from "next/head";
+import { useRouter } from "next/router";
+import {
+  useCategoryListings,
+  useCartStore,
+  ratingForPubkey,
+} from "@/data/hooks";
+import { catMeta, toneBg } from "@/lib/catalog";
+import { BottomNav } from "@/components/ui/BottomNav";
+import { SectionTitle } from "@/components/ui/Section";
+import { Sticker } from "@/components/ui/Sticker";
+import { ListCard, CategoryFeature } from "@/components/cards";
+import Link from "next/link";
+
+export default function CategoryScreen() {
+  const router = useRouter();
+  const raw = router.query.category;
+  const category = typeof raw === "string" ? decodeURIComponent(raw) : "";
+  const { data: listings } = useCategoryListings(category);
+  const { count } = useCartStore();
+
+  if (!category) return null;
+
+  const meta = catMeta(category);
+  const spotlight = listings[0];
+
+  return (
+    <>
+      <Head>
+        <title>{category} · Shopstr</title>
+      </Head>
+
+      {/* Colored hero — takes the category's accent (smart-opens into this color) */}
+      <header className={`cat-pop relative overflow-hidden border-b-2 border-ink ${toneBg(meta.tone)}`}>
+        <div className="mx-auto max-w-[1240px] px-4 pb-6 pt-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => router.back()}
+              aria-label="Back"
+              className={`ds-press grid h-10 w-10 place-items-center rounded-full border-2 ${
+                meta.onDark ? "border-white/60 text-white" : "border-ink text-ink"
+              } bg-paper-pure/15`}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <span className="font-mono text-[0.66rem] uppercase tracking-[0.18em]">Category</span>
+            <Link
+              href="/search"
+              aria-label="Search"
+              className={`ds-press grid h-10 w-10 place-items-center rounded-full border-2 ${
+                meta.onDark ? "border-white/60 text-white" : "border-ink text-ink"
+              } bg-paper-pure/15`}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </Link>
+          </div>
+          <Sticker name={meta.sticker} className="spin-slow pointer-events-none absolute -right-4 top-10 h-28 w-28 opacity-90" />
+          <h1 className="ds-display mt-5 text-5xl leading-[0.86]">{category}</h1>
+          <p className="mt-2.5 font-mono text-sm opacity-85">
+            {listings.length} listing{listings.length === 1 ? "" : "s"} · priced in sats
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-4 md:pb-12">
+        {spotlight && (
+          <CategoryFeature
+            product={spotlight}
+            title={spotlight.title}
+            kicker={`Spotlight · ${category}`}
+            href={`/listing/${spotlight.id}`}
+            cta="View item"
+          />
+        )}
+
+        <SectionTitle note={`${listings.length} items`}>All {category}</SectionTitle>
+        {listings.length === 0 ? (
+          <p className="text-text-muted">Nothing in this category yet.</p>
+        ) : (
+          <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            {listings.map((p, i) => (
+              <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
+                <ListCard product={p} rating={ratingForPubkey(p.pubkey)} />
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      <BottomNav active="/marketplace" />
+    </>
+  );
+}
