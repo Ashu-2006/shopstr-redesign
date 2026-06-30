@@ -246,3 +246,50 @@ p {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* =============================================================================
+   EXPERIMENT — separation by COLOR only (no borders / strokes)
+   Scoped to body.soft-sep so it's a clean, reversible variant. Strategy:
+   - Deepen the page surface so white cards/sheets separate by fill contrast.
+   - Make every border transparent (keeps 2px layout, removes the stroke).
+   - Give form fields a filled well so they read without an outline.
+   - Drop decorative image outlines and ink "hairline" gap fills.
+   ========================================================================== */
+body.soft-sep {
+  /* deeper warm page so paper-pure (#fff) surfaces pop by contrast */
+  --ds-paper: #e6e2d7;
+  /* paper-2 sits a touch deeper so empty media wells separate from BOTH the
+     white cards above them and the warm page behind them (the listing gallery
+     reads as a real surface even before its image loads) */
+  --ds-paper-2: #d4cdbb;
+  background: var(--ds-paper);
+}
+.soft-sep *,
+.soft-sep *::before,
+.soft-sep *::after {
+  border-color: transparent !important;
+}
+/* sticky chrome lifts off the page as a clean white surface */
+.soft-sep header.sticky,
+.soft-sep .sticky {
+  background: var(--ds-paper-pure);
+}
+/* form fields read as filled wells, not outlined boxes */
+.soft-sep input,
+.soft-sep textarea {
+  background-color: var(--ds-paper-2) !important;
+}
+/* decorative strokes that aren't CSS borders */
+.soft-sep img {
+  outline: none !important;
+}
+/* ink "hairline" grids (gap-px on a bg-ink container) -> spacing instead */
+.soft-sep .bg-ink.gap-px {
+  background: transparent !important;
+  gap: 0.5rem !important;
+}
+/* dense data rows that lived inside a hairline grid keep their structure via a
+   filled well instead of the stroke, so spec tables / detail lists stay legible */
+.soft-sep .bg-ink.gap-px > * {
+  background: var(--ds-paper-pure);
+}
