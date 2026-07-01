@@ -69,18 +69,25 @@ export function OneWayFrame({
 
       <Sticker name={sticker} className="pointer-events-none absolute right-7 top-[84px] z-0 h-16 w-16" />
 
-      {/* The card PERSISTS across steps. `layout` smart-animates its height as the
-          inner content swaps, so steps don't pop in as fresh cards. */}
-      <motion.div
-        layout
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ layout: { type: "spring", bounce: 0, duration: 0.45 }, duration: 0.4 }}
-        className="z-10 mx-6 my-auto w-full max-w-[440px] self-center overflow-hidden rounded-2xl border-2 border-ink bg-paper-pure p-6 text-ink"
-        style={{ marginBottom: "max(env(safe-area-inset-bottom), 1.5rem)" }}
+      {/* Centering region: the card sits vertically centered in the space below
+          the header, with balanced gutters. It grows to fit tall steps (the page
+          scrolls rather than clipping) and respects the bottom safe-area inset. */}
+      <div
+        className="flex flex-1 items-center justify-center px-6 pt-2"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1.5rem)" }}
       >
-        {children}
-      </motion.div>
+        {/* The card PERSISTS across steps. `layout` smart-animates its height as the
+            inner content swaps, so steps don't pop in as fresh cards. */}
+        <motion.div
+          layout
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ layout: { type: "spring", bounce: 0, duration: 0.45 }, duration: 0.4 }}
+          className="z-10 w-full max-w-[440px] overflow-hidden rounded-2xl border-2 border-ink bg-paper-pure p-6 text-ink"
+        >
+          {children}
+        </motion.div>
+      </div>
     </div>
   );
 }
