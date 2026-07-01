@@ -35,7 +35,10 @@ export default function ListingDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [size, setSize] = useState<string | null>(null);
 
-  if (!isLoading && !product) {
+  // Only declare a listing genuinely missing once the router is ready with a
+  // real id. During a route change the id momentarily empties; showing
+  // "not found" then (or flashing it before hydration) is wrong.
+  if (router.isReady && id && !isLoading && !product) {
     return (
       <>
         <TopBar cartCount={cart.count} />
