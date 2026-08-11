@@ -128,6 +128,23 @@ p {
   scale: var(--ds-press-scale);
 }
 
+/* Animated focus ring on form fields. Outline sits outside the box model, so
+   animating outline-width from 0 causes zero layout shift (never animate
+   border-width for focus, it moves content). Unlayered, so it wins over the
+   `outline-none` utility; keyboard and field focus both get the ring. */
+input,
+textarea,
+select {
+  outline: 0 solid var(--ds-purple);
+  outline-offset: 2px;
+  transition: outline-width var(--ds-dur-fast) var(--ds-ease-smooth);
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-width: 2.5px;
+}
+
 /* Hide scrollbars on horizontal rails / disclosure scrollers. */
 .no-scrollbar {
   scrollbar-width: none;
