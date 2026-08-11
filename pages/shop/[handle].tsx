@@ -62,22 +62,32 @@ export default function Shop() {
           </button>
           <button aria-label="More" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-ink text-text-on-dark">⋯</button>
         </div>
-        <div className="h-[120px] overflow-hidden">
+        <div className="h-[120px] overflow-hidden md:h-[200px] lg:h-[240px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={profile.banner ?? "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900"} alt="" className="h-full w-full object-cover" />
+          <img src={profile.banner ?? "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600"} alt="" className="h-full w-full object-cover" />
         </div>
         <div className="mx-auto max-w-[1100px] px-4 pb-1">
           <div className="flex items-end gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={profile.picture} alt="" className="-mt-11 h-[74px] w-[74px] rounded-[18px] border-2 border-ink object-cover" />
+            <img src={profile.picture} alt="" className="-mt-11 h-[74px] w-[74px] rounded-[18px] border-2 border-ink object-cover md:-mt-14 md:h-[92px] md:w-[92px]" />
+            {/* Mobile: Follow rides the avatar row. md+: it docks beside the
+                name, so the action stays with the identity it acts on. */}
             <button
               onClick={() => toggleFollow(handle)}
-              className={`ds-press mb-1.5 ml-auto rounded-pill border-2 px-5 py-2.5 font-bold ${following ? "border-ink bg-paper-pure text-ink" : "border-ink bg-purple text-on-purple"}`}
+              className={`ds-press mb-1.5 ml-auto rounded-pill border-2 px-5 py-2.5 font-bold md:hidden ${following ? "border-ink bg-paper-pure text-ink" : "border-ink bg-purple text-on-purple"}`}
             >
               {following ? <span className="inline-flex items-center gap-1.5"><Check size={18} /> Following</span> : <span className="inline-flex items-center gap-1.5"><Plus size={18} /> Follow</span>}
             </button>
           </div>
-          <h1 className="ds-display mt-3 text-3xl">@{profile.handle}</h1>
+          <div className="mt-3 flex items-center gap-4">
+            <h1 className="ds-display text-3xl md:text-4xl">@{profile.handle}</h1>
+            <button
+              onClick={() => toggleFollow(handle)}
+              className={`ds-press hidden rounded-pill border-2 px-5 py-2 font-bold md:inline-flex ${following ? "border-ink bg-paper-pure text-ink" : "border-ink bg-purple text-on-purple"}`}
+            >
+              {following ? <span className="inline-flex items-center gap-1.5"><Check size={18} /> Following</span> : <span className="inline-flex items-center gap-1.5"><Plus size={18} /> Follow</span>}
+            </button>
+          </div>
           <div className="mt-1 font-mono text-[0.7rem] text-text-subtle">
             <Stars avg={avg} count={reviews.scores.length} /> · {items[0]?.location ?? "-"}{profile.nip05 ? ` · ${profile.nip05}` : ""}
           </div>
