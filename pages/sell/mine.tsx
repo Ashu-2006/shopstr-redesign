@@ -25,15 +25,23 @@ export default function MyListings() {
       <Head><title>My listings · Shopstr</title></Head>
       <SheetHeader title="My listings" backTo="/profile" />
       <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12">
-        <Link href="/sell/new" className="ds-press mb-3.5 flex w-full items-center justify-center gap-2 rounded-pill border-2 border-purple bg-purple py-3.5 font-bold text-on-purple">
-          ＋ New listing
-        </Link>
-        <div className="no-scrollbar mb-3 flex gap-2 overflow-x-auto">
-          {["Active", "Sold", "Drafts"].map((f) => (
-            <Pill key={f} interactive active={filter === f} onClick={() => setFilter(f)}>
-              {f === "Active" && mine.length > 0 ? `Active ${mine.length}` : f}
-            </Pill>
-          ))}
+        {/* Mobile: full-width thumb CTA. md+: compact button docked in the
+            header row beside the lane pills (a stretched pill reads as a
+            banner, not an action, at desktop widths). */}
+        <div className="mb-3 flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between">
+          <Link
+            href="/sell/new"
+            className="ds-press flex w-full items-center justify-center gap-2 rounded-pill border-2 border-purple bg-purple py-3.5 font-bold text-on-purple md:order-last md:w-auto md:px-6 md:py-2.5"
+          >
+            ＋ New listing
+          </Link>
+          <div className="no-scrollbar flex gap-2 overflow-x-auto">
+            {["Active", "Sold", "Drafts"].map((f) => (
+              <Pill key={f} interactive active={filter === f} onClick={() => setFilter(f)}>
+                {f === "Active" && mine.length > 0 ? `Active ${mine.length}` : f}
+              </Pill>
+            ))}
+          </div>
         </div>
         {filter !== "Active" ? (
           <EmptyState
