@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
+import { tEnter, tExit } from "@/lib/motion";
 import { Lightning } from "@phosphor-icons/react";
 import { useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
@@ -41,8 +42,8 @@ export default function Cart() {
                   layout
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -16 }}
-                  transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}
+                  exit={{ opacity: 0, x: -16, transition: tExit }}
+                  transition={tEnter}
                   className="flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

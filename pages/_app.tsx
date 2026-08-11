@@ -5,6 +5,7 @@ import { IconContext } from "@phosphor-icons/react";
 import { Agentation } from "agentation";
 import { AppProviders } from "@/data/store";
 import { LeftSidebar } from "@/components/ui/LeftSidebar";
+import { dur, ease, tFast } from "@/lib/motion";
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -15,8 +16,9 @@ export default function App({ Component, pageProps }: AppProps) {
           current text color + font size (1em). Per-icon size/color overrides
           still win. Set once here so the whole app is consistent. */}
       <IconContext.Provider value={{ weight: "duotone", color: "currentColor", size: "1em" }}>
-      {/* reducedMotion="user" makes every framer animation respect the OS setting. */}
-      <MotionConfig reducedMotion="user" transition={{ type: "spring", bounce: 0, duration: 0.35 }}>
+      {/* reducedMotion="user" makes every framer animation respect the OS setting.
+          Default transition is the 140ms/smooth workhorse from lib/motion. */}
+      <MotionConfig reducedMotion="user" transition={tFast}>
         {/* Persistent desktop-only left nav rail (hidden < md). Rendered OUTSIDE
             the route-fade below so it never re-fades on navigation. It's
             position:fixed, so the md:pl-20 inset on the content wrapper (not a
@@ -39,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
           key={router.pathname}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+          transition={{ duration: dur.moderate, ease: ease.swing }}
         >
           <Component {...pageProps} />
         </motion.div>

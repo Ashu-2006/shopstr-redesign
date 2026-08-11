@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
+import { dur, ease, tEnter, tFast } from "@/lib/motion";
 import { MagnifyingGlass, X, Faders, Heart } from "@phosphor-icons/react";
 import { useListings, useSession } from "@/data/hooks";
 import { primaryType, tintFor, priceLabel } from "@/lib/catalog";
@@ -148,7 +149,7 @@ export default function Search() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {results.map((p) => (
-                    <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}>
+                    <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={tFast}>
                       <ResultCard p={p} />
                     </motion.div>
                   ))}
@@ -167,8 +168,8 @@ export default function Search() {
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              exit={{ y: "100%", transition: { duration: dur.moderate, ease: ease.exit } }}
+              transition={tEnter}
               className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[88vh] max-w-[560px] flex-col rounded-t-2xl border-2 border-ink bg-paper"
             >
               <div className="flex items-center justify-between border-b-2 border-ink px-5 py-4">
@@ -266,7 +267,7 @@ function ResultCard({ p }: { p: ProductData }) {
       <div className={`relative aspect-square overflow-hidden rounded-lg border-2 border-ink ${tintFor(p)}`}>
         <Link href={`/listing/${p.id}`} className="absolute inset-0 block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={p.images[0]} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.06]" />
+          <img src={p.images[0]} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
         </Link>
         {type && <span className="absolute left-2.5 top-2.5 rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">{type}</span>}
         <button onClick={() => toggleFav(p.id)} aria-label="Save" aria-pressed={fav}

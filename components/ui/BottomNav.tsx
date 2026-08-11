@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { House, UsersThree, ChatCircle, Wallet, User } from "@phosphor-icons/react";
+import { tEnter, tLayout } from "@/lib/motion";
 
 type Item = { href: string; label: string; icon: ReactNode };
 
@@ -47,7 +48,7 @@ export function BottomNav({ active }: { active: string }) {
                 <motion.span
                   layoutId="nav-active-pill"
                   className="absolute inset-0 rounded-pill bg-yellow"
-                  transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                  transition={tLayout}
                 />
               )}
               <span className="relative z-10">{it.icon}</span>
@@ -55,7 +56,7 @@ export function BottomNav({ active }: { active: string }) {
                 <motion.span
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
-                  transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
+                  transition={tEnter}
                   className="ds-display relative z-10 overflow-hidden whitespace-nowrap pr-1 text-sm leading-none"
                 >
                   {it.label}

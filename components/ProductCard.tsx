@@ -42,7 +42,7 @@ export function ProductCard({ product }: { product: ProductData }) {
           src={product.images[0]}
           alt={product.title}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-105"
           style={{ outline: "1px solid rgba(0,0,0,0.08)", outlineOffset: "-1px" }}
         />
         {type && (

@@ -2,6 +2,7 @@ import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
+import { tLayout } from "@/lib/motion";
 import { profileByHandle, useSellerListings, useReviews, averageRating, useSession } from "@/data/hooks";
 import { timeAgo } from "@/lib/format";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -66,7 +67,7 @@ export default function Shop() {
                   <motion.span
                     layoutId="shop-tab-underline"
                     className="absolute inset-x-0 -bottom-0.5 h-[3px] rounded-full bg-purple"
-                    transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+                    transition={tLayout}
                   />
                 )}
               </button>

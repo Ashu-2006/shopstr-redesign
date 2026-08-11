@@ -30,8 +30,10 @@ export default function Paid() {
     <>
       <Head><title>Order placed · Shopstr</title></Head>
       <div className="relative flex min-h-screen flex-col items-center justify-center gap-4 overflow-hidden bg-green px-6 py-10 text-center text-ink">
-        <Sticker name="shape-sparkle-4pt" className="absolute left-8 top-[14%] h-14 w-14" />
-        <Sticker name="shape-daisy-yellow" className="absolute right-8 top-[22%] h-14 w-14" />
+        {/* Reward stickers pop in staggered 60ms apart; simultaneous entry reads
+            as a glitch. */}
+        <Sticker name="shape-sparkle-4pt" className="pop-in absolute left-8 top-[14%] h-14 w-14" />
+        <Sticker name="shape-daisy-yellow" className="pop-in absolute right-8 top-[22%] h-14 w-14 [animation-delay:60ms]" />
 
         <div className="z-10 grid h-[118px] w-[118px] place-items-center rounded-full bg-ink">
           <svg width="54" height="54" viewBox="0 0 24 24" fill="none" className="check-draw">
@@ -40,7 +42,8 @@ export default function Paid() {
         </div>
 
         <h2 className="ds-display z-10 text-4xl leading-[0.95]">Paid in<br /><span className="inline-flex items-center gap-2">full <Lightning size={32} /></span></h2>
-        <div className="z-10 rounded-pill border-2 border-ink bg-paper-pure px-[18px] py-2.5 font-mono font-bold tabular-nums">
+        {/* The amount lands after the check has drawn. */}
+        <div className="pop-in z-10 rounded-pill border-2 border-ink bg-paper-pure px-[18px] py-2.5 font-mono font-bold tabular-nums [animation-delay:300ms]">
           − {groupInt(snapshot.total)} sats
         </div>
 

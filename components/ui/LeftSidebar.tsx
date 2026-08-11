@@ -55,12 +55,12 @@ function Row({ item, active }: { item: Item; active: boolean }) {
       aria-current={active ? "page" : undefined}
       title={item.label}
       className={[
-        "ds-press flex h-12 items-center rounded-lg transition-colors duration-150",
+        "ds-press flex h-12 items-center rounded-lg transition-colors duration-(--ds-dur-instant)",
         active ? "bg-ink text-text-on-dark" : "text-ink hover:bg-paper-2",
       ].join(" ")}
     >
       <span className="grid w-14 shrink-0 place-items-center">{item.icon}</span>
-      <span className="whitespace-nowrap pr-4 text-sm font-semibold opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
+      <span className="whitespace-nowrap pr-4 text-sm font-semibold opacity-0 transition-opacity duration-(--ds-dur-moderate) group-hover:opacity-100 motion-reduce:transition-none">
         {item.label}
       </span>
     </Link>
@@ -80,7 +80,7 @@ export function LeftSidebar() {
 
   return (
     <aside
-      className="group fixed inset-y-0 left-0 z-40 hidden w-20 flex-col overflow-hidden border-r-2 border-ink bg-paper transition-[width] duration-300 ease-out hover:w-64 motion-reduce:transition-none md:flex"
+      className="group fixed inset-y-0 left-0 z-40 hidden w-20 flex-col overflow-hidden border-r-2 border-ink bg-paper transition-[width] duration-(--ds-dur-moderate) ease-swing hover:w-64 motion-reduce:transition-none md:flex"
     >
       {/* Brand — sparkle mark always visible; wordmark reveals on hover */}
       <Link
@@ -91,7 +91,7 @@ export function LeftSidebar() {
         <span className="grid w-14 shrink-0 place-items-center">
           <Sticker name="shape-sparkle-4pt" className="h-6 w-6" />
         </span>
-        <span className="ds-display whitespace-nowrap pr-4 text-xl leading-none opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
+        <span className="ds-display whitespace-nowrap pr-4 text-xl leading-none opacity-0 transition-opacity duration-(--ds-dur-moderate) group-hover:opacity-100 motion-reduce:transition-none">
           shopstr
         </span>
       </Link>
@@ -106,10 +106,10 @@ export function LeftSidebar() {
           href="/sell/new"
           aria-label="Sell an item"
           title="Sell"
-          className="ds-press mt-2 flex h-12 items-center rounded-lg bg-purple text-on-purple transition-colors duration-150 hover:bg-purple-press"
+          className="ds-press mt-2 flex h-12 items-center rounded-lg bg-purple text-on-purple transition-colors duration-(--ds-dur-instant) hover:bg-purple-press"
         >
           <span className="grid w-14 shrink-0 place-items-center">{ICON.sell}</span>
-          <span className="ds-display whitespace-nowrap pr-4 text-sm leading-none opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
+          <span className="ds-display whitespace-nowrap pr-4 text-sm leading-none opacity-0 transition-opacity duration-(--ds-dur-moderate) group-hover:opacity-100 motion-reduce:transition-none">
             Sell
           </span>
         </Link>

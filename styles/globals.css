@@ -71,9 +71,17 @@
   --radius-2xl: var(--ds-radius-2xl);
   --radius-pill: var(--ds-radius-pill);
 
-  /* motion easings */
+  /* motion — the four curves as ease-* utilities. Durations have no Tailwind
+     namespace; consume them as duration-(--ds-dur-*). The defaults make every
+     bare transition utility run 140ms smooth unless overridden. */
+  --ease-smooth: var(--ds-ease-smooth);
+  --ease-swing: var(--ds-ease-swing);
+  --ease-exit: var(--ds-ease-exit);
+  --ease-jumpy: var(--ds-ease-jumpy);
   --ease-out: var(--ds-ease-out);
   --ease-fluid: var(--ds-ease-fluid);
+  --default-transition-duration: var(--ds-dur-fast);
+  --default-transition-timing-function: var(--ds-ease-smooth);
 }
 
 /* ------------------------------------------------------------------ BASE -- */
@@ -109,11 +117,12 @@ p {
   text-wrap: pretty;
 }
 
-/* Tactile press for interactive elements. Always 0.96. */
+/* Tactile press for interactive elements. Always 0.96. Press feedback runs at
+   70ms — a press must feel immediate; hover can afford 140ms. */
 .ds-press {
   transition-property: scale;
-  transition-duration: var(--ds-dur-fast);
-  transition-timing-function: var(--ds-ease-out);
+  transition-duration: var(--ds-dur-instant);
+  transition-timing-function: var(--ds-ease-smooth);
 }
 .ds-press:active {
   scale: var(--ds-press-scale);
@@ -129,34 +138,114 @@ p {
 }
 
 /* Staggered enter for feed children. Apply `.stagger` to a parent and give each
-   child `animation-delay`. Pairs with the `ds-rise` keyframe. */
+   child `animation-delay`. Opacity resolves at 60% so content is readable while
+   the translate is still settling. */
 @keyframes ds-rise {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(14px);
   }
-  to {
+  60% {
+    opacity: 1;
+  }
+  100% {
     opacity: 1;
     transform: none;
   }
 }
 .stagger > * {
-  animation: ds-rise 0.5s var(--ds-ease-out) both;
+  animation: ds-rise var(--ds-dur-moderate) var(--ds-ease-swing) both;
 }
 
-/* Colored category hero pop-in. */
+/* Colored category hero pop-in. Bulges 2% at 70%, settles — never zooms in
+   from small. */
 @keyframes ds-catpop {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.94);
+    transform: scale(0.97);
   }
-  to {
+  70% {
     opacity: 1;
-    transform: none;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 .cat-pop {
-  animation: ds-catpop 0.42s var(--ds-ease-out) both;
+  animation: ds-catpop var(--ds-dur-moderate) var(--ds-ease-smooth) both;
+}
+
+/* Menu / popover / disclosure entrance. transform-origin at the anchor edge
+   makes it emerge from the thing you tapped instead of materializing in space.
+   `backwards` fill prevents a one-frame flash of the final position. */
+@keyframes ds-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  70% {
+    opacity: 1;
+    transform: scaleY(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+.menu-in {
+  transform-origin: top;
+  animation: ds-slide-in var(--ds-dur-moderate) var(--ds-ease-swing) backwards;
+}
+.menu-in-bottom {
+  transform-origin: bottom;
+  animation: ds-slide-in var(--ds-dur-moderate) var(--ds-ease-swing) backwards;
+}
+
+/* Sticker / reveal pop. Starts at scale(1) and bulges 5% — bulging reads
+   physical, growing from small reads cheap. Opacity is solid by 40% so the
+   content is readable before the motion ends. */
+@keyframes ds-popdown {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  20% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.pop-in {
+  animation: ds-popdown var(--ds-dur-moderate) var(--ds-ease-smooth) both;
+}
+
+/* Toast / notice — enters from the edge it lives on with a 1% overshoot.
+   Stagger simultaneous toasts by 40-60ms. */
+@keyframes ds-toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.toast-in {
+  animation: ds-toast-in var(--ds-dur-moderate) var(--ds-ease-swing) both;
 }
 
 /* Slow spin for decorative stickers. */
@@ -182,14 +271,16 @@ p {
   }
 }
 .bump {
-  animation: ds-pop 0.35s var(--ds-ease-out);
+  animation: ds-pop var(--ds-dur-moderate) var(--ds-ease-smooth);
 }
 
-/* Success check stroke-draw (paid screen). */
+/* Success check stroke-draw (paid screen). Delayed one fast beat so it lands
+   after the surface has settled. */
 .check-draw path {
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
-  animation: ds-draw 0.55s var(--ds-ease-out) 0.15s forwards;
+  animation: ds-draw var(--ds-dur-slow) var(--ds-ease-swing) var(--ds-dur-fast)
+    forwards;
 }
 @keyframes ds-draw {
   to {
@@ -244,7 +335,7 @@ p {
 /* Hover-lift on cards (desktop pointers only). */
 @media (hover: hover) {
   .lift {
-    transition: transform 0.25s var(--ds-ease-out);
+    transition: transform var(--ds-dur-fast) var(--ds-ease-swing);
   }
   .lift:hover {
     transform: translateY(-3px);

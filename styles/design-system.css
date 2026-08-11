@@ -127,13 +127,23 @@
   --ds-stroke-bold: 2.5px;
 
   /* -------------------------------------------------------------- MOTION --
-     Shared by Framer Motion / GSAP / CSS. Springs feel bouncy-but-controlled;
-     bounce stays 0 per the make-interfaces rules. */
-  --ds-dur-fast: 140ms;
-  --ds-dur-base: 240ms;
-  --ds-dur-slow: 420ms;
-  --ds-ease-out: cubic-bezier(0.2, 0, 0, 1);
-  --ds-ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+     Shared by Framer Motion / GSAP / CSS. Four durations on a ~2x scale, four
+     curves. That is the whole vocabulary; adding a fifth means the scale is
+     wrong. The entrance shape everywhere: fade in fast, overshoot 2-5%, settle.
+     lib/motion.ts mirrors these values for Framer Motion; keep them in sync. */
+  --ds-dur-instant: 70ms; /* micro-feedback: icon opacity, row hover, press */
+  --ds-dur-fast: 140ms; /* THE WORKHORSE: hover, focus, color, most things */
+  --ds-dur-moderate: 300ms; /* entrances: menus, popovers, accordions */
+  --ds-dur-slow: 560ms; /* large travel: drawers, page-level, image zoom */
+  --ds-dur-base: var(--ds-dur-moderate); /* deprecated alias */
+
+  --ds-ease-smooth: cubic-bezier(0.45, 0.05, 0.55, 0.95); /* neutral default */
+  --ds-ease-swing: cubic-bezier(0, 0.55, 0.45, 1); /* max velocity at t=0; slides */
+  --ds-ease-exit: cubic-bezier(0.65, 0.05, 0.36, 1); /* hesitates, then commits */
+  --ds-ease-jumpy: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* overshoots both ends; sticker pops only */
+  --ds-ease-out: var(--ds-ease-swing); /* deprecated alias */
+  --ds-ease-fluid: var(--ds-ease-smooth); /* deprecated alias */
+
   --ds-press-scale: 0.96;
 
   /* -------------------------------------------------------------- LAYOUT --*/

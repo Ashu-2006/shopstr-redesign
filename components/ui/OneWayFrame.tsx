@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { X } from "@phosphor-icons/react";
 import { Sticker, type StickerName } from "@/components/ui/Sticker";
+import { tEnter, tLayout } from "@/lib/motion";
 
 type Tone = "purple" | "yellow" | "green";
 
@@ -57,7 +58,7 @@ export function OneWayFrame({
             {Array.from({ length: total }).map((_, i) => (
               <span
                 key={i}
-                className={`h-[5px] w-[22px] rounded-[3px] transition-opacity duration-300 ${
+                className={`h-[5px] w-[22px] rounded-[3px] transition-opacity ${
                   onPurple ? "bg-white" : "bg-ink"
                 } ${i < (current ?? 0) ? "opacity-100" : "opacity-30"}`}
               />
@@ -81,7 +82,7 @@ export function OneWayFrame({
           layout
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ layout: { type: "spring", bounce: 0, duration: 0.45 }, duration: 0.4 }}
+          transition={{ layout: tLayout, ...tEnter }}
           className="z-10 w-full max-w-[440px] overflow-hidden rounded-2xl border-2 border-ink bg-paper-pure p-6 text-ink"
         >
           {children}

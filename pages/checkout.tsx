@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
+import { shake, tEnter } from "@/lib/motion";
 import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowRight, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
@@ -127,7 +128,7 @@ export default function Checkout() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.28, ease: [0.2, 0, 0, 1] }}
+            transition={tEnter}
           >
             {step === "type" && (
               <>
@@ -230,7 +231,7 @@ function ShipStep() {
     if (!draft.zip.trim()) e.zip = true;
     if (Object.keys(e).length) {
       setErrs(e);
-      controls.start({ x: [0, -8, 8, -6, 6, 0], transition: { duration: 0.4 } });
+      controls.start(shake);
       return;
     }
     setErrs({});
@@ -312,7 +313,7 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
         <div className="mt-4">
           <div className="relative mx-auto h-[200px] w-[200px]">
             <div
-              className={`grid h-full w-full place-items-center rounded-lg border-2 border-ink transition-[filter,opacity] duration-300 ${expired ? "opacity-30 blur-[2px]" : ""}`}
+              className={`grid h-full w-full place-items-center rounded-lg border-2 border-ink transition-[filter,opacity] duration-(--ds-dur-moderate) ${expired ? "opacity-30 blur-[2px]" : ""}`}
               style={{ background: "conic-gradient(from 0deg,#121212 0 25%,#fff 0 50%,#121212 0 75%,#fff 0),repeating-conic-gradient(#121212 0 12.5%,#fff 0 25%)", backgroundSize: "24px 24px" }}
             >
               <span className="grid h-12 w-12 place-items-center rounded-xl border-2 border-ink bg-white text-purple"><Bolt /></span>

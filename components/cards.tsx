@@ -24,7 +24,7 @@ export function HeroCard({ product, n }: { product: ProductData; n: number }) {
       className="group relative block h-[360px] w-full shrink-0 basis-full snap-center overflow-hidden text-white md:h-[440px]"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={product.images[0]} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[700ms] ease-out motion-safe:group-hover:scale-[1.05]" />
+      <img src={product.images[0]} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.05]" />
       <div className="absolute inset-0 bg-[linear-gradient(transparent_38%,rgba(0,0,0,0.85))]" />
       <span className="ds-display absolute left-5 top-4 z-10 text-5xl mix-blend-difference">
         {String(n).padStart(2, "0")}
@@ -65,7 +65,7 @@ export function CategoryFeature({
     >
       <div className="h-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.06]" />
+        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
       </div>
       <div className="flex flex-col justify-between p-[18px]">
         <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em] text-[#cfcbff]">{kicker}</span>
@@ -94,7 +94,7 @@ export function BreakCard({ product, kicker }: { product: ProductData; kicker: s
       </div>
       <div className="my-3.5 h-[190px] overflow-hidden rounded-lg border-2 border-ink">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.06]" />
+        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
       </div>
       <h3 className="ds-display text-[1.4rem] leading-[0.92]">{product.title}</h3>
       <div className="mt-1.5 flex items-baseline justify-between">
@@ -121,7 +121,7 @@ export function ListCard({
     >
       <div className={`overflow-hidden border-r-2 border-ink ${tintFor(product)}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt={product.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.06]" style={{ outline: "1px solid rgba(0,0,0,0.06)", outlineOffset: "-1px" }} />
+        <img src={product.images[0]} alt={product.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" style={{ outline: "1px solid rgba(0,0,0,0.06)", outlineOffset: "-1px" }} />
       </div>
       <div className="flex flex-col p-3.5">
         <div className="mb-2.5 flex flex-wrap gap-1.5">
@@ -164,7 +164,7 @@ export function NearCard({ product }: { product: ProductData }) {
     >
       <div className={`h-[150px] overflow-hidden ${tintFor(product)}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[600ms] ease-out motion-safe:group-hover:scale-[1.06]" />
+        <img src={product.images[0]} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
       </div>
       <div className="p-3.5">
         <div className="line-clamp-2 text-[0.92rem] font-bold leading-tight">{product.title}</div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { MagnifyingGlass, ShoppingBag } from "@phosphor-icons/react";
 import { Logo } from "@/components/ui/Logo";
+import { bump } from "@/lib/motion";
 
 /**
  * Discovery top bar: logo + promoted search + cart. Sticky. Mobile-primary;
@@ -78,8 +79,7 @@ export function TopBar({
             <motion.span
               key={cartCount}
               initial={{ scale: 0.4 }}
-              animate={{ scale: [1.35, 1] }}
-              transition={{ duration: 0.35, ease: [0.34, 1.36, 0.64, 1] }}
+              animate={bump}
               className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 font-mono text-[0.62rem] font-bold text-text-on-dark tabular-nums"
             >
               {cartCount}
