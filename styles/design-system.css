@@ -136,6 +136,9 @@
   --ds-dur-moderate: 300ms; /* entrances: menus, popovers, accordions */
   --ds-dur-slow: 560ms; /* large travel: drawers, page-level, image zoom */
   --ds-dur-base: var(--ds-dur-moderate); /* deprecated alias */
+  /* Ambient loop duration (skeleton sweep). Deliberately OUTSIDE the four-step
+     interaction scale above: it paces a background loop, not an interaction. */
+  --ds-dur-loop: 1.6s;
 
   --ds-ease-smooth: cubic-bezier(0.45, 0.05, 0.55, 0.95); /* neutral default */
   --ds-ease-swing: cubic-bezier(0, 0.55, 0.45, 1); /* max velocity at t=0; slides */

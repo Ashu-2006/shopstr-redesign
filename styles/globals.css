@@ -274,6 +274,40 @@ p {
   animation: ds-pop var(--ds-dur-moderate) var(--ds-ease-smooth);
 }
 
+/* Skeleton loading sweep. A calm gradient SWEEP on paper tokens, never an
+   opacity pulse (reads cheap) and never a spinner (spinner-pop is banned; see
+   docs/superpowers/specs/2026-08-12-loading-empty-states-design.md). The card's
+   ink frame renders live; only content areas get this fill, shape-matched so
+   nothing reflows when data lands. */
+@keyframes ds-skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.ds-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ds-paper-2) 0%,
+    var(--ds-paper-2) 35%,
+    var(--ds-paper) 50%,
+    var(--ds-paper-2) 65%,
+    var(--ds-paper-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: ds-skeleton-sweep var(--ds-dur-loop) linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* animation-name: none (not just the global duration kill) so the infinite
+     loop can't restart every 0.001ms; falls back to a static fill. */
+  .ds-skeleton {
+    animation: none;
+    background: var(--ds-paper-2);
+  }
+}
+
 /* Success check stroke-draw (paid screen). Delayed one fast beat so it lands
    after the surface has settled. */
 .check-draw path {

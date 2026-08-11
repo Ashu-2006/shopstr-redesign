@@ -9,7 +9,7 @@ import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Button } from "@/components/ui/Button";
-import { Sticker } from "@/components/ui/Sticker";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const SHIPPING = 4000;
 
@@ -24,14 +24,15 @@ export default function Cart() {
 
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
         {items.length === 0 ? (
-          <div className="px-6 pt-16 text-center">
-            <Sticker name="shape-starburst" className="mx-auto mb-4 h-20 w-20" />
-            <p className="ds-display text-2xl">Cart&apos;s empty</p>
-            <p className="mt-2 text-text-muted">Go find something worth keeping.</p>
-            <Link href="/marketplace" className="mt-5 inline-block">
-              <Button variant="secondary">Browse the market</Button>
-            </Link>
-          </div>
+          <EmptyState
+            headline="Cart's empty"
+            body="Go find something worth keeping."
+            cta={
+              <Link href="/marketplace">
+                <Button variant="secondary">Browse the market</Button>
+              </Link>
+            }
+          />
         ) : (
           <>
             <ul className="flex flex-col gap-2.5">
