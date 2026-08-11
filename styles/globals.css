@@ -1,10 +1,23 @@
 /* Font @import MUST come first — CSS requires all @import rules to precede other
-   rules, and `@import "tailwindcss"` expands into rules. Three OFL families:
-   Archivo Black (display), Space Grotesk (body), Space Mono (numbers). Self-host
-   the .woff2 files before production. */
-@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+   rules, and `@import "tailwindcss"` expands into rules.
+   Type system:
+   - display: "Circular Std" (self-hosted, @font-face below) -> sans fallbacks
+   - body:    Inter (loaded here) -> sans fallbacks; 400 default, 600 for labels
+   - mono:    system ui-monospace stack (no webfont) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "./design-system.css";
+
+/* Display face — Circular Std Medium (single static weight). Declaring a wide
+   weight range makes the browser use this one file across weights instead of
+   faux-bolding, so `font-bold` display headings stay on-brand. */
+@font-face {
+  font-family: "Circular Std";
+  src: url("/circular-std-medium-500.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* -----------------------------------------------------------------------------
    Tailwind v4 CSS-first theme — map `--ds-*` into Tailwind's namespaced theme

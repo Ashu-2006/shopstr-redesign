@@ -11,6 +11,7 @@ import {
   type Tone,
 } from "@/lib/catalog";
 import { Sticker, type StickerName } from "@/components/ui/Sticker";
+import { Star, SealCheck, ArrowUpRight } from "@phosphor-icons/react";
 
 /* The chosen card system, ported from the prototype. All pure presentation:
    props in, JSX out. Each links into the app via next/link. */
@@ -139,8 +140,13 @@ export function ListCard({
         <p className="mt-1.5 line-clamp-2 text-[0.8rem] leading-snug text-text-muted">{product.summary}</p>
         <div className="mt-auto flex items-center justify-between pt-2.5">
           <span className="font-mono text-[1.15rem] font-bold tabular-nums">{priceLabel(product)}</span>
-          <span className="font-mono text-[0.66rem] text-text-subtle">
-            {rating && rating.count > 0 ? `★ ${rating.avg.toFixed(1)} · ` : ""}
+          <span className="inline-flex items-center gap-1 font-mono text-[0.66rem] text-text-subtle">
+            {rating && rating.count > 0 && (
+              <>
+                <Star weight="fill" size={12} aria-hidden />
+                {`${rating.avg.toFixed(1)} · `}
+              </>
+            )}
             {product.location}
           </span>
         </div>
@@ -219,17 +225,15 @@ export function SellerCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={profile.picture} alt="" className="h-14 w-14 rounded-[15px] border-2 border-ink object-cover" />
         <span className="inline-flex items-center gap-1 rounded-pill bg-ink px-2.5 py-1.5 font-mono text-[0.74rem] font-bold text-white tabular-nums">
-          ★ {avg.toFixed(1)}
+          <Star weight="fill" size={13} aria-hidden />
+          {avg.toFixed(1)}
         </span>
       </div>
       <div className="min-w-0">
         <div className="ds-display flex items-center gap-1 truncate text-lg leading-none">
           @{profile.handle}
           {profile.nip05 && (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <path d="M12 2l2.4 1.8 3 .2.2 3L19.4 9.6l-1.8 2.4 1.8 2.4-1.8 2.6-.2 3-3 .2L12 22l-2.4-1.8-3-.2-.2-3L4.6 14.4l1.8-2.4-1.8-2.4 1.8-2.6.2-3 3-.2L12 2z" fill="#121212" />
-              <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <SealCheck size={13} className="shrink-0" aria-label="verified" />
           )}
         </div>
         <div className="mt-1.5 truncate font-mono text-[0.66rem] opacity-70">
@@ -239,7 +243,7 @@ export function SellerCard({
       <div className={`mt-auto flex items-center justify-between border-t-2 pt-3 font-mono text-[0.72rem] font-bold ${onDark ? "border-white/25" : "border-ink/20"}`}>
         <span className="tabular-nums">{compactSats(profile.totalSales ?? 0)} sold</span>
         <span className="inline-flex items-center gap-1">Visit
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <ArrowUpRight size={13} />
         </span>
       </div>
     </Link>

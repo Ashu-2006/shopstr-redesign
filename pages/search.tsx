@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
+import { MagnifyingGlass, X, Faders, Heart } from "@phosphor-icons/react";
 import { useListings, useSession } from "@/data/hooks";
 import { primaryType, tintFor, priceLabel } from "@/lib/catalog";
 import type { ProductData } from "@/data/types";
@@ -11,8 +12,8 @@ type Sort = "featured" | "newest" | "high" | "low";
 const SORTS: { key: Sort; label: string }[] = [
   { key: "featured", label: "Featured" },
   { key: "newest", label: "Newest" },
-  { key: "high", label: "Price: High–Low" },
-  { key: "low", label: "Price: Low–High" },
+  { key: "high", label: "Price: High to Low" },
+  { key: "low", label: "Price: Low to High" },
 ];
 const SIZES = ["S", "M", "L", "XL"];
 
@@ -85,7 +86,7 @@ export default function Search() {
       <header className="sticky top-0 z-30 border-b-2 border-ink bg-paper px-4 py-3">
         <div className="mx-auto flex max-w-[1240px] items-center gap-3">
           <div className="relative flex flex-1 items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0 text-text-subtle"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+            <MagnifyingGlass size={18} className="shrink-0 text-text-subtle" />
             <input
               ref={inputRef}
               autoFocus
@@ -97,7 +98,7 @@ export default function Search() {
             />
             {query && (
               <button onClick={clear} aria-label="Clear" className="ds-press grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper-2">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /></svg>
+                <X size={13} />
               </button>
             )}
           </div>
@@ -115,7 +116,7 @@ export default function Search() {
             {suggestions.map((term, i) => (
               <li key={term + i} style={{ animationDelay: `${i * 40}ms` }}>
                 <button onClick={() => commit(term)} className="flex w-full items-center gap-3 border-b-2 border-paper-2 py-3.5 text-left ds-press">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-text-subtle"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  <MagnifyingGlass size={16} className="shrink-0 text-text-subtle" />
                   <Suggestion term={term} query={query.trim()} />
                 </button>
               </li>
@@ -131,7 +132,7 @@ export default function Search() {
               <span className="font-mono text-sm tabular-nums">{results.length} result{results.length === 1 ? "" : "s"}</span>
               <button onClick={() => setSheet(true)} className="ds-press inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 font-bold">
                 Filter
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><circle cx="16" cy="7" r="2.3" stroke="currentColor" strokeWidth="2" /><circle cx="8" cy="17" r="2.3" stroke="currentColor" strokeWidth="2" /></svg>
+                <Faders size={16} />
                 {filterCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-purple px-1 font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">{filterCount}</span>}
               </button>
             </div>
@@ -173,7 +174,7 @@ export default function Search() {
               <div className="flex items-center justify-between border-b-2 border-ink px-5 py-4">
                 <h2 className="ds-display text-2xl">Filter</h2>
                 <button onClick={() => setSheet(false)} aria-label="Close" className="ds-press grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-paper-pure">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /></svg>
+                  <X size={15} />
                 </button>
               </div>
 
@@ -255,7 +256,7 @@ function Suggestion({ term, query }: { term: string; query: string }) {
   );
 }
 
-/* Search result card — image well + fav heart + type tag + title + price. */
+/* Search result card: image well + fav heart + type tag + title + price. */
 function ResultCard({ p }: { p: ProductData }) {
   const { favs, toggleFav } = useSession();
   const fav = favs.has(p.id);
@@ -270,7 +271,7 @@ function ResultCard({ p }: { p: ProductData }) {
         {type && <span className="absolute left-2.5 top-2.5 rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">{type}</span>}
         <button onClick={() => toggleFav(p.id)} aria-label="Save" aria-pressed={fav}
           className={`ds-press absolute right-2.5 top-2.5 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-ink ${fav ? "bg-pink" : "bg-paper-pure"}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={fav ? "#121212" : "none"}><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5 6 5c2 0 3.2 1.3 4 2.5C10.8 6.3 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.4-9.5 9-9.5 9z" stroke="#121212" strokeWidth="2" /></svg>
+          <Heart size={16} weight={fav ? "fill" : "duotone"} className="text-ink" />
         </button>
       </div>
       <Link href={`/listing/${p.id}`} className="mt-2 block">

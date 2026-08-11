@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SealCheck } from "@phosphor-icons/react";
 import type { Profile } from "@/data/types";
 import { Stars } from "@/components/ui/Stars";
 
@@ -32,10 +33,7 @@ export function SellerStrip({
         <div className="flex items-center gap-1.5 font-bold">
           @{profile.handle}
           {profile.nip05 && (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-label="verified">
-              <path d="M12 2l2.4 1.8 3 .2.2 3L19.4 9.6l-1.8 2.4 1.8 2.4-1.8 2.6-.2 3-3 .2L12 22l-2.4-1.8-3-.2-.2-3L4.6 14.4l1.8-2.4-1.8-2.4 1.8-2.6.2-3 3-.2L12 2z" fill="#25c26e" />
-              <path d="M9 12l2 2 4-4" stroke="#121212" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <SealCheck size={14} color="#25c26e" aria-label="verified" className="shrink-0" />
           )}
         </div>
         <div className="font-mono text-[0.72rem] text-[#bdbcb4]">

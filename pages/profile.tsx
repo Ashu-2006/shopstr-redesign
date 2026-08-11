@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Sticker } from "@/components/ui/Sticker";
+import { X, Gear, Star } from "@phosphor-icons/react";
 
 const TILTS = [
   { label: "@ekko", href: "/shop/ekko", bg: "bg-pink", rot: -4, ml: 0 },
@@ -18,9 +19,9 @@ export default function Profile() {
       <Head><title>You · Shopstr</title></Head>
       <div className="relative flex min-h-screen flex-col overflow-hidden bg-yellow">
         <div className="flex items-center justify-between px-5 py-[18px]">
-          <button onClick={() => router.push("/marketplace")} aria-label="Close" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">✕</button>
+          <button onClick={() => router.push("/marketplace")} aria-label="Close" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure"><X size={20} /></button>
           <span className="font-mono text-[0.78rem] uppercase tracking-[0.2em]">Profile</span>
-          <Link href="/settings" aria-label="Settings" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">⚙</Link>
+          <Link href="/settings" aria-label="Settings" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure"><Gear size={20} /></Link>
         </div>
 
         <Sticker name="shape-starburst" className="spin-slow absolute right-6 top-[62px] z-0 h-20 w-20" />
@@ -40,7 +41,7 @@ export default function Profile() {
 
         <div className="z-10 mx-3.5 flex gap-3 rounded-t-2xl border-2 border-b-0 border-ink bg-paper-pure p-4 md:mx-auto md:w-full md:max-w-[600px]">
           <Link href="/marketplace" className="ds-press flex min-h-[118px] flex-1 flex-col justify-between rounded-lg border-2 border-ink bg-pink p-3.5">
-            <span className="text-xl">★</span>
+            <span className="text-xl"><Star weight="fill" size={20} /></span>
             <span className="font-bold leading-tight">Rate Shopstr</span>
           </Link>
           <Link href="/shop/ekko" className="ds-press flex min-h-[118px] flex-1 flex-col justify-between rounded-lg border-2 border-ink bg-purple p-3.5 text-on-purple">

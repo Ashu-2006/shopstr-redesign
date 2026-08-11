@@ -7,6 +7,7 @@ import { timeAgo } from "@/lib/format";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
 import { Stars } from "@/components/ui/Stars";
+import { CaretLeft, Check, Plus, Star } from "@phosphor-icons/react";
 
 const NOW = 1717372800000;
 
@@ -29,7 +30,7 @@ export default function Shop() {
       <div className="relative border-b-2 border-ink">
         <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3">
           <button onClick={() => router.back()} aria-label="Back" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <CaretLeft size={18} />
           </button>
           <button aria-label="More" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-ink text-text-on-dark">⋯</button>
         </div>
@@ -45,7 +46,7 @@ export default function Shop() {
               onClick={() => toggleFollow(handle)}
               className={`ds-press mb-1.5 ml-auto rounded-pill border-2 px-5 py-2.5 font-bold ${following ? "border-ink bg-paper-pure text-ink" : "border-ink bg-purple text-on-purple"}`}
             >
-              {following ? "✓ Following" : "+ Follow"}
+              {following ? <span className="inline-flex items-center gap-1.5"><Check size={18} /> Following</span> : <span className="inline-flex items-center gap-1.5"><Plus size={18} /> Follow</span>}
             </button>
           </div>
           <h1 className="ds-display mt-3 text-3xl">@{profile.handle}</h1>
@@ -83,12 +84,12 @@ export default function Shop() {
         {tab === "reviews" && (
           <div className="flex flex-col gap-2.5">
             {(reviews.comments ?? []).length === 0 && reviews.scores.length > 0 && (
-              <p className="text-text-muted">★ {avg.toFixed(1)} from {reviews.scores.length} reviews.</p>
+              <p className="inline-flex items-center gap-1 text-text-muted"><Star weight="fill" size={16} /> {avg.toFixed(1)} from {reviews.scores.length} reviews.</p>
             )}
             {(reviews.comments ?? []).map((c) => (
               <div key={c.id} className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
                 <div className="flex justify-between">
-                  <span className="font-mono text-sm font-bold tabular-nums">★ {c.score.toFixed(1)}</span>
+                  <span className="inline-flex items-center gap-1 font-mono text-sm font-bold tabular-nums"><Star weight="fill" size={15} /> {c.score.toFixed(1)}</span>
                   <span className="font-mono text-[0.7rem] text-text-subtle">{timeAgo(c.createdAt, NOW)}</span>
                 </div>
                 <p className="mt-1.5 text-sm text-text-muted">{c.text}</p>

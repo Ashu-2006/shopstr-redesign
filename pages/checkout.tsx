@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
+import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowRight, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
@@ -16,12 +17,12 @@ const goStep = (router: ReturnType<typeof useRouter>, step: Step) =>
 
 /* ------------------------------------------------------------------ icons -- */
 const ic = "shrink-0";
-const Box = () => (<svg className={ic} width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><path d="M4 7.5l8 4.5 8-4.5M12 12v9" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>);
-const Pin = () => (<svg className={ic} width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><circle cx="12" cy="10" r="2.4" stroke="currentColor" strokeWidth="2" /></svg>);
-const Lock = () => (<svg className={ic} width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" /><path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" strokeWidth="2" /></svg>);
-const Bolt = () => (<svg className={ic} width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 3L5 13h5l-1 8 8-11h-5l1-7z" fill="currentColor" /></svg>);
-const Key = () => (<svg className={ic} width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="8" r="4" stroke="currentColor" strokeWidth="2" /><path d="M11 11l8 8M16 16l2-2M18 18l2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>);
-const Spark = () => (<svg className={ic} width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2 2-8z" fill="currentColor" /></svg>);
+const Box = () => <Package className={ic} size={20} />;
+const Pin = () => <MapPin className={ic} size={20} />;
+const LockIcon = () => <Lock className={ic} size={16} />;
+const Bolt = () => <Lightning className={ic} size={18} />;
+const KeyIcon = () => <Key className={ic} size={16} />;
+const Spark = () => <Sparkle className={ic} size={16} />;
 
 /* ------------------------------------------------------------- primitives -- */
 const inputBase = "rounded-md border-2 px-3.5 py-3 text-[0.92rem] outline-none w-full bg-paper-pure";
@@ -64,7 +65,7 @@ function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; o
 function NextCircle({ onClick }: { onClick: () => void }) {
   return (
     <button onClick={onClick} aria-label="Continue" className="ds-press grid h-[54px] w-[54px] place-items-center rounded-full bg-ink text-text-on-dark">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M12 6l6 6-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <ArrowRight size={22} />
     </button>
   );
 }
@@ -168,7 +169,7 @@ export default function Checkout() {
                 </div>
                 <div className="mt-3 flex items-center justify-between font-mono text-sm text-text-muted">
                   <span>03 / 05</span>
-                  <span className="inline-flex items-center gap-1.5"><Key /> npub1ekko…q8r7</span>
+                  <span className="inline-flex items-center gap-1.5"><KeyIcon /> npub1ekko…q8r7</span>
                 </div>
               </>
             )}
@@ -247,7 +248,7 @@ function ShipStep() {
           <div className="flex-1"><Field label="City" invalid={errs.city}><input className={fieldCls("city")} value={draft.city} onChange={(e) => { set("city", e.target.value); setErrs((p) => ({ ...p, city: false })); }} /></Field></div>
           <div className="w-28"><Field label="Postcode" invalid={errs.zip}><input className={fieldCls("zip")} value={draft.zip} onChange={(e) => { set("zip", e.target.value); setErrs((p) => ({ ...p, zip: false })); }} /></Field></div>
         </div>
-        <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><Lock /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
+        <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><LockIcon /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
       </div>
       <Nav label="02 / 05"><NextCircle onClick={submit} /></Nav>
     </motion.div>
@@ -298,7 +299,11 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
       <div className="flex overflow-hidden rounded-pill border-2 border-ink">
         {(["lightning", "cashu"] as const).map((p) => (
           <button key={p} onClick={() => onPay(p)} className={`flex-1 py-3 font-bold ${pay === p ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
-            {p === "lightning" ? "Lightning ⚡" : "Cashu token"}
+            {p === "lightning" ? (
+              <span className="inline-flex items-center justify-center gap-1.5"><Lightning size={16} /> Lightning</span>
+            ) : (
+              "Cashu token"
+            )}
           </button>
         ))}
       </div>
@@ -322,9 +327,9 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
           {expired ? (
             <div className="mt-3 text-center">
               <div className="font-mono font-bold text-red">Invoice expired</div>
-              <p className="mt-1 text-[0.82rem] text-text-muted">Refreshing automatically — or generate one now.</p>
+              <p className="mt-1 text-[0.82rem] text-text-muted">Refreshing automatically, or generate one now.</p>
               <button onClick={regen} className="ds-press mt-2.5 inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5 font-bold">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <ArrowsClockwise size={16} />
                 Generate fresh invoice
               </button>
             </div>

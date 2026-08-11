@@ -11,6 +11,7 @@ import {
   useSession,
   averageRating,
 } from "@/data/hooks";
+import { Heart, Lightning, ShoppingBag, ChatCircle, Star } from "@phosphor-icons/react";
 import { formatSats, groupInt, timeAgo } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
@@ -99,9 +100,7 @@ export default function ListingDetail() {
                 isFav ? "bg-pink" : "bg-paper-pure"
               }`}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill={isFav ? "#121212" : "none"}>
-                <path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5 6 5c2 0 3.2 1.3 4 2.5C10.8 6.3 12 5 14 5c3.5 0 5 4 3.5 7-2.5 4.4-9.5 9-9.5 9z" stroke="#121212" strokeWidth="2" />
-              </svg>
+              <Heart size={18} weight={isFav ? "fill" : "duotone"} />
             </button>
           </div>
 
@@ -169,8 +168,8 @@ export default function ListingDetail() {
             {[
               ["Shipping", shippingLine],
               ["Ships from", product.location],
-              ["Category", product.categories.filter((c) => !["Digital", "Service", "Resale", "Exchange", "Swap", "Physical"].includes(c)).join(", ") || "—"],
-              ["Quantity", product.quantity != null ? `${groupInt(product.quantity)} available` : "—"],
+              ["Category", product.categories.filter((c) => !["Digital", "Service", "Resale", "Exchange", "Swap", "Physical"].includes(c)).join(", ") || "-"],
+              ["Quantity", product.quantity != null ? `${groupInt(product.quantity)} available` : "-"],
             ].map(([k, v]) => (
               <div key={k} className="bg-paper-pure p-3">
                 <dt className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-subtle">{k}</dt>
@@ -191,7 +190,7 @@ export default function ListingDetail() {
                 {reviews.comments.map((c) => (
                   <li key={c.id} className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-sm font-bold tabular-nums">★ {c.score.toFixed(1)}</span>
+                      <span className="inline-flex items-center gap-1 font-mono text-sm font-bold tabular-nums"><Star weight="fill" size={14} /> {c.score.toFixed(1)}</span>
                       <span className="font-mono text-[0.7rem] text-text-subtle">{timeAgo(c.createdAt, 1717372800000)}</span>
                     </div>
                     <p className="mt-1.5 text-sm text-text-muted">{c.text}</p>
@@ -219,10 +218,7 @@ export default function ListingDetail() {
         <div className="mx-auto max-w-[1100px]">
           {walletCovers && (
             <div className="mb-2 flex items-center justify-center gap-1.5 rounded-pill border-2 border-purple bg-purple-soft px-3.5 py-2 font-mono text-[0.72rem] font-bold text-purple-press">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="6" width="18" height="13" rx="3" stroke="currentColor" strokeWidth="2" />
-                <path d="M16 12h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <Lightning size={14} />
               Pay from your Shopstr wallet · {formatSats(walletBalance)} available
             </div>
           )}
@@ -236,20 +232,15 @@ export default function ListingDetail() {
             <Button variant="secondary" full className="flex-1" onClick={buyNow}>
               {walletCovers ? "Buy with sats" : "Buy now"}
             </Button>
-            <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" strokeWidth="2" strokeLinejoin="round" />
-                <path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" strokeWidth="2" />
-              </svg>
+            <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
+              <ShoppingBag size={22} />
             </button>
             <Link
               href={`/messages/${seller?.handle ?? ""}?pid=${product.id}&from=listing`}
               aria-label="Message seller"
-              className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-green"
+              className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-green text-ink"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M4 5h16v11H9l-4 3V5z" stroke="#121212" strokeWidth="2" strokeLinejoin="round" />
-              </svg>
+              <ChatCircle size={22} />
             </Link>
           </div>
         </div>

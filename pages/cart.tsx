@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
+import { Lightning } from "@phosphor-icons/react";
 import { useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
@@ -76,7 +77,7 @@ export default function Cart() {
                 <span className="text-2xl tabular-nums">{groupInt(subtotal + SHIPPING)} sats</span>
               </div>
               <Button variant="accent" full onClick={() => router.push("/checkout")}>
-                Checkout · pay with sats ⚡
+                <span className="inline-flex items-center justify-center gap-2"><Lightning size={18} /> Checkout · pay with sats</span>
               </Button>
             </div>
           </>

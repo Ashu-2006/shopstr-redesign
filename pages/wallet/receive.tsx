@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
+import { Lightning } from "@phosphor-icons/react";
 
 const inputCls = "rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 text-[0.92rem] outline-none focus:border-purple w-full";
 
@@ -20,7 +21,7 @@ export default function Receive() {
             backgroundSize: "24px 24px",
           }}
         >
-          <span className="grid h-12 w-12 place-items-center rounded-xl border-2 border-ink bg-white text-purple">⚡</span>
+          <span className="grid h-12 w-12 place-items-center rounded-xl border-2 border-ink bg-white text-purple"><Lightning size={24} /></span>
         </div>
         <label className="mt-4 flex flex-col gap-1.5">
           <span className="font-mono text-[0.66rem] uppercase tracking-[0.08em] text-text-muted">Or request an amount</span>

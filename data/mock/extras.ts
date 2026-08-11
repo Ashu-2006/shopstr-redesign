@@ -4,6 +4,7 @@
 export interface Community {
   slug: string;
   name: string;
+  /** Phosphor icon NAME string (from the allowlist), rendered by the consumer. */
   emoji: string;
   /** Primary category whose listings populate the community feed. */
   category: string;
@@ -22,7 +23,7 @@ export const MOCK_COMMUNITIES: Community[] = [
   {
     slug: "riso",
     name: "Riso & Print Club",
-    emoji: "🎨",
+    emoji: "Palette",
     category: "Art & Print",
     members: "1,243",
     listings: "84",
@@ -35,7 +36,7 @@ export const MOCK_COMMUNITIES: Community[] = [
   {
     slug: "coffee",
     name: "Specialty Coffee",
-    emoji: "☕",
+    emoji: "Coffee",
     category: "Coffee",
     members: "940",
     listings: "51",
@@ -46,7 +47,7 @@ export const MOCK_COMMUNITIES: Community[] = [
   {
     slug: "film",
     name: "Film Shooters",
-    emoji: "📷",
+    emoji: "Camera",
     category: "Photography",
     members: "2,310",
     listings: "120",
@@ -57,7 +58,7 @@ export const MOCK_COMMUNITIES: Community[] = [
   {
     slug: "textiles",
     name: "Slow Textiles",
-    emoji: "🧶",
+    emoji: "Cube",
     category: "Apparel",
     members: "610",
     listings: "39",
@@ -68,7 +69,7 @@ export const MOCK_COMMUNITIES: Community[] = [
   {
     slug: "ceramics",
     name: "Clay Heads",
-    emoji: "🏺",
+    emoji: "Sphere",
     category: "Ceramics",
     members: "1,120",
     listings: "46",

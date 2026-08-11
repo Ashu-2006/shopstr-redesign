@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { Lightning, Key, Star } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { Sticker } from "@/components/ui/Sticker";
@@ -38,7 +39,7 @@ export default function Paid() {
           </svg>
         </div>
 
-        <h2 className="ds-display z-10 text-4xl leading-[0.95]">Paid in<br />full ⚡</h2>
+        <h2 className="ds-display z-10 text-4xl leading-[0.95]">Paid in<br /><span className="inline-flex items-center gap-2">full <Lightning size={32} /></span></h2>
         <div className="z-10 rounded-pill border-2 border-ink bg-paper-pure px-[18px] py-2.5 font-mono font-bold tabular-nums">
           − {groupInt(snapshot.total)} sats
         </div>
@@ -48,7 +49,7 @@ export default function Paid() {
           <div className="flex justify-between"><span className="text-text-muted">Items</span><span>{snapshot.count}</span></div>
           <div className="flex justify-between"><span className="text-text-muted">Network</span><span>Lightning</span></div>
           <div className="mt-1 flex items-center justify-between border-t-2 border-paper-2 pt-2.5">
-            <span className="text-text-muted">🔑 Your key</span>
+            <span className="inline-flex items-center gap-1.5 text-text-muted"><Key size={16} /> Your key</span>
             <Link href="/settings" className="font-bold text-purple underline">Back it up</Link>
           </div>
         </div>
@@ -59,7 +60,7 @@ export default function Paid() {
 
         <div className="z-10 flex w-full max-w-[420px] flex-col gap-2.5">
           <Link href={`/review/${snapshot.firstId}`} className="ds-press inline-flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-ink py-3.5 font-bold text-text-on-dark">
-            ★ Leave a review
+            <Star weight="fill" size={18} /> Leave a review
           </Link>
           <div className="flex gap-2.5">
             <Link href="/marketplace" className="ds-press inline-flex flex-1 items-center justify-center rounded-pill border-2 border-ink bg-paper-pure py-3.5 font-bold">Keep browsing</Link>

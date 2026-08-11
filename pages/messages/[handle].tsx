@@ -6,6 +6,7 @@ import { useListing, profileByHandle } from "@/data/hooks";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
+import { Star, Check, PaperPlaneTilt } from "@phosphor-icons/react";
 
 function QuotedCard({ pid }: { pid: string }) {
   const product = MOCK_LISTINGS.find((l) => l.id === pid);
@@ -72,7 +73,7 @@ export default function Thread() {
               <>
                 <div className="max-w-[80%] self-start rounded-lg rounded-bl-[5px] border-2 border-ink bg-paper-pure p-3">
                   {product && <QuotedCard pid={product.id} />}
-                  Hey! Thanks for your interest 👋
+                  Hey! Thanks for your interest
                 </div>
                 <div className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">
                   Hi! Is this still available? Could you combine shipping if I take two?
@@ -94,7 +95,7 @@ export default function Thread() {
                 <div className="text-center font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">Today</div>
                 <div className={`flex flex-col gap-2.5 rounded-lg border-2 border-ink bg-paper-pure p-3.5 ${snoozed ? "opacity-50" : ""}`}>
                   <div className="flex items-center gap-2 font-bold">
-                    <span className="grid h-7 w-7 place-items-center rounded-[9px] border-2 border-ink bg-yellow">★</span>
+                    <span className="grid h-7 w-7 place-items-center rounded-[9px] border-2 border-ink bg-yellow"><Star weight="fill" size={16} /></span>
                     Did your order arrive?
                   </div>
                   <p className="text-[0.84rem] text-text-muted">
@@ -102,7 +103,7 @@ export default function Thread() {
                   </p>
                   {!snoozed && (
                     <div className="flex flex-wrap gap-2">
-                      <Link href={`/review/${product?.id ?? "lst_007"}`} className="ds-press rounded-pill border-2 border-ink bg-ink px-3.5 py-2 text-sm font-semibold text-text-on-dark">✓ Yes, leave a review</Link>
+                      <Link href={`/review/${product?.id ?? "lst_007"}`} className="ds-press inline-flex items-center gap-1.5 rounded-pill border-2 border-ink bg-ink px-3.5 py-2 text-sm font-semibold text-text-on-dark"><Check size={16} /> Yes, leave a review</Link>
                       <button onClick={() => setSnoozed(true)} className="ds-press rounded-pill border-2 border-ink bg-paper-pure px-3.5 py-2 text-sm font-semibold">Not yet</button>
                       <button onClick={() => setProblem(true)} className="ds-press rounded-pill border-2 border-ink bg-pink px-3.5 py-2 text-sm font-semibold">There&apos;s a problem</button>
                     </div>
@@ -127,10 +128,8 @@ export default function Thread() {
             placeholder={`Message @${handle}…`}
             className="flex-1 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5 outline-none focus:border-purple"
           />
-          <button onClick={send} aria-label="Send" className="ds-press grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-purple bg-purple">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M4 12h15M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button onClick={send} aria-label="Send" className="ds-press grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-purple bg-purple text-white">
+            <PaperPlaneTilt size={18} />
           </button>
         </div>
       </div>

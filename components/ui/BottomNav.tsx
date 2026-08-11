@@ -1,49 +1,16 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { House, UsersThree, ChatCircle, Wallet, User } from "@phosphor-icons/react";
 
 type Item = { href: string; label: string; icon: ReactNode };
 
 const ICON = {
-  browse: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-      <rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-      <rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-      <rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  ),
-  community: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="2" />
-      <circle cx="17" cy="9.5" r="2.4" stroke="currentColor" strokeWidth="2" />
-      <path d="M3.5 19c0-3 2.6-4.6 5.5-4.6S14.5 16 14.5 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M15.5 14.6c2.6 0 5 1.3 5 4.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  ),
-  inbox: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 3v-3a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-    </svg>
-  ),
-  orders: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
-      <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  ),
-  wallet: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="6" width="18" height="13" rx="3" stroke="currentColor" strokeWidth="2" />
-      <path d="M16 12h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  ),
-  profile: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
-      <path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  ),
+  browse: <House size={22} />,
+  community: <UsersThree size={22} />,
+  inbox: <ChatCircle size={22} />,
+  wallet: <Wallet size={22} />,
+  profile: <User size={22} />,
 };
 
 const ITEMS: Item[] = [

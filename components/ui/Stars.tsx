@@ -1,3 +1,4 @@
+import { Star } from "@phosphor-icons/react";
 import { formatRating, groupInt } from "@/lib/format";
 
 /** Inline rating: ★ 4.9 · 81 reviews. Number is mono/tabular (it's a value). */
@@ -15,7 +16,8 @@ export function Stars({
   }
   return (
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
-      <span aria-hidden>★</span>
+      <Star weight="fill" size={16} aria-hidden />
+
       <span className="font-mono tabular-nums font-bold">{formatRating(avg)}</span>
       <span className="text-text-subtle">· {groupInt(count)} reviews</span>
     </span>

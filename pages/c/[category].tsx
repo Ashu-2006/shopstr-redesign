@@ -5,6 +5,7 @@ import {
   useCartStore,
   ratingForPubkey,
 } from "@/data/hooks";
+import { CaretLeft, MagnifyingGlass } from "@phosphor-icons/react";
 import { catMeta, toneBg } from "@/lib/catalog";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
@@ -30,7 +31,7 @@ export default function CategoryScreen() {
         <title>{category} · Shopstr</title>
       </Head>
 
-      {/* Colored hero — takes the category's accent (smart-opens into this color) */}
+      {/* Colored hero: takes the category's accent (smart-opens into this color) */}
       <header className={`cat-pop relative overflow-hidden border-b-2 border-ink ${toneBg(meta.tone)}`}>
         <div className="mx-auto max-w-[1240px] px-4 pb-6 pt-4">
           <div className="flex items-center justify-between">
@@ -41,9 +42,7 @@ export default function CategoryScreen() {
                 meta.onDark ? "border-white/60 text-white" : "border-ink text-ink"
               } bg-paper-pure/15`}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <CaretLeft size={18} />
             </button>
             <span className="font-mono text-[0.66rem] uppercase tracking-[0.18em]">Category</span>
             <Link
@@ -53,10 +52,7 @@ export default function CategoryScreen() {
                 meta.onDark ? "border-white/60 text-white" : "border-ink text-ink"
               } bg-paper-pure/15`}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <MagnifyingGlass size={18} />
             </Link>
           </div>
           <Sticker name={meta.sticker} className="spin-slow pointer-events-none absolute -right-4 top-10 h-28 w-28 opacity-90" />

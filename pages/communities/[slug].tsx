@@ -5,10 +5,13 @@ import { useCommunity, useCategoryListings, ratingForPubkey } from "@/data/hooks
 import { SectionTitle } from "@/components/ui/Section";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { ListCard, BreakCard } from "@/components/cards";
+import { Palette, Coffee, Camera, Cube, Sphere, Check, Plus, CaretLeft, type Icon } from "@phosphor-icons/react";
 
 const TONE: Record<string, string> = {
   pink: "bg-pink", yellow: "bg-yellow", green: "bg-green", blue: "bg-blue", purple: "bg-purple",
 };
+
+const COMM_ICONS: Record<string, Icon> = { Palette, Coffee, Camera, Cube, Sphere };
 
 export default function CommunityDetail() {
   const router = useRouter();
@@ -18,6 +21,7 @@ export default function CommunityDetail() {
   const [joined, setJoined] = useState(false);
 
   if (!comm) return null;
+  const CommIcon = COMM_ICONS[comm.emoji];
   const list = listings.length >= 2 ? listings : listings.concat([]);
   const pinned = list[0];
   const rest = list.slice(1);
@@ -28,7 +32,7 @@ export default function CommunityDetail() {
       <div className="relative border-b-2 border-ink">
         <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3">
           <button onClick={() => router.back()} aria-label="Back" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <CaretLeft size={18} />
           </button>
           <button aria-label="Share" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-ink text-text-on-dark">↗</button>
         </div>
@@ -37,7 +41,7 @@ export default function CommunityDetail() {
           <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900" alt="" className="h-full w-full object-cover" />
         </div>
         <div className="mx-auto max-w-[1100px] px-4 pb-3.5">
-          <div className={`-mt-8 grid h-16 w-16 place-items-center rounded-[18px] border-2 border-ink text-3xl ${TONE[comm.tone]}`}>{comm.emoji}</div>
+          <div className={`-mt-8 grid h-16 w-16 place-items-center rounded-[18px] border-2 border-ink text-3xl ${TONE[comm.tone]}`}>{CommIcon && <CommIcon size={32} />}</div>
           <h1 className="ds-display mt-2.5 text-2xl">{comm.name}</h1>
           <div className="mt-1.5 font-mono text-[0.66rem] uppercase tracking-[0.06em] text-text-muted">NIP-72 community · curated by @{comm.curator}</div>
           <div className="mt-3 flex gap-2.5">
@@ -50,9 +54,9 @@ export default function CommunityDetail() {
           </div>
           <button
             onClick={() => setJoined((j) => !j)}
-            className={`ds-press mt-3 w-full rounded-pill border-2 py-3.5 font-bold ${joined ? "border-ink bg-paper-pure text-ink" : "border-purple bg-purple text-on-purple"}`}
+            className={`ds-press mt-3 flex w-full items-center justify-center gap-2 rounded-pill border-2 py-3.5 font-bold ${joined ? "border-ink bg-paper-pure text-ink" : "border-purple bg-purple text-on-purple"}`}
           >
-            {joined ? "✓ Joined" : "+ Join community"}
+            {joined ? <><Check size={18} /> Joined</> : <><Plus size={18} /> Join community</>}
           </button>
         </div>
       </div>

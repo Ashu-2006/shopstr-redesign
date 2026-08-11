@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
+import { X } from "@phosphor-icons/react";
 import { Sticker, type StickerName } from "@/components/ui/Sticker";
 
 type Tone = "purple" | "yellow" | "green";
@@ -48,9 +49,7 @@ export function OneWayFrame({
             onPurple ? "border-white/50" : "border-ink"
           }`}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-          </svg>
+          <X size={15} />
         </button>
         <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] opacity-90">{step}</span>
         {total ? (

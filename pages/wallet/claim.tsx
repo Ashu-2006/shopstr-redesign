@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { Sticker } from "@/components/ui/Sticker";
 import { SectionTitle } from "@/components/ui/Section";
 import { RecRow } from "@/components/RecRow";
+import { Gear } from "@phosphor-icons/react";
 
 export default function Claim() {
   const { data: claim } = useClaimable();
@@ -36,7 +37,7 @@ export default function Claim() {
           Or just browse the market
         </Link>
         <Link href="/wallet/payout" className="ds-press mt-2.5 flex w-full items-center justify-center gap-2 rounded-pill border-2 border-purple bg-paper py-3.5 font-bold text-purple">
-          ⚙ Change where sats go after a sale
+          <Gear size={18} /> Change where sats go after a sale
         </Link>
       </main>
       <BottomNav active="/wallet" />

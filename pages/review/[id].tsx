@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useListing, useProfile } from "@/data/hooks";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
+import { Star, Sparkle } from "@phosphor-icons/react";
 
 export default function ReviewComposer() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function ReviewComposer() {
           <div className="text-[0.9rem] font-bold">{product.title}</div>
         </div>
 
-        <div className="my-3 flex justify-center gap-2 text-4xl">
+        <div className="my-3 flex justify-center gap-2">
           {[1, 2, 3, 4, 5].map((i) => (
             <button
               key={i}
@@ -34,7 +35,7 @@ export default function ReviewComposer() {
               aria-label={`${i} stars`}
               className={`ds-press leading-none transition-transform ${i <= score ? "scale-110 text-yellow" : "text-ink/25"}`}
             >
-              ★
+              {i <= score ? <Star weight="fill" size={36} /> : <Star size={36} />}
             </button>
           ))}
         </div>
@@ -44,8 +45,8 @@ export default function ReviewComposer() {
           <textarea rows={3} placeholder="Beautifully packed, exactly as described…" className="w-full resize-none rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 outline-none focus:border-purple" />
         </label>
 
-        <button onClick={() => router.push("/orders")} className="ds-press mt-4 w-full rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark">
-          Publish review ✦
+        <button onClick={() => router.push("/orders")} className="ds-press mt-4 inline-flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark">
+          Publish review <Sparkle size={18} />
         </button>
         <p className="mt-2 text-center font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">Signed to your key · published as NIP-85</p>
       </OneWayFrame>

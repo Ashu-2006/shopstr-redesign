@@ -7,6 +7,7 @@ import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Pill } from "@/components/ui/Pill";
+import { ChatCircle } from "@phosphor-icons/react";
 
 const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id)!;
 
@@ -59,8 +60,8 @@ export default function OrderDetail() {
           })}
         </ol>
 
-        <Link href={`/messages/${order.sellerHandle}`} className="ds-press mt-1 flex w-full items-center justify-center rounded-pill border-2 border-ink bg-paper-pure py-3.5 font-bold">
-          ✦ Message @{order.sellerHandle}
+        <Link href={`/messages/${order.sellerHandle}`} className="ds-press mt-1 flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-paper-pure py-3.5 font-bold">
+          <ChatCircle size={18} /> Message @{order.sellerHandle}
         </Link>
         <Link href={`/review/${order.productId}`} className="ds-press mt-2.5 flex w-full items-center justify-center rounded-pill border-2 border-purple bg-purple py-3.5 font-bold text-on-purple">
           Leave a review

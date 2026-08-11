@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { MagnifyingGlass, ShoppingBag } from "@phosphor-icons/react";
 import { Logo } from "@/components/ui/Logo";
 
 /**
@@ -29,10 +30,7 @@ export function TopBar({
       aria-hidden
       className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-subtle"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-        <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </svg>
+      <MagnifyingGlass size={18} />
     </span>
   );
   return (
@@ -50,10 +48,7 @@ export function TopBar({
               aria-label="Search"
               className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper-pure ds-press"
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <MagnifyingGlass size={19} />
             </Link>
           </>
         ) : (
@@ -78,10 +73,7 @@ export function TopBar({
           aria-label={`Cart, ${cartCount} items`}
           className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-ink bg-yellow ds-press"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" strokeWidth="2" strokeLinejoin="round" />
-            <path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" strokeWidth="2" />
-          </svg>
+          <ShoppingBag size={20} color="#121212" />
           {cartCount > 0 && (
             <motion.span
               key={cartCount}

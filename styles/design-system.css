@@ -7,8 +7,8 @@
 
    Hard rules encoded here:
    - NO shadows. Separation via spacing first, 1-2px stroke only when needed.
-   - Display type is UPPERCASE Archivo Black, tight tracking.
-   - Body is Space Grotesk. Every value/number uses Space Mono, tabular figures.
+   - Display type is UPPERCASE Circular Std, tight tracking.
+   - Body is Inter. Every value/number uses the mono stack, tabular figures.
    - Shapes (circle / square / triangle / semicircle / arrow) are first-class
      decorative + functional assets.
 
@@ -71,10 +71,12 @@
   --ds-danger: var(--ds-red);
 
   /* ----------------------------------------------------------- TYPOGRAPHY --
-     Three OFL families, three jobs. Loaded via @font-face in globals.css. */
-  --ds-font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
-  --ds-font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --ds-font-mono: "Space Mono", ui-monospace, "Cascadia Code", monospace;
+     Three families, three jobs. Circular Std via @font-face + Inter loaded in
+     globals.css; mono is a pure system stack. Body: 400 default, 600 for
+     eyebrows/labels. */
+  --ds-font-display: "Circular Std", ui-sans-serif, system-ui, sans-serif;
+  --ds-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --ds-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Display = uppercase + tight tracking. Body = normal. Mono = tabular. */
   --ds-tracking-display: -0.02em;
