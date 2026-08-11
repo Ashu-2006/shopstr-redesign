@@ -1,4 +1,4 @@
-/* Motion tokens for Framer Motion — the JS mirror of the CSS motion block in
+/* Motion tokens for Framer Motion: the JS mirror of the CSS motion block in
    styles/design-system.css. Four durations on a ~2x scale, four curves; that is
    the whole vocabulary. Keep both files in sync.
 
@@ -8,13 +8,13 @@
 
 /** Durations in seconds (Framer Motion's unit). */
 export const dur = {
-  /** 70ms — micro-feedback: icon opacity, row hover, press. */
+  /** 70ms: micro-feedback (icon opacity, row hover, press). */
   instant: 0.07,
-  /** 140ms — THE WORKHORSE: hover, focus, color, most transitions. */
+  /** 140ms: THE WORKHORSE (hover, focus, color, most transitions). */
   fast: 0.14,
-  /** 300ms — entrances: menus, popovers, step changes, list items. */
+  /** 300ms: entrances (menus, popovers, step changes, list items). */
   moderate: 0.3,
-  /** 560ms — large travel: drawers, page-level moves, image zoom. */
+  /** 560ms: large travel (drawers, page-level moves, image zoom). */
   slow: 0.56,
 } as const;
 
@@ -27,7 +27,7 @@ export const ease = {
   swing: [0, 0.55, 0.45, 1],
   /** Hesitates, then commits. Exits and dismissals. */
   exit: [0.65, 0.05, 0.36, 1],
-  /** Overshoots both ends. Sticker pops only — one per screen, sparingly. */
+  /** Overshoots both ends. Sticker pops only, one per screen, sparingly. */
   jumpy: [0.68, -0.55, 0.27, 1.55],
 } as const;
 
@@ -37,7 +37,7 @@ export const ease = {
 export const tFast = { duration: dur.fast, ease: ease.smooth };
 /** Entrance tween: 300ms swing (already moving on frame one). */
 export const tEnter = { duration: dur.moderate, ease: ease.swing };
-/** Exit tween: faster than entry — the user already decided to dismiss. */
+/** Exit tween: faster than entry, because the user already decided to dismiss. */
 export const tExit = { duration: dur.fast, ease: ease.exit };
 /** Layout smart-animate (persistent cards, shared elements). */
 export const tLayout = { duration: dur.moderate, ease: ease.swing };
@@ -68,7 +68,7 @@ export const bump = {
   transition: { duration: dur.moderate, ease: ease.smooth },
 };
 
-/** Error shake — three decaying swings over one moderate beat. */
+/** Error shake: three decaying swings over one moderate beat. */
 export const shake = {
   x: [0, -8, 8, -6, 6, 0],
   transition: { duration: dur.moderate + dur.fast, ease: ease.smooth },

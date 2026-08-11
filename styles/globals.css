@@ -71,7 +71,7 @@
   --radius-2xl: var(--ds-radius-2xl);
   --radius-pill: var(--ds-radius-pill);
 
-  /* motion — the four curves as ease-* utilities. Durations have no Tailwind
+  /* motion: the four curves as ease-* utilities. Durations have no Tailwind
      namespace; consume them as duration-(--ds-dur-*). The defaults make every
      bare transition utility run 140ms smooth unless overridden. */
   --ease-smooth: var(--ds-ease-smooth);
@@ -118,7 +118,7 @@ p {
 }
 
 /* Tactile press for interactive elements. Always 0.96. Press feedback runs at
-   70ms — a press must feel immediate; hover can afford 140ms. */
+   70ms: a press must feel immediate; hover can afford 140ms. */
 .ds-press {
   transition-property: scale;
   transition-duration: var(--ds-dur-instant);
@@ -157,7 +157,7 @@ p {
   animation: ds-rise var(--ds-dur-moderate) var(--ds-ease-swing) both;
 }
 
-/* Colored category hero pop-in. Bulges 2% at 70%, settles — never zooms in
+/* Colored category hero pop-in. Bulges 2% at 70%, settles. Never zooms in
    from small. */
 @keyframes ds-catpop {
   0% {
@@ -203,7 +203,7 @@ p {
   animation: ds-slide-in var(--ds-dur-moderate) var(--ds-ease-swing) backwards;
 }
 
-/* Sticker / reveal pop. Starts at scale(1) and bulges 5% — bulging reads
+/* Sticker / reveal pop. Starts at scale(1) and bulges 5%: bulging reads
    physical, growing from small reads cheap. Opacity is solid by 40% so the
    content is readable before the motion ends. */
 @keyframes ds-popdown {
@@ -228,7 +228,7 @@ p {
   animation: ds-popdown var(--ds-dur-moderate) var(--ds-ease-smooth) both;
 }
 
-/* Toast / notice — enters from the edge it lives on with a 1% overshoot.
+/* Toast / notice: enters from the edge it lives on with a 1% overshoot.
    Stagger simultaneous toasts by 40-60ms. */
 @keyframes ds-toast-in {
   0% {
