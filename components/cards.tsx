@@ -26,7 +26,7 @@ export function HeroCard({ product, n }: { product: ProductData; n: number }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={product.images[0]} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.05]" />
       <div className="absolute inset-0 bg-[linear-gradient(transparent_38%,rgba(0,0,0,0.85))]" />
-      <span className="ds-display absolute left-5 top-4 z-10 text-5xl mix-blend-difference">
+      <span className="ds-display absolute left-5 top-4 z-10 text-5xl mix-blend-difference lg:left-8 lg:text-6xl">
         {String(n).padStart(2, "0")}
       </span>
       <span className="absolute right-5 top-5 z-10 inline-flex rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">
@@ -34,9 +34,9 @@ export function HeroCard({ product, n }: { product: ProductData; n: number }) {
       </span>
       <Sticker name="badge-bff-star" className="absolute right-5 top-[60px] z-10 h-12 w-12" />
       <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[1240px] p-5 md:p-8">
-        <h3 className="ds-display text-[1.9rem] leading-[0.92] md:text-4xl">{product.title}</h3>
+        <h3 className="ds-display text-[1.9rem] leading-[0.92] md:text-4xl lg:text-5xl">{product.title}</h3>
         <div className="mt-2.5 flex items-baseline justify-between">
-          <span className="font-mono text-xl font-bold tabular-nums">{priceLabel(product)}</span>
+          <span className="font-mono text-xl font-bold tabular-nums lg:text-2xl">{priceLabel(product)}</span>
           <span className="font-mono text-[0.78rem] opacity-85">{product.location}</span>
         </div>
       </div>
@@ -79,26 +79,29 @@ export function CategoryFeature({
   );
 }
 
-/* ---- H4: full-bleed accent, inset photo (mid-feed break card) ------------- */
+/* ---- H4: full-bleed accent, inset photo (mid-feed break card) -------------
+   Mobile: stacked (kicker / photo / title / price). Desktop spans two feed
+   columns, so the photo letterboxes badly if it stays full-width; at lg the
+   card becomes a split composition: text left, taller inset photo right. */
 export function BreakCard({ product, kicker }: { product: ProductData; kicker: string }) {
   return (
     <Link
       href={`/listing/${product.id}`}
-      className="group lift flex flex-col rounded-xl border-2 border-ink bg-green p-4 text-ink"
+      className="group lift flex flex-col rounded-xl border-2 border-ink bg-green p-4 text-ink lg:grid lg:grid-cols-2 lg:gap-x-7 lg:p-6"
     >
       <div className="flex items-center justify-between">
         <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em]">{kicker}</span>
-        <span className="inline-flex rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">
+        <span className="inline-flex rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white lg:hidden">
           {primaryCategory(product)}
         </span>
       </div>
-      <div className="my-3.5 h-[190px] overflow-hidden rounded-lg border-2 border-ink">
+      <div className="my-3.5 h-[190px] overflow-hidden rounded-lg border-2 border-ink lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:my-0 lg:h-[240px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
       </div>
-      <h3 className="ds-display text-[1.4rem] leading-[0.92]">{product.title}</h3>
-      <div className="mt-1.5 flex items-baseline justify-between">
-        <span className="font-mono text-[1.1rem] font-bold tabular-nums">{priceLabel(product)}</span>
+      <h3 className="ds-display text-[1.4rem] leading-[0.92] lg:row-start-2 lg:self-center lg:text-3xl">{product.title}</h3>
+      <div className="mt-1.5 flex items-baseline justify-between lg:row-start-3 lg:mt-0 lg:self-end">
+        <span className="font-mono text-[1.1rem] font-bold tabular-nums lg:text-[1.3rem]">{priceLabel(product)}</span>
         <span className="font-mono text-[0.74rem]">{product.location}</span>
       </div>
     </Link>

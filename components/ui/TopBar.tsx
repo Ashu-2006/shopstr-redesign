@@ -43,11 +43,19 @@ export function TopBar({
 
         {searchHref ? (
           <>
-            <span className="flex-1" />
+            {/* Desktop has the room: show the field itself (it links to /search).
+                Mobile keeps the icon-only progressive disclosure. */}
+            <Link href={searchHref} className="relative hidden flex-1 md:block">
+              {icon}
+              <span className="block w-full rounded-pill border-2 border-ink bg-paper-pure py-2.5 pl-11 pr-4 text-sm font-medium text-text-subtle">
+                Search by name, price, or seller
+              </span>
+            </Link>
+            <span className="flex-1 md:hidden" />
             <Link
               href={searchHref}
               aria-label="Search"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper-pure ds-press"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-ink bg-paper-pure ds-press md:hidden"
             >
               <MagnifyingGlass size={19} />
             </Link>

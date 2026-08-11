@@ -113,7 +113,24 @@ export default function Marketplace() {
           {(sellersLoading || topSellers.length > 0) && (
             <>
               <SectionTitle note="This week">Top sellers</SectionTitle>
-              <Carousel snap={false}>
+              {/* Scroll rail on mobile; a grid that fills the container at lg
+                  (fixed-width tiles left a dead track at desktop widths). */}
+              <div className="lg:hidden">
+                <Carousel snap={false}>
+                  {sellersLoading
+                    ? Array.from({ length: 4 }, (_, i) => <SellerCardSkeleton key={i} />)
+                    : topSellers.map((s, i) => (
+                        <SellerCard
+                          key={s.profile.pubkey}
+                          profile={s.profile}
+                          avg={s.avg}
+                          count={s.count}
+                          tone={(["pink", "blue", "green", "yellow"] as const)[i % 4]}
+                        />
+                      ))}
+                </Carousel>
+              </div>
+              <div className="hidden gap-3 lg:grid lg:grid-cols-4 [&>*]:w-full">
                 {sellersLoading
                   ? Array.from({ length: 4 }, (_, i) => <SellerCardSkeleton key={i} />)
                   : topSellers.map((s, i) => (
@@ -125,7 +142,7 @@ export default function Marketplace() {
                         tone={(["pink", "blue", "green", "yellow"] as const)[i % 4]}
                       />
                     ))}
-              </Carousel>
+              </div>
             </>
           )}
 
