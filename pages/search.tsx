@@ -115,7 +115,9 @@ export default function Search() {
 
       {/* ---- Brutalist search bar ---- */}
       <header className="sticky top-0 z-30 border-b-2 border-ink bg-paper px-4 py-3">
-        <div className="mx-auto flex max-w-[1240px] items-center gap-3">
+        {/* Suggestion mode reads as a command palette at lg: the bar narrows to
+            the same centered measure as the term list. Results mode goes wide. */}
+        <div className={`mx-auto flex max-w-[1240px] items-center gap-3 ${committed ? "" : "lg:max-w-[680px]"}`}>
           <div className="relative flex flex-1 items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5">
             <MagnifyingGlass size={18} className="shrink-0 text-text-subtle" />
             <input
@@ -139,7 +141,7 @@ export default function Search() {
 
       {!committed ? (
         /* ---- Suggestions ---- */
-        <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 md:pb-12">
+        <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 md:pb-12 lg:max-w-[680px]">
           <div className="mb-3 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-text-subtle">
             {query.trim() ? "Top suggestions" : "Popular"}
           </div>
