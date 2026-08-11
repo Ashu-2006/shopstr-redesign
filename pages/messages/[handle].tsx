@@ -63,13 +63,13 @@ export default function Thread() {
           right={<button aria-label="More" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">⋯</button>}
         />
 
-        <div className="mx-auto w-full max-w-[760px] flex-1 lg:grid lg:max-w-[1200px] lg:grid-cols-[400px_1fr] lg:items-start lg:gap-8 lg:px-6 lg:pb-10">
+        <div className="mx-auto flex w-full max-w-[760px] flex-1 flex-col lg:grid lg:max-w-[1200px] lg:grid-cols-[400px_1fr] lg:items-start lg:gap-8 lg:px-6 lg:pb-10">
           {/* Desktop split view: inbox rail stays visible next to the open thread. */}
           <aside className="hidden lg:block">
             <InboxList chats={chats} now={NOW} activeHandle={handle} />
           </aside>
 
-          <section className="flex min-h-0 flex-col lg:h-[calc(100dvh-140px)] lg:overflow-hidden lg:rounded-2xl lg:border-2 lg:border-ink lg:bg-paper">
+          <section className="flex min-h-0 flex-1 flex-col lg:h-[calc(100dvh-140px)] lg:flex-none lg:overflow-hidden lg:rounded-2xl lg:border-2 lg:border-ink lg:bg-paper">
         <div className="w-full flex-1 overflow-y-auto px-4 pb-4">
           {/* .stagger gives every bubble the ds-rise entrance (rises from the
               composer edge). Seed history staggers 55ms/bubble on mount; a
