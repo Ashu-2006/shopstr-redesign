@@ -140,13 +140,15 @@ export function useSellerListings(pubkey: string): AsyncResult<ProductData[]> {
   return { data: isLoading ? [] : data, isLoading };
 }
 
-/** Listings in a category (matches any category tag). */
+/** Listings in a category (matches any category tag). Routes carry lowercase
+    slugs ("ceramics") while listings store display-cased names ("Ceramics"),
+    so the match is case-insensitive. */
 export function useCategoryListings(category: string): AsyncResult<ProductData[]> {
   const isLoading = useSimulatedLoad("listings");
-  const data = useMemo(
-    () => MOCK_LISTINGS.filter((l) => l.categories.includes(category)),
-    [category]
-  );
+  const data = useMemo(() => {
+    const slug = category.toLowerCase();
+    return MOCK_LISTINGS.filter((l) => l.categories.some((c) => c.toLowerCase() === slug));
+  }, [category]);
   return { data: isLoading ? [] : data, isLoading };
 }
 
