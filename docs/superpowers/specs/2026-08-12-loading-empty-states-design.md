@@ -1,6 +1,6 @@
 # Loading + Empty States System
 
-Status: PROPOSED (awaiting approval)
+Status: IMPLEMENTED (all 5 phases, 2026-08-12). Verified live via Chrome DevTools; condensed rules live in CLAUDE.md.
 Date: 2026-08-12
 Sources: armorIQ-platform-proto state system (Skeleton / PageState / error-state spec / 04_UX_LEARNINGS.md), full audit of this repo's 24 routes.
 
