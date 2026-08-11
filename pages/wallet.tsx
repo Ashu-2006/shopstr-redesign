@@ -1,13 +1,18 @@
 import Head from "next/head";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { bump } from "@/lib/motion";
 import { useTxns, useClaimable, useSession } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Sticker } from "@/components/ui/Sticker";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { RowSkeleton } from "@/components/skeletons";
 
 export default function Wallet() {
-  const { data: txns } = useTxns();
+  const { data: txns, isLoading } = useTxns();
   const { data: claim } = useClaimable();
   const { walletBalance } = useSession();
 
@@ -30,9 +35,16 @@ export default function Wallet() {
         <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-ink p-6 text-text-on-dark">
           <Sticker name="shape-sunstar-yellow" className="absolute right-3.5 top-3.5 h-14 w-14" />
           <div className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-[#bdbcb4]">Spendable balance</div>
-          <div className="mt-1.5 font-mono text-5xl font-bold leading-none tabular-nums">
+          {/* Keyed on the balance so any change replays the bump. Origin-left keeps
+              the tabular digits anchored while it pops. */}
+          <motion.div
+            key={walletBalance}
+            animate={bump}
+            style={{ transformOrigin: "left center" }}
+            className="mt-1.5 font-mono text-5xl font-bold leading-none tabular-nums"
+          >
             {groupInt(walletBalance)} <span className="text-base text-[#bdbcb4]">sats</span>
-          </div>
+          </motion.div>
           <div className="mt-4 flex gap-2.5">
             <Link href="/wallet/receive" className="ds-press inline-flex flex-1 items-center justify-center rounded-pill border-2 border-ink bg-paper-pure py-3 font-bold text-ink">Receive</Link>
             <Link href="/wallet/send" className="ds-press inline-flex flex-1 items-center justify-center rounded-pill border-2 border-purple bg-purple py-3 font-bold text-on-purple">Send</Link>
@@ -43,20 +55,40 @@ export default function Wallet() {
           <h2 className="ds-display text-xl">Activity</h2>
           <span className="font-mono text-xs text-text-subtle">NIP-60 · Cashu</span>
         </div>
-        {txns.map((t, i) => (
-          <div key={i} className="flex items-center gap-3 border-b-2 border-ink py-3">
-            <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono ${t.dir === "out" ? "bg-pink" : "bg-green"}`}>
-              {t.dir === "out" ? "↑" : "↓"}
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="font-bold">{t.title}</div>
-              <div className="font-mono text-[0.66rem] text-text-subtle">{t.sub}</div>
-            </div>
-            <span className={`font-mono font-bold tabular-nums ${t.dir === "out" ? "text-ink" : "text-green"}`}>
-              {t.amount > 0 ? "+" : ""}{groupInt(t.amount)}
-            </span>
+        {isLoading ? (
+          <div aria-hidden="true">
+            {Array.from({ length: 3 }, (_, i) => (
+              <RowSkeleton key={i} frame="divider" avatar="circle" avatarSize={36} />
+            ))}
           </div>
-        ))}
+        ) : txns.length === 0 ? (
+          <EmptyState
+            variant="inline"
+            headline="No activity yet"
+            body="Sats in and out show up here the moment they move."
+            cta={
+              <Link href="/wallet/receive">
+                <Button variant="secondary">Receive sats</Button>
+              </Link>
+            }
+            className="!py-10"
+          />
+        ) : (
+          txns.map((t, i) => (
+            <div key={i} className="flex items-center gap-3 border-b-2 border-ink py-3">
+              <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono ${t.dir === "out" ? "bg-pink" : "bg-green"}`}>
+                {t.dir === "out" ? "↑" : "↓"}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="font-bold">{t.title}</div>
+                <div className="font-mono text-[0.66rem] text-text-subtle">{t.sub}</div>
+              </div>
+              <span className={`font-mono font-bold tabular-nums ${t.dir === "out" ? "text-ink" : "text-green"}`}>
+                {t.amount > 0 ? "+" : ""}{groupInt(t.amount)}
+              </span>
+            </div>
+          ))
+        )}
       </main>
       <BottomNav active="/wallet" />
     </>

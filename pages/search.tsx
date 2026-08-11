@@ -1,13 +1,16 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
 import { dur, ease, tEnter, tFast } from "@/lib/motion";
-import { MagnifyingGlass, X, Faders, Heart } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, Faders, Heart, CaretDown, Check } from "@phosphor-icons/react";
 import { useListings, useSession } from "@/data/hooks";
 import { primaryType, tintFor, priceLabel } from "@/lib/catalog";
 import type { ProductData } from "@/data/types";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type Sort = "featured" | "newest" | "high" | "low";
 const SORTS: { key: Sort; label: string }[] = [
@@ -20,10 +23,18 @@ const SIZES = ["S", "M", "L", "XL"];
 
 export default function Search() {
   const router = useRouter();
-  const { data: listings } = useListings();
+  const { data: listings, isLoading } = useListings();
 
-  const PMIN = useMemo(() => Math.min(...listings.map((l) => l.price)), [listings]);
-  const PMAX = useMemo(() => Math.max(...listings.map((l) => l.price)), [listings]);
+  // Math.min of an empty array is Infinity; guard so the price filter can't be
+  // poisoned while the listings family loads (or if it's genuinely empty).
+  const PMIN = useMemo(
+    () => (listings.length ? Math.min(...listings.map((l) => l.price)) : 0),
+    [listings]
+  );
+  const PMAX = useMemo(
+    () => (listings.length ? Math.max(...listings.map((l) => l.price)) : 0),
+    [listings]
+  );
 
   const [query, setQuery] = useState("");
   const [committed, setCommitted] = useState<string | null>(null);
@@ -35,6 +46,25 @@ export default function Search() {
   const [lo, setLo] = useState(PMIN);
   const [hi, setHi] = useState(PMAX);
   const [sheet, setSheet] = useState(false);
+  const [sortMenu, setSortMenu] = useState(false);
+
+  // Until the user touches the price filter, track the real bounds as they
+  // arrive (data lands after mount, so the initial 0..0 must self-correct).
+  const priceTouched = useRef(false);
+  useEffect(() => {
+    if (!priceTouched.current) {
+      setLo(PMIN);
+      setHi(PMAX);
+    }
+  }, [PMIN, PMAX]);
+  const userSetLo = (n: number) => {
+    priceTouched.current = true;
+    setLo(n);
+  };
+  const userSetHi = (n: number) => {
+    priceTouched.current = true;
+    setHi(n);
+  };
 
   const commit = (term: string) => {
     setQuery(term);
@@ -113,16 +143,27 @@ export default function Search() {
           <div className="mb-3 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-text-subtle">
             {query.trim() ? "Top suggestions" : "Popular"}
           </div>
-          <ul className="stagger flex flex-col">
-            {suggestions.map((term, i) => (
-              <li key={term + i} style={{ animationDelay: `${i * 40}ms` }}>
-                <button onClick={() => commit(term)} className="flex w-full items-center gap-3 border-b-2 border-paper-2 py-3.5 text-left ds-press">
+          {isLoading ? (
+            <ul className="flex flex-col" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, i) => (
+                <li key={i} className="flex items-center gap-3 border-b-2 border-paper-2 py-3.5">
                   <MagnifyingGlass size={16} className="shrink-0 text-text-subtle" />
-                  <Suggestion term={term} query={query.trim()} />
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <Skeleton shape="line" w={`${38 + ((i * 17) % 30)}%`} h="1.25rem" />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="stagger flex flex-col">
+              {suggestions.map((term, i) => (
+                <li key={term + i} style={{ animationDelay: `${i * 40}ms` }}>
+                  <button onClick={() => commit(term)} className="flex w-full items-center gap-3 border-b-2 border-paper-2 py-3.5 text-left ds-press">
+                    <MagnifyingGlass size={16} className="shrink-0 text-text-subtle" />
+                    <Suggestion term={term} query={query.trim()} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </main>
       ) : (
         /* ---- Results ---- */
@@ -130,21 +171,82 @@ export default function Search() {
           <div className="mx-auto max-w-[1240px] px-4">
             <h1 className="ds-display mt-5 text-3xl">{committed}</h1>
             <div className="mt-3 flex items-center justify-between border-t-2 border-ink py-3">
-              <span className="font-mono text-sm tabular-nums">{results.length} result{results.length === 1 ? "" : "s"}</span>
-              <button onClick={() => setSheet(true)} className="ds-press inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 font-bold">
-                Filter
-                <Faders size={16} />
-                {filterCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-purple px-1 font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">{filterCount}</span>}
-              </button>
+              {isLoading ? (
+                <Skeleton shape="line" w={72} h="0.875rem" />
+              ) : (
+                <span className="font-mono text-sm tabular-nums">{results.length} result{results.length === 1 ? "" : "s"}</span>
+              )}
+              <div className="flex items-center gap-2">
+                {/* Desktop sort: a popover that emerges from its control (.menu-in,
+                    anchor-origin). Mobile keeps sort inside the filter sheet. */}
+                <div className="relative hidden md:block">
+                  <button
+                    onClick={() => setSortMenu((v) => !v)}
+                    aria-expanded={sortMenu}
+                    aria-haspopup="menu"
+                    className="ds-press inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 font-bold"
+                  >
+                    Sort
+                    <CaretDown size={14} className={`transition-transform ${sortMenu ? "rotate-180" : ""}`} />
+                  </button>
+                  {sortMenu && (
+                    <>
+                      <button aria-label="Close sort menu" onClick={() => setSortMenu(false)} className="fixed inset-0 z-40 cursor-default" />
+                      <div role="menu" className="menu-in absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border-2 border-ink bg-paper-pure">
+                        {SORTS.map((s) => (
+                          <button
+                            key={s.key}
+                            role="menuitemradio"
+                            aria-checked={s.key === sort}
+                            onClick={() => { setSort(s.key); setSortMenu(false); }}
+                            className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-semibold transition-colors duration-(--ds-dur-instant) hover:bg-paper-2"
+                          >
+                            {s.label}
+                            {s.key === sort && <Check size={14} weight="bold" />}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <button onClick={() => setSheet(true)} className="ds-press inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 font-bold">
+                  Filter
+                  <Faders size={16} />
+                  {filterCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-purple px-1 font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">{filterCount}</span>}
+                </button>
+              </div>
             </div>
           </div>
 
           <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-3 md:pb-12">
-            {results.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-ink/30 px-6 py-16 text-center">
-                <p className="ds-display text-2xl">Nothing matches</p>
-                <p className="mt-2 text-text-muted">Try a different term or clear the filters.</p>
+            {isLoading ? (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <ResultCardSkeleton key={i} />
+                ))}
               </div>
+            ) : results.length === 0 ? (
+              <EmptyState
+                variant="inline"
+                headline="Nothing matches"
+                body="Try a different term, or clear the filters."
+                cta={
+                  filterCount > 0 ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setSort("featured");
+                        setSizes(new Set());
+                        setLo(PMIN);
+                        setHi(PMAX);
+                        priceTouched.current = false;
+                      }}
+                    >
+                      Clear filters
+                    </Button>
+                  ) : undefined
+                }
+              />
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 <AnimatePresence mode="popLayout" initial={false}>
@@ -217,21 +319,21 @@ export default function Search() {
                   <label className="flex-1">
                     <span className="font-mono text-[0.62rem] uppercase tracking-[0.08em] text-text-muted">Min · sats</span>
                     <input type="number" value={lo} min={PMIN} max={hi}
-                      onChange={(e) => setLo(Math.min(Number(e.target.value) || PMIN, hi))}
+                      onChange={(e) => userSetLo(Math.min(Number(e.target.value) || PMIN, hi))}
                       className="mt-1 w-full rounded-md border-2 border-ink bg-paper-pure px-3 py-2.5 font-mono font-bold tabular-nums outline-none focus:border-purple" />
                   </label>
                   <label className="flex-1">
                     <span className="font-mono text-[0.62rem] uppercase tracking-[0.08em] text-text-muted">Max · sats</span>
                     <input type="number" value={hi} min={lo} max={PMAX}
-                      onChange={(e) => setHi(Math.max(Number(e.target.value) || PMAX, lo))}
+                      onChange={(e) => userSetHi(Math.max(Number(e.target.value) || PMAX, lo))}
                       className="mt-1 w-full rounded-md border-2 border-ink bg-paper-pure px-3 py-2.5 font-mono font-bold tabular-nums outline-none focus:border-purple" />
                   </label>
                 </div>
-                <PriceRange min={PMIN} max={PMAX} lo={lo} hi={hi} setLo={setLo} setHi={setHi} />
+                <PriceRange min={PMIN} max={PMAX} lo={lo} hi={hi} setLo={userSetLo} setHi={userSetHi} />
               </div>
 
               <div className="flex items-center gap-3 border-t-2 border-ink px-5 py-4" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1rem)" }}>
-                <button onClick={() => { setSort("featured"); setSizes(new Set()); setLo(PMIN); setHi(PMAX); }} className="ds-press font-bold underline">Clear all</button>
+                <button onClick={() => { setSort("featured"); setSizes(new Set()); setLo(PMIN); setHi(PMAX); priceTouched.current = false; }} className="ds-press font-bold underline">Clear all</button>
                 <button onClick={() => setSheet(false)} className="ds-press ml-auto rounded-pill border-2 border-ink bg-ink px-6 py-3 font-bold text-text-on-dark">
                   Show {results.length} result{results.length === 1 ? "" : "s"}
                 </button>
@@ -254,6 +356,21 @@ function Suggestion({ term, query }: { term: string; query: string }) {
       {term.slice(i, i + query.length)}
       <span className="text-text-muted">{term.slice(i + query.length)}</span>
     </span>
+  );
+}
+
+/* Shape-match of ResultCard: bordered image well, unframed text below. */
+function ResultCardSkeleton() {
+  return (
+    <div className="flex flex-col">
+      <div className="overflow-hidden rounded-lg border-2 border-ink">
+        <Skeleton shape="rect" className="aspect-square !rounded-none" w="100%" />
+      </div>
+      <div className="mt-2">
+        <Skeleton shape="line" w="80%" h="0.95rem" />
+        <Skeleton shape="line" w={72} h="0.92rem" className="mt-1.5" />
+      </div>
+    </div>
   );
 }
 

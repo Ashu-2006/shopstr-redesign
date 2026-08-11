@@ -5,6 +5,8 @@ import { useCommunities, profileByHandle } from "@/data/hooks";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Sticker } from "@/components/ui/Sticker";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import type { Community } from "@/data/mock/extras";
 
 const TONE: Record<Community["tone"], string> = {
@@ -21,7 +23,7 @@ const COMM_ICONS: Record<string, Icon> = { Palette, Coffee, Camera, Cube, Sphere
 const AVATARS = ["ekko", "alice", "daveshoots"].map((h) => profileByHandle(h)?.picture);
 
 export default function Communities() {
-  const { data: comms } = useCommunities();
+  const { data: comms, isLoading } = useCommunities();
   const featured = comms.find((c) => c.featured);
   const rest = comms.filter((c) => !c.featured);
 
@@ -41,6 +43,34 @@ export default function Communities() {
           </p>
         </div>
 
+        {isLoading ? (
+          <div className="mt-4 grid grid-cols-2 gap-3 px-4 md:grid-cols-3" aria-hidden="true">
+            <div className="col-span-2 flex min-h-[96px] items-center gap-3.5 rounded-lg border-2 border-ink bg-paper-pure p-3.5 md:col-span-3">
+              <Skeleton shape="rect" w={34} h={34} />
+              <div className="flex-1">
+                <Skeleton shape="line" w="40%" h="1.1rem" />
+                <Skeleton shape="line" w="65%" className="mt-2" />
+              </div>
+            </div>
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex min-h-[128px] flex-col justify-between rounded-lg border-2 border-ink bg-paper-pure p-3.5">
+                <Skeleton shape="rect" w={28} h={28} />
+                <div>
+                  <Skeleton shape="line" w="75%" h="1rem" />
+                  <Skeleton shape="line" w={80} className="mt-2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : comms.length === 0 ? (
+          <div className="mt-4 px-4">
+            <EmptyState
+              sticker="shape-heart-circle"
+              headline="No communities yet"
+              body="Curated corners of the market start with one person who cares. That could be you."
+            />
+          </div>
+        ) : (
         <div className="mt-4 grid grid-cols-2 gap-3 px-4 md:grid-cols-3">
           {featured && (
             <Link href={`/communities/${featured.slug}`} className={`lift col-span-2 flex min-h-[96px] items-center gap-3.5 overflow-hidden rounded-lg border-2 border-ink p-3.5 md:col-span-3 ${TONE[featured.tone]}`}>
@@ -67,6 +97,7 @@ export default function Communities() {
             </Link>
           ))}
         </div>
+        )}
 
         <div className="px-4 pt-4">
           <Link href="/communities" className="ds-press flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-paper-pure py-3.5 font-bold">

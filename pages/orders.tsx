@@ -6,6 +6,9 @@ import { MOCK_LISTINGS } from "@/data/mock/listings";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Pill } from "@/components/ui/Pill";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { RowSkeleton } from "@/components/skeletons";
 import type { OrderStatus } from "@/data/mock/extras";
 
 const CHIP: Record<OrderStatus, { label: string; tone: "green" | "blue" | "ink" }> = {
@@ -13,10 +16,10 @@ const CHIP: Record<OrderStatus, { label: string; tone: "green" | "blue" | "ink" 
   shipped: { label: "Shipped", tone: "blue" },
   delivered: { label: "Delivered", tone: "ink" },
 };
-const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id)!;
+const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id);
 
 export default function Orders() {
-  const { data: orders } = useOrders();
+  const { data: orders, isLoading } = useOrders();
   const [filter, setFilter] = useState<string>("All");
   const FILTERS = ["All", "Paid", "Shipped", "Delivered"];
   const shown = filter === "All" ? orders : orders.filter((o) => CHIP[o.status].label === filter);
@@ -31,23 +34,56 @@ export default function Orders() {
             <Pill key={f} interactive active={filter === f} onClick={() => setFilter(f)}>{f}</Pill>
           ))}
         </div>
-        <div className="flex flex-col gap-2.5">
-          {shown.map((o) => {
-            const p = byId(o.productId);
-            const chip = CHIP[o.status];
-            return (
-              <Link key={o.id} href={`/orders/${o.id}`} className="ds-press flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.images[0]} alt="" className="h-14 w-14 shrink-0 rounded-md border-2 border-ink object-cover" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-bold">{p.title}</div>
-                  <div className="font-mono text-[0.66rem] text-text-subtle">Order #{o.id} · @{o.sellerHandle} · {o.placed}</div>
-                </div>
-                <Pill tone={chip.tone} className="!px-2.5 !py-1 !text-xs">{chip.label}</Pill>
+        {isLoading ? (
+          <div className="flex flex-col gap-2.5" aria-hidden="true">
+            {Array.from({ length: 4 }, (_, i) => (
+              <RowSkeleton key={i} />
+            ))}
+          </div>
+        ) : orders.length === 0 ? (
+          // True zero: nothing bought yet.
+          <EmptyState
+            sticker="shape-sparkle-4pt"
+            headline="Nothing on the way"
+            body="Buy something and track it here, from paid to delivered."
+            cta={
+              <Link href="/marketplace">
+                <Button variant="secondary">Browse the market</Button>
               </Link>
-            );
-          })}
-        </div>
+            }
+          />
+        ) : shown.length === 0 ? (
+          // Filter zero: chrome stays, recovery is one tap.
+          <EmptyState
+            variant="inline"
+            headline={`No ${filter.toLowerCase()} orders`}
+            body="Everything you've bought sits in another lane."
+            cta={
+              <Button variant="secondary" onClick={() => setFilter("All")}>
+                Show all orders
+              </Button>
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {shown.map((o) => {
+              const p = byId(o.productId);
+              if (!p) return null;
+              const chip = CHIP[o.status];
+              return (
+                <Link key={o.id} href={`/orders/${o.id}`} className="ds-press flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.images[0]} alt="" className="h-14 w-14 shrink-0 rounded-md border-2 border-ink object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-bold">{p.title}</div>
+                    <div className="font-mono text-[0.66rem] text-text-subtle">Order #{o.id} · @{o.sellerHandle} · {o.placed}</div>
+                  </div>
+                  <Pill tone={chip.tone} className="!px-2.5 !py-1 !text-xs">{chip.label}</Pill>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </main>
       <BottomNav active="/orders" />
     </>

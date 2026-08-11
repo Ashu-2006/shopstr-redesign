@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { AnimatePresence, motion } from "framer-motion";
+import { dur, ease, tExit } from "@/lib/motion";
 import {
   useListing,
   useListings,
@@ -21,6 +23,9 @@ import { SellerStrip } from "@/components/SellerStrip";
 import { ProductCard } from "@/components/ProductCard";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { Toast } from "@/components/ui/Toast";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ListingDetailSkeleton } from "@/components/skeletons";
 
 export default function ListingDetail() {
   const router = useRouter();
@@ -36,6 +41,20 @@ export default function ListingDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [size, setSize] = useState<string | null>(null);
 
+  // Add-to-cart reward: a sparkle pops off the bag button (keyed so rapid taps
+  // replay) and a toast confirms. Pages own the timers; Toast stays pure.
+  const [addedPop, setAddedPop] = useState(0);
+  const [toast, setToast] = useState(false);
+  const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (popTimer.current) clearTimeout(popTimer.current);
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    []
+  );
+
   // Only declare a listing genuinely missing once the router is ready with a
   // real id. During a route change the id momentarily empties; showing
   // "not found" then (or flashing it before hydration) is wrong.
@@ -43,17 +62,33 @@ export default function ListingDetail() {
     return (
       <>
         <TopBar cartCount={cart.count} />
-        <main className="mx-auto max-w-[700px] px-4 py-24 text-center">
-          <p className="ds-display text-3xl">Listing not found</p>
-          <Link href="/marketplace" className="mt-4 inline-block font-bold text-purple underline">
-            Back to marketplace
-          </Link>
+        <main className="mx-auto max-w-[700px] px-4 py-16">
+          <EmptyState
+            sticker="shape-daisy-yellow"
+            headline="Listing not found"
+            body="It may have sold or been taken down."
+            cta={
+              <Link href="/marketplace">
+                <Button variant="secondary">Back to the market</Button>
+              </Link>
+            }
+          />
         </main>
         <BottomNav active="/marketplace" />
       </>
     );
   }
-  if (!product) return null;
+  // Loading (or a route transition with an empty id): skeleton-first, never a
+  // blank screen. Mirrors the populated two-column layout so nothing reflows.
+  if (!product) {
+    return (
+      <>
+        <TopBar searchHref="/search" cartCount={cart.count} />
+        <ListingDetailSkeleton />
+        <BottomNav active="/marketplace" />
+      </>
+    );
+  }
 
   const avg = averageRating(reviews.scores);
   const type = product.categories.find((c) =>
@@ -71,7 +106,15 @@ export default function ListingDetail() {
     cart.add(product.id, 1, size ?? undefined);
     router.push("/checkout");
   };
-  const addToCart = () => cart.add(product.id, 1, size ?? undefined);
+  const addToCart = () => {
+    cart.add(product.id, 1, size ?? undefined);
+    setAddedPop((k) => k + 1);
+    setToast(true);
+    if (popTimer.current) clearTimeout(popTimer.current);
+    popTimer.current = setTimeout(() => setAddedPop(0), 900);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(false), 2400);
+  };
 
   // One source of truth for the purchase controls. Mobile/tablet renders it in
   // the fixed bottom bar; lg+ renders it inline in the info column (buy box).
@@ -93,9 +136,38 @@ export default function ListingDetail() {
         <Button variant="secondary" full className="flex-1" onClick={buyNow}>
           {walletCovers ? "Buy with sats" : "Buy now"}
         </Button>
-        <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
-          <ShoppingBag size={22} />
-        </button>
+        <span className="relative">
+          <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
+            <ShoppingBag size={22} />
+          </button>
+          {/* On-action reveal: the sparkle pops off the bag. The one sanctioned
+              jumpy moment on this screen; opacity resolves fast+smooth while the
+              transform overshoots. */}
+          <AnimatePresence>
+            {addedPop > 0 && (
+              <motion.span
+                key={addedPop}
+                aria-hidden
+                initial={{ opacity: 0, scale: 0.4, rotate: -20, y: 0 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  rotate: 8,
+                  y: -34,
+                  transition: {
+                    duration: dur.moderate,
+                    ease: ease.jumpy,
+                    opacity: { duration: dur.fast, ease: ease.smooth },
+                  },
+                }}
+                exit={{ opacity: 0, transition: tExit }}
+                className="pointer-events-none absolute -top-9 left-1/2 -ml-6 h-12 w-12"
+              >
+                <Sticker name="shape-sparkle-4pt" className="h-full w-full" />
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </span>
         <Link
           href={`/messages/${seller?.handle ?? ""}?pid=${product.id}&from=listing`}
           aria-label="Message seller"
@@ -217,12 +289,14 @@ export default function ListingDetail() {
 
           {seller && <SellerStrip profile={seller} avg={avg} count={reviews.scores.length} />}
 
-          {reviews.comments && reviews.comments.length > 0 && (
-            <section>
-              <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="ds-display text-xl">Reviews</h2>
+          <section>
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="ds-display text-xl">Reviews</h2>
+              {reviews.scores.length > 0 && (
                 <Stars avg={avg} count={reviews.scores.length} className="text-sm" />
-              </div>
+              )}
+            </div>
+            {reviews.comments && reviews.comments.length > 0 ? (
               <ul className="flex flex-col gap-2.5">
                 {reviews.comments.map((c) => (
                   <li key={c.id} className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
@@ -234,8 +308,15 @@ export default function ListingDetail() {
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
+            ) : (
+              <EmptyState
+                variant="inline"
+                headline="No reviews yet"
+                body="Be the first after you buy."
+                className="!py-8"
+              />
+            )}
+          </section>
 
         </div>
 
@@ -257,6 +338,20 @@ export default function ListingDetail() {
       <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 md:pb-6 lg:hidden">
         <div className="mx-auto max-w-[1100px]">{buyControls}</div>
       </div>
+
+      <AnimatePresence>
+        {toast && (
+          <Toast
+            action={
+              <Link href="/cart" className="underline underline-offset-2">
+                View cart
+              </Link>
+            }
+          >
+            Added to cart
+          </Toast>
+        )}
+      </AnimatePresence>
     </>
   );
 }

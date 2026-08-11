@@ -5,9 +5,13 @@ import { motion } from "framer-motion";
 import { tLayout } from "@/lib/motion";
 import { profileByHandle, useSellerListings, useReviews, averageRating, useSession } from "@/data/hooks";
 import { timeAgo } from "@/lib/format";
+import Link from "next/link";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
 import { Stars } from "@/components/ui/Stars";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ProductCardSkeleton } from "@/components/skeletons";
 import { CaretLeft, Check, Plus, Star } from "@phosphor-icons/react";
 
 const NOW = 1717372800000;
@@ -16,11 +20,34 @@ export default function Shop() {
   const router = useRouter();
   const handle = typeof router.query.handle === "string" ? router.query.handle : "";
   const profile = profileByHandle(handle);
-  const { data: items } = useSellerListings(profile?.pubkey ?? "");
+  const { data: items, isLoading: itemsLoading } = useSellerListings(profile?.pubkey ?? "");
   const { data: reviews } = useReviews(profile?.pubkey ?? "");
   const { follows, toggleFollow } = useSession();
   const [tab, setTab] = useState<"items" | "reviews" | "policies">("items");
 
+  // profileByHandle is synchronous, so a missing profile with a real handle is
+  // genuinely not-found (never a blank screen). An empty handle is just a
+  // route transition; render nothing for that one frame.
+  if (router.isReady && handle && !profile) {
+    return (
+      <>
+        <Head><title>Shop not found · Shopstr</title></Head>
+        <main className="mx-auto max-w-[700px] px-4 py-16">
+          <EmptyState
+            sticker="shape-daisy-yellow"
+            headline="Shop not found"
+            body="This seller moved on or never existed."
+            cta={
+              <Link href="/marketplace">
+                <Button variant="secondary">Back to the market</Button>
+              </Link>
+            }
+          />
+        </main>
+        <BottomNav active="/profile" />
+      </>
+    );
+  }
   if (!profile) return null;
   const avg = averageRating(reviews.scores);
   const following = follows.has(handle);
@@ -62,7 +89,7 @@ export default function Shop() {
                 onClick={() => setTab(t)}
                 className={`relative px-1 py-3 font-bold capitalize transition-colors ${tab === t ? "text-ink" : "text-text-muted"}`}
               >
-                {t === "items" ? `Items ${items.length}` : t}
+                {t === "items" ? (items.length > 0 ? `Items ${items.length}` : "Items") : t}
                 {tab === t && (
                   <motion.span
                     layoutId="shop-tab-underline"
@@ -77,13 +104,39 @@ export default function Shop() {
       </div>
 
       <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12">
-        {tab === "items" && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {items.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-        )}
+        {tab === "items" &&
+          (itemsLoading ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
+              {Array.from({ length: 8 }, (_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <EmptyState
+              sticker="shape-smiley"
+              headline="Shelf's empty"
+              body="This seller hasn't listed anything yet. Check back soon."
+              cta={
+                <Link href="/marketplace">
+                  <Button variant="secondary">Back to the market</Button>
+                </Link>
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {items.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+          ))}
         {tab === "reviews" && (
           <div className="flex flex-col gap-2.5">
+            {reviews.scores.length === 0 && (reviews.comments ?? []).length === 0 && (
+              <EmptyState
+                variant="inline"
+                headline="No reviews yet"
+                body="Reviews land here after a sale closes."
+                className="!py-8"
+              />
+            )}
             {(reviews.comments ?? []).length === 0 && reviews.scores.length > 0 && (
               <p className="inline-flex items-center gap-1 text-text-muted"><Star weight="fill" size={16} /> {avg.toFixed(1)} from {reviews.scores.length} reviews.</p>
             )}

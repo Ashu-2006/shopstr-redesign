@@ -10,6 +10,10 @@ import { catMeta, toneBg } from "@/lib/catalog";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { Sticker } from "@/components/ui/Sticker";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ListCardSkeleton } from "@/components/skeletons";
 import { ListCard, CategoryFeature } from "@/components/cards";
 import Link from "next/link";
 
@@ -17,7 +21,7 @@ export default function CategoryScreen() {
   const router = useRouter();
   const raw = router.query.category;
   const category = typeof raw === "string" ? decodeURIComponent(raw) : "";
-  const { data: listings } = useCategoryListings(category);
+  const { data: listings, isLoading } = useCategoryListings(category);
   const { count } = useCartStore();
 
   if (!category) return null;
@@ -57,9 +61,16 @@ export default function CategoryScreen() {
           </div>
           <Sticker name={meta.sticker} className="spin-slow pointer-events-none absolute -right-4 top-10 h-28 w-28 opacity-90" />
           <h1 className="ds-display mt-5 text-5xl leading-[0.86]">{category}</h1>
-          <p className="mt-2.5 font-mono text-sm opacity-85">
-            {listings.length} listing{listings.length === 1 ? "" : "s"} · priced in sats
-          </p>
+          {/* Count only when true: never "0 listings" while loading or empty. */}
+          {isLoading ? (
+            <Skeleton shape="line" w={150} className="mt-2.5 opacity-60" />
+          ) : (
+            <p className="mt-2.5 font-mono text-sm opacity-85">
+              {listings.length > 0
+                ? `${listings.length} listing${listings.length === 1 ? "" : "s"} · priced in sats`
+                : "Priced in sats"}
+            </p>
+          )}
         </div>
       </header>
 
@@ -74,9 +85,26 @@ export default function CategoryScreen() {
           />
         )}
 
-        <SectionTitle note={`${listings.length} items`}>All {category}</SectionTitle>
-        {listings.length === 0 ? (
-          <p className="text-text-muted">Nothing in this category yet.</p>
+        <SectionTitle note={listings.length > 0 ? `${listings.length} items` : undefined}>
+          All {category}
+        </SectionTitle>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+            {Array.from({ length: 6 }, (_, i) => (
+              <ListCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : listings.length === 0 ? (
+          <EmptyState
+            sticker={meta.sticker}
+            headline="Nothing here yet"
+            body={`No ${category.toLowerCase()} listed right now. Check back soon, or browse the rest of the market.`}
+            cta={
+              <Link href="/marketplace">
+                <Button variant="secondary">Back to the market</Button>
+              </Link>
+            }
+          />
         ) : (
           <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {listings.map((p, i) => (

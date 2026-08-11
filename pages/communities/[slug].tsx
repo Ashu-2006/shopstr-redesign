@@ -1,9 +1,14 @@
 import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useCommunity, useCategoryListings, ratingForPubkey } from "@/data/hooks";
 import { SectionTitle } from "@/components/ui/Section";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ListCardSkeleton } from "@/components/skeletons";
 import { ListCard, BreakCard } from "@/components/cards";
 import { Palette, Coffee, Camera, Cube, Sphere, Check, Plus, CaretLeft, type Icon } from "@phosphor-icons/react";
 
@@ -16,15 +21,66 @@ const COMM_ICONS: Record<string, Icon> = { Palette, Coffee, Camera, Cube, Sphere
 export default function CommunityDetail() {
   const router = useRouter();
   const slug = typeof router.query.slug === "string" ? router.query.slug : "";
-  const { data: comm } = useCommunity(slug);
-  const { data: listings } = useCategoryListings(comm?.category ?? "");
+  const { data: comm, isLoading: commLoading } = useCommunity(slug);
+  const { data: listings, isLoading: listingsLoading } = useCategoryListings(comm?.category ?? "");
   const [joined, setJoined] = useState(false);
 
-  if (!comm) return null;
+  // Genuinely missing community: designed not-found, never a blank screen.
+  if (router.isReady && slug && !commLoading && !comm) {
+    return (
+      <>
+        <Head><title>Community not found · Shopstr</title></Head>
+        <main className="mx-auto max-w-[700px] px-4 py-16">
+          <EmptyState
+            sticker="shape-daisy-yellow"
+            headline="Community not found"
+            body="This corner of the market moved or never existed."
+            cta={
+              <Link href="/communities">
+                <Button variant="secondary">All communities</Button>
+              </Link>
+            }
+          />
+        </main>
+        <BottomNav active="/communities" />
+      </>
+    );
+  }
+  // Loading: mirror the header layout (banner well, icon tile, stat tiles).
+  if (!comm) {
+    return (
+      <>
+        <Head><title>Community · Shopstr</title></Head>
+        <div className="border-b-2 border-ink">
+          <Skeleton shape="rect" h={130} w="100%" className="!rounded-none" />
+          <div className="mx-auto max-w-[1100px] px-4 pb-3.5">
+            <Skeleton shape="rect" w={64} h={64} className="-mt-8 !rounded-[18px] border-2 border-ink" />
+            <Skeleton shape="line" w="45%" h="1.4rem" className="mt-3" />
+            <Skeleton shape="line" w={220} className="mt-2.5" />
+            <div className="mt-3 flex gap-2.5">
+              {Array.from({ length: 3 }, (_, i) => (
+                <div key={i} className="flex-1 rounded-md border-2 border-ink bg-paper-pure p-2.5">
+                  <Skeleton shape="line" w="55%" h="1.05rem" className="mx-auto" />
+                  <Skeleton shape="line" w="70%" h="0.56rem" className="mx-auto mt-1.5" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12" aria-hidden="true">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }, (_, i) => (
+              <ListCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
+        <BottomNav active="/communities" />
+      </>
+    );
+  }
   const CommIcon = COMM_ICONS[comm.emoji];
-  const list = listings.length >= 2 ? listings : listings.concat([]);
-  const pinned = list[0];
-  const rest = list.slice(1);
+  const pinned = listings[0];
+  const rest = listings.slice(1);
 
   return (
     <>
@@ -68,14 +124,30 @@ export default function CommunityDetail() {
             <BreakCard product={pinned} kicker="Community pick" />
           </>
         )}
-        <SectionTitle note={`${list.length} items`}>Latest listings</SectionTitle>
-        <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
-          {rest.map((p, i) => (
-            <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
-              <ListCard product={p} rating={ratingForPubkey(p.pubkey)} />
-            </div>
-          ))}
-        </div>
+        <SectionTitle note={listings.length > 0 ? `${listings.length} items` : undefined}>
+          Latest listings
+        </SectionTitle>
+        {listingsLoading ? (
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+            {Array.from({ length: 3 }, (_, i) => (
+              <ListCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : listings.length === 0 ? (
+          <EmptyState
+            variant="inline"
+            headline="Nothing listed yet"
+            body="Members' listings in this category will show up here."
+          />
+        ) : (
+          <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            {rest.map((p, i) => (
+              <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
+                <ListCard product={p} rating={ratingForPubkey(p.pubkey)} />
+              </div>
+            ))}
+          </div>
+        )}
       </main>
       <BottomNav active="/communities" />
     </>

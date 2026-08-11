@@ -7,11 +7,12 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { Sticker } from "@/components/ui/Sticker";
 import { SectionTitle } from "@/components/ui/Section";
 import { RecRow } from "@/components/RecRow";
+import { RowSkeleton } from "@/components/skeletons";
 import { Gear } from "@phosphor-icons/react";
 
 export default function Claim() {
   const { data: claim } = useClaimable();
-  const { data: listings } = useListings();
+  const { data: listings, isLoading } = useListings();
   const amount = claim?.amount ?? 45000;
   const recs = listings.filter((l) => l.price <= amount).slice(0, 3);
 
@@ -27,11 +28,19 @@ export default function Claim() {
           <div className="mt-1.5 font-mono text-[0.66rem] uppercase tracking-[0.1em]">sats added to your Shopstr wallet</div>
         </div>
 
-        <SectionTitle note={`Under ${groupInt(amount)} sats`}>Spend it here</SectionTitle>
-        <p className="-mt-1 mb-3 text-text-muted">Three things you can buy with this, right now, to keep the sats circulating.</p>
-        <div className="flex flex-col gap-2.5">
-          {recs.map((p) => <RecRow key={p.id} product={p} />)}
-        </div>
+        {/* Optional discovery module: hides entirely when there is nothing to
+            recommend; the copy never promises items that aren't there. */}
+        {(isLoading || recs.length > 0) && (
+          <>
+            <SectionTitle note={`Under ${groupInt(amount)} sats`}>Spend it here</SectionTitle>
+            <p className="-mt-1 mb-3 text-text-muted">Things you can buy with this right now, to keep the sats circulating.</p>
+            <div className="flex flex-col gap-2.5">
+              {isLoading
+                ? Array.from({ length: 3 }, (_, i) => <RowSkeleton key={i} avatarSize={50} />)
+                : recs.map((p) => <RecRow key={p.id} product={p} />)}
+            </div>
+          </>
+        )}
 
         <Link href="/marketplace" className="ds-press mt-4 flex w-full items-center justify-center rounded-pill border-2 border-ink bg-paper-pure py-3.5 font-bold">
           Or just browse the market

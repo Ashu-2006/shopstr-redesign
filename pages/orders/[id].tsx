@@ -7,17 +7,65 @@ import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Pill } from "@/components/ui/Pill";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { RowSkeleton } from "@/components/skeletons";
 import { ChatCircle } from "@phosphor-icons/react";
 
-const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id)!;
+const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id);
 
 export default function OrderDetail() {
   const router = useRouter();
   const id = typeof router.query.id === "string" ? router.query.id : "";
-  const { data: order } = useOrder(id);
-  if (!order) return null;
+  const { data: order, isLoading } = useOrder(id);
 
-  const p = byId(order.productId);
+  const notFound = router.isReady && id && !isLoading && !order;
+  const p = order ? byId(order.productId) : undefined;
+  if (notFound || (order && !p)) {
+    return (
+      <>
+        <Head><title>Order not found · Shopstr</title></Head>
+        <SheetHeader title="Order" backTo="/orders" />
+        <main className="mx-auto max-w-[760px] px-4 py-12">
+          <EmptyState
+            sticker="shape-daisy-yellow"
+            headline="Order not found"
+            body="It may belong to another key, or the link is stale."
+            cta={
+              <Link href="/orders">
+                <Button variant="secondary">Back to orders</Button>
+              </Link>
+            }
+          />
+        </main>
+        <BottomNav active="/orders" />
+      </>
+    );
+  }
+  if (!order || !p) {
+    // Loading: mirror the populated layout (order card + timeline + actions).
+    return (
+      <>
+        <Head><title>Order · Shopstr</title></Head>
+        <SheetHeader title="Order" backTo="/orders" />
+        <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12" aria-hidden="true">
+          <RowSkeleton />
+          <h2 className="ds-display mb-3 mt-6 text-xl">Timeline</h2>
+          <ol className="relative ml-3 border-l-2 border-ink pl-7">
+            {Array.from({ length: 4 }, (_, i) => (
+              <li key={i} className="relative mb-5">
+                <span className="absolute -left-[37px] top-0.5 h-4 w-4 rounded-full border-2 border-ink bg-paper-pure" />
+                <Skeleton shape="line" w="35%" h="0.95rem" />
+                <Skeleton shape="line" w="55%" className="mt-1.5" h="0.66rem" />
+              </li>
+            ))}
+          </ol>
+        </main>
+        <BottomNav active="/orders" />
+      </>
+    );
+  }
   const stages = ["paid", "shipped", "delivered"];
   const reached = stages.indexOf(order.status);
   const nodes = [

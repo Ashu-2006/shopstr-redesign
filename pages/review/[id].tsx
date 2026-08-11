@@ -1,18 +1,58 @@
 import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useListing, useProfile } from "@/data/hooks";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Star, Sparkle } from "@phosphor-icons/react";
 
 export default function ReviewComposer() {
   const router = useRouter();
   const id = typeof router.query.id === "string" ? router.query.id : "";
-  const { data: product } = useListing(id);
+  const { data: product, isLoading } = useListing(id);
   const { data: seller } = useProfile(product?.pubkey ?? "");
   const [score, setScore] = useState(5);
 
-  if (!product) return null;
+  // Genuinely missing purchase (never during a route transition or load).
+  if (router.isReady && id && !isLoading && !product) {
+    return (
+      <>
+        <Head><title>Leave a review · Shopstr</title></Head>
+        <main className="mx-auto max-w-[700px] px-4 py-16">
+          <EmptyState
+            sticker="shape-daisy-yellow"
+            headline="Nothing to review"
+            body="This purchase moved or never existed."
+            cta={
+              <Link href="/orders">
+                <Button variant="secondary">Back to orders</Button>
+              </Link>
+            }
+          />
+        </main>
+      </>
+    );
+  }
+  // Loading: keep the flow shell so the frame doesn't pop in after the data.
+  if (!product) {
+    return (
+      <>
+        <Head><title>Leave a review · Shopstr</title></Head>
+        <OneWayFrame tone="green" step="Leave a review" sticker="shape-daisy-yellow" closeTo={`/orders`}>
+          <Skeleton shape="line" w={160} />
+          <Skeleton shape="rect" w="60%" h="1.8rem" className="mt-3" />
+          <div className="mt-4 flex items-center gap-2.5">
+            <Skeleton shape="rect" w={48} h={48} className="!rounded-[10px]" />
+            <Skeleton shape="line" w="45%" h="0.9rem" />
+          </div>
+          <Skeleton shape="rect" w="100%" h={110} className="mt-4" />
+        </OneWayFrame>
+      </>
+    );
+  }
 
   return (
     <>
@@ -35,7 +75,11 @@ export default function ReviewComposer() {
               aria-label={`${i} stars`}
               className={`ds-press leading-none transition-transform ${i <= score ? "scale-110 text-yellow" : "text-ink/25"}`}
             >
-              {i <= score ? <Star weight="fill" size={36} /> : <Star size={36} />}
+              {/* The star you land on pops (remounts via key when it becomes the
+                  score, replaying the bump). The rest just fill. */}
+              <span key={i === score ? `sel-${score}` : `idle-${i}`} className={i === score ? "bump inline-block" : "inline-block"}>
+                {i <= score ? <Star weight="fill" size={36} /> : <Star size={36} />}
+              </span>
             </button>
           ))}
         </div>
