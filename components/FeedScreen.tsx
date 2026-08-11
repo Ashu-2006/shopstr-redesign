@@ -6,17 +6,26 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { DiscoveryChips } from "@/components/DiscoveryChips";
 import { ListCard } from "@/components/cards";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { FeedSkeleton } from "@/components/skeletons";
+import type { ReactNode } from "react";
 
 /** Shared discovery feed: top bar + chips + a staggered column of H5 list cards.
-   2-up on desktop. Used by /new, /near, /following. */
+   2-up on desktop. Used by /new, /near, /following. Chrome (chips + title)
+   paints immediately; the list area is skeleton-first while loading. */
 export function FeedScreen({
   title,
   sub,
   listings,
+  loading = false,
+  empty,
 }: {
   title: string;
   sub: string;
   listings: ProductData[];
+  loading?: boolean;
+  /** Override the default empty treatment (e.g. /following's page empty). */
+  empty?: ReactNode;
 }) {
   const { count } = useCartStore();
   return (
@@ -27,12 +36,17 @@ export function FeedScreen({
       <TopBar searchHref="/search" cartCount={count} />
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-4 md:pb-12">
         <DiscoveryChips />
-        <SectionTitle note={sub}>{title}</SectionTitle>
-        {listings.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-ink/30 px-6 py-16 text-center">
-            <p className="ds-display text-2xl">Nothing here yet</p>
-            <p className="mt-2 text-text-muted">Try a different filter or come back soon.</p>
-          </div>
+        <SectionTitle note={loading ? undefined : sub}>{title}</SectionTitle>
+        {loading ? (
+          <FeedSkeleton />
+        ) : listings.length === 0 ? (
+          empty ?? (
+            <EmptyState
+              variant="inline"
+              headline="Nothing here yet"
+              body="Try a different filter or come back soon."
+            />
+          )
         ) : (
           <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {listings.map((p, i) => (
