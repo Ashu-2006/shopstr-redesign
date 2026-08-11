@@ -73,6 +73,40 @@ export default function ListingDetail() {
   };
   const addToCart = () => cart.add(product.id, 1, size ?? undefined);
 
+  // One source of truth for the purchase controls. Mobile/tablet renders it in
+  // the fixed bottom bar; lg+ renders it inline in the info column (buy box).
+  const buyControls = (
+    <>
+      {walletCovers && (
+        <div className="mb-2 flex items-center justify-center gap-1.5 rounded-pill border-2 border-purple bg-purple-soft px-3.5 py-2 font-mono text-[0.72rem] font-bold text-purple-press">
+          <Lightning size={14} />
+          Pay from your Shopstr wallet · {formatSats(walletBalance)} available
+        </div>
+      )}
+      <div className="flex items-center gap-2.5 rounded-2xl border-2 border-ink bg-ink p-3">
+        <div className="hidden flex-col pl-2 pr-3 text-text-on-dark sm:flex">
+          <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-[#bdbcb4]">
+            {walletCovers ? "From wallet" : "Price"}
+          </span>
+          <span className="font-mono text-lg font-bold leading-none tabular-nums">{groupInt(product.price)}</span>
+        </div>
+        <Button variant="secondary" full className="flex-1" onClick={buyNow}>
+          {walletCovers ? "Buy with sats" : "Buy now"}
+        </Button>
+        <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
+          <ShoppingBag size={22} />
+        </button>
+        <Link
+          href={`/messages/${seller?.handle ?? ""}?pid=${product.id}&from=listing`}
+          aria-label="Message seller"
+          className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-green text-ink"
+        >
+          <ChatCircle size={22} />
+        </Link>
+      </div>
+    </>
+  );
+
   return (
     <>
       <Head>
@@ -82,7 +116,7 @@ export default function ListingDetail() {
 
       <TopBar searchHref="/search" cartCount={cart.count} />
 
-      <main className="mx-auto max-w-[1100px] px-4 pb-44 pt-4 md:grid md:grid-cols-2 md:gap-10 md:pb-12">
+      <main className="mx-auto max-w-[1100px] px-4 pb-44 pt-4 md:grid md:grid-cols-2 md:gap-10 lg:pb-16">
         {/* ---- Gallery ---- */}
         <div className="md:sticky md:top-24 md:self-start">
           <div className="mb-3 flex items-center justify-between">
@@ -122,7 +156,7 @@ export default function ListingDetail() {
                   key={src}
                   onClick={() => setActiveImg(i)}
                   aria-label={`Image ${i + 1}`}
-                  className={`h-16 w-16 overflow-hidden rounded-lg border-2 ds-press ${i === activeImg ? "border-purple" : "border-ink"}`}
+                  className={`h-16 w-16 overflow-hidden rounded-lg border-2 ds-press lg:h-20 lg:w-20 ${i === activeImg ? "border-purple" : "border-ink"}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt="" className="h-full w-full object-cover" />
@@ -164,6 +198,9 @@ export default function ListingDetail() {
             </div>
           )}
 
+          {/* Desktop buy box: the CTA lives with the product, not in a viewport-wide bar. */}
+          <div className="hidden lg:block">{buyControls}</div>
+
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
             {[
               ["Shipping", shippingLine],
@@ -200,50 +237,25 @@ export default function ListingDetail() {
             </section>
           )}
 
-          {others.length > 0 && (
-            <section>
-              <h2 className="ds-display mb-3 text-xl">More from @{seller?.handle}</h2>
-              <div className="grid grid-cols-2 gap-3">
-                {others.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            </section>
-          )}
         </div>
+
+        {/* Related items span both columns: an orphaned grid under the buy box reads
+            as part of the purchase decision; full-width it reads as browsing. */}
+        {others.length > 0 && (
+          <section className="mt-8 md:col-span-2 md:mt-2">
+            <h2 className="ds-display mb-3 text-xl">More from @{seller?.handle}</h2>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {others.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
-      {/* ---- Sticky buy control row ---- */}
-      <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 md:pb-6">
-        <div className="mx-auto max-w-[1100px]">
-          {walletCovers && (
-            <div className="mb-2 flex items-center justify-center gap-1.5 rounded-pill border-2 border-purple bg-purple-soft px-3.5 py-2 font-mono text-[0.72rem] font-bold text-purple-press">
-              <Lightning size={14} />
-              Pay from your Shopstr wallet · {formatSats(walletBalance)} available
-            </div>
-          )}
-          <div className="flex items-center gap-2.5 rounded-2xl border-2 border-ink bg-ink p-3">
-            <div className="hidden flex-col pl-2 pr-3 text-text-on-dark sm:flex">
-              <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-[#bdbcb4]">
-                {walletCovers ? "From wallet" : "Price"}
-              </span>
-              <span className="font-mono text-lg font-bold leading-none tabular-nums">{groupInt(product.price)}</span>
-            </div>
-            <Button variant="secondary" full className="flex-1" onClick={buyNow}>
-              {walletCovers ? "Buy with sats" : "Buy now"}
-            </Button>
-            <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
-              <ShoppingBag size={22} />
-            </button>
-            <Link
-              href={`/messages/${seller?.handle ?? ""}?pid=${product.id}&from=listing`}
-              aria-label="Message seller"
-              className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-green text-ink"
-            >
-              <ChatCircle size={22} />
-            </Link>
-          </div>
-        </div>
+      {/* ---- Fixed buy bar: mobile/tablet only. Desktop gets the inline buy box. ---- */}
+      <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 md:pb-6 lg:hidden">
+        <div className="mx-auto max-w-[1100px]">{buyControls}</div>
       </div>
     </>
   );
