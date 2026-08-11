@@ -5,6 +5,11 @@ Mock data only; ports back to the real Shopstr repo later. See `data/` for the
 architecture and **`docs/app-map.md`** for the full IA / routes / flows / principles.
 These instructions override defaults.
 
+## Git workflow (IMPORTANT)
+- **Commit after every major piece of work** on your own initiative (a feature, a screen, a nav/layout change, a refactor). Do not wait to be asked to commit. Write a clear message and end it with the required `Co-Authored-By` trailer.
+- **Never push unless I explicitly ask you to push.** When I do ask, **push directly to `main`** (this repo works on `main`; do not open PRs or feature branches unless I say so).
+- Never use `--no-verify` or skip hooks. Never force-push `main`.
+
 ## Stack
 - Next.js 16 (Pages Router, Turbopack), React 19, TypeScript 5, `@/` alias to repo root.
 - Tailwind CSS v4 (CSS-first: `@import "tailwindcss"` + `@theme inline`). NOT v3 — no `tailwind.config.js` utilities, no `@tailwind base`. Any font/other `@import url(...)` MUST come BEFORE `@import "tailwindcss"` (Tailwind expands into rules; CSS requires all `@import`s first, else the build 500s).
@@ -87,6 +92,14 @@ Named `shape-*` (sparkle, starburst, daisy, sun-rays, heart-circle, smiley, hand
 ## Marketplace / browsing UX notes (from review)
 - **Search + filters = progressive disclosure.** Don't show the full search field + every filter row by default. Collapse them; reveal on click/tap (a search icon expands the field; a "Filters" control opens the chips). Keep the default browse view clean.
 - **Avoid cramped grids.** The plain 2-col card grid felt small/cramped on mobile. Vary the rhythm — mixed tile sizes, editorial rows, magazine/asymmetric layouts — so browsing never feels monotonous.
+
+## Loading + empty states (the rules; full spec in docs/superpowers/specs/2026-08-12-loading-empty-states-design.md)
+Every data surface implements: **loading (skeleton) / empty / no-results / not-found / populated.**
+- **Skeleton-first, never a spinner.** No spinner primitive exists in this app; don't add one. Chrome (nav, headers, tabs, borders) paints immediately; content areas fill with `Skeleton` blocks (`components/ui/Skeleton.tsx`, `.ds-skeleton` gradient sweep, `--ds-dur-loop`). Card skeletons in `components/skeletons.tsx` mirror the real card geometry exactly (same frame, radius, min-heights) so NOTHING reflows when data lands.
+- **Never re-skeleton shown data.** `useSimulatedLoad` in `data/hooks.ts` fires once per data family per session. Tab/filter switches never show loading UI. No `?state=` dev overrides; state derives from `isLoading` only.
+- **Empty is not no-results.** True zero: `EmptyState` page variant (sticker + display headline + body + a CTA that WORKS). Filter/search zero: `variant="inline"` (dashed box, chrome preserved, "Clear filters"-style recovery). Dynamic routes with a bad id: not-found page variant + back nav; `return null` blank screens are banned.
+- **Copy never lies.** Counts and lead-ins render only when > 0 (no "0 items", no "Active 0"). Optional discovery rails (Top sellers, Near you, claim recs) hide entirely when empty; destination surfaces show designed empties. Headline: short, present tense; body: one line that explains and recovers.
+- Reduced motion: the sweep falls back to a static fill (already in globals.css); keep that guard when touching skeleton CSS.
 
 ## Pinterest reference rule (IMPORTANT)
 The `Pinterest/` folder holds layout/component references. **If you are referencing a
