@@ -1,8 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
 import { tEnter, tExit } from "@/lib/motion";
+import { Toast } from "@/components/ui/Toast";
 import { Lightning } from "@phosphor-icons/react";
 import { useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
@@ -17,12 +19,35 @@ export default function Cart() {
   const router = useRouter();
   const { items, subtotal, inc, dec } = useCartStore();
 
+  // Removal notice. dec() drops the line at zero; the toast confirms it.
+  const [toast, setToast] = useState(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    []
+  );
+  const decWithNotice = (id: string, quantity: number) => {
+    dec(id);
+    if (quantity === 1) {
+      setToast(true);
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setToast(false), 2400);
+    }
+  };
+
   return (
     <>
       <Head><title>Cart · Shopstr</title></Head>
       <SheetHeader title="Your cart" backTo="/marketplace" />
 
-      <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
+      {/* Desktop: line items left, sticky order summary right. */}
+      <main
+        className={`mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12 ${
+          items.length > 0 ? "lg:grid lg:max-w-[1100px] lg:grid-cols-[1fr_400px] lg:items-start lg:gap-8" : ""
+        }`}
+      >
         {items.length === 0 ? (
           <EmptyState
             headline="Cart's empty"
@@ -56,7 +81,7 @@ export default function Cart() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => dec(c.product.id)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[9px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
+                    <button onClick={() => decWithNotice(c.product.id, c.quantity)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[9px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
                     <span className="min-w-5 text-center font-mono font-bold tabular-nums">{c.quantity}</span>
                     <button onClick={() => inc(c.product.id)} aria-label="Increase" className="ds-press grid h-8 w-8 place-items-center rounded-[9px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">+</button>
                   </div>
@@ -65,7 +90,7 @@ export default function Cart() {
               </AnimatePresence>
             </ul>
 
-            <div className="mt-4 rounded-lg border-2 border-purple bg-purple p-4 text-on-purple">
+            <div className="mt-4 rounded-lg border-2 border-purple bg-purple p-4 text-on-purple lg:sticky lg:top-24 lg:mt-0">
               <div className="mb-2 flex items-baseline justify-between font-mono text-sm">
                 <span>Subtotal</span>
                 <span className="tabular-nums">{groupInt(subtotal)} sats</span>
@@ -85,6 +110,8 @@ export default function Cart() {
           </>
         )}
       </main>
+
+      <AnimatePresence>{toast && <Toast>Removed from cart</Toast>}</AnimatePresence>
 
       <BottomNav active="/cart" />
     </>
