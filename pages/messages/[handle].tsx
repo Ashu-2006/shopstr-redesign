@@ -66,7 +66,7 @@ export default function Thread() {
                   Hi! Is this still available?
                 </div>
                 <div className="text-center font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">
-                  Draft ready — your question is grounded in the listing.
+                  Draft ready. Your question is grounded in the listing.
                 </div>
               </>
             ) : (
@@ -79,7 +79,7 @@ export default function Thread() {
                   Hi! Is this still available? Could you combine shipping if I take two?
                 </div>
                 <div className="max-w-[80%] self-start rounded-lg rounded-bl-[5px] border-2 border-ink bg-paper-pure p-3">
-                  Yes — I can ship two together to save on postage. Want me to send an updated invoice?
+                  Yes, I can ship two together to save on postage. Want me to send an updated invoice?
                 </div>
                 <div className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">Perfect, yes please.</div>
               </>

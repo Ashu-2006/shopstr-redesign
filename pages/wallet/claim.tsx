@@ -28,7 +28,7 @@ export default function Claim() {
         </div>
 
         <SectionTitle note={`Under ${groupInt(amount)} sats`}>Spend it here</SectionTitle>
-        <p className="-mt-1 mb-3 text-text-muted">Three things you can buy with this, right now — keep the sats circulating.</p>
+        <p className="-mt-1 mb-3 text-text-muted">Three things you can buy with this, right now, to keep the sats circulating.</p>
         <div className="flex flex-col gap-2.5">
           {recs.map((p) => <RecRow key={p.id} product={p} />)}
         </div>

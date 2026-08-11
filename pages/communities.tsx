@@ -37,7 +37,7 @@ export default function Communities() {
             le.
           </h1>
           <p className="mt-2.5 max-w-[40ch] text-text-muted">
-            NIP-72 communities — curated corners of the market run by people who care about the craft.
+            NIP-72 communities: curated corners of the market run by people who care about the craft.
           </p>
         </div>
 

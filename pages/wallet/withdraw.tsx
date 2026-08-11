@@ -16,7 +16,7 @@ export default function Withdraw() {
         <FlowLead>Withdraw 45,000 sats</FlowLead>
         <h3 className="ds-display mt-2 text-2xl leading-[0.95]">3 things under<br />your balance</h3>
         <p className="mt-2 text-[0.92rem] text-text-muted">
-          Spending keeps your sats in the circular economy. These are ready to buy right now — or continue the withdrawal.
+          Spending keeps your sats in the circular economy. These are ready to buy right now, or continue the withdrawal.
         </p>
         <div className="mt-4 flex flex-col gap-2.5">
           {recs.map((p) => <RecRow key={p.id} product={p} />)}

@@ -51,7 +51,7 @@ export default function Shop() {
           </div>
           <h1 className="ds-display mt-3 text-3xl">@{profile.handle}</h1>
           <div className="mt-1 font-mono text-[0.7rem] text-text-subtle">
-            <Stars avg={avg} count={reviews.scores.length} /> · {items[0]?.location ?? "—"}{profile.nip05 ? ` · ${profile.nip05}` : ""}
+            <Stars avg={avg} count={reviews.scores.length} /> · {items[0]?.location ?? "-"}{profile.nip05 ? ` · ${profile.nip05}` : ""}
           </div>
           {profile.about && <p className="mt-2.5 text-text-muted">{profile.about}</p>}
           <div className="mt-3.5 flex gap-2 border-b-2 border-ink">
@@ -99,7 +99,7 @@ export default function Shop() {
         )}
         {tab === "policies" && (
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
-            {[["Ships from", items[0]?.location ?? "—"], ["Delivery", "3–5 days"], ["Returns", "14 days"], ["Payment", "Lightning · Cashu"]].map(([k, v]) => (
+            {[["Ships from", items[0]?.location ?? "-"], ["Delivery", "3-5 days"], ["Returns", "14 days"], ["Payment", "Lightning · Cashu"]].map(([k, v]) => (
               <div key={k} className="bg-paper-pure p-3">
                 <dt className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-subtle">{k}</dt>
                 <dd className="mt-0.5 font-medium">{v}</dd>

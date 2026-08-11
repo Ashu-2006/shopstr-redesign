@@ -131,7 +131,7 @@ export const MOCK_LISTINGS: ProductData[] = [
   {
     id: "lst_007",
     pubkey: "pk_ekko",
-    title: 'Risograph zine — "Soft Static" no. 4',
+    title: 'Risograph zine: "Soft Static" no. 4',
     summary: "32 pages, 2-color riso on recycled stock. Limited run of 100.",
     images: [
       "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900",
@@ -266,7 +266,7 @@ export const MOCK_LISTINGS: ProductData[] = [
   {
     id: "lst_014",
     pubkey: "pk_bob",
-    title: "Keycap set — artisan resin (swap)",
+    title: "Keycap set: artisan resin (swap)",
     summary: "Trade for a GMK base set or escrow swap. Open to offers over DM.",
     images: [
       "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=900",
@@ -323,7 +323,7 @@ export const MOCK_LISTINGS: ProductData[] = [
   {
     id: "lst_017",
     pubkey: "pk_dave",
-    title: "Darkroom print — silver gelatin",
+    title: "Darkroom print: silver gelatin",
     summary: "Hand-printed 8×10, archival. Signed verso. Edition of 12.",
     images: [
       "https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=900",
@@ -342,7 +342,7 @@ export const MOCK_LISTINGS: ProductData[] = [
   {
     id: "lst_018",
     pubkey: "pk_ekko",
-    title: "Sticker pack — die-cut vinyl (10)",
+    title: "Sticker pack: die-cut vinyl (10)",
     summary: "Weatherproof matte vinyl, 10 designs. Great on laptops + bottles.",
     images: [
       "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900",
