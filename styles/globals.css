@@ -419,6 +419,13 @@ body.soft-sep {
   --ds-paper-2: #d4cdbb;
   background: var(--ds-paper);
 }
+/* The html canvas must match, or pages shorter than the viewport show a seam
+   where the body's deepened paper ends and the default paper shows through. */
+html:has(body.soft-sep) {
+  --ds-paper: #e6e2d7;
+  --ds-paper-2: #d4cdbb;
+  background: var(--ds-paper);
+}
 .soft-sep *,
 .soft-sep *::before,
 .soft-sep *::after {

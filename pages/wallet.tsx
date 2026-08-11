@@ -19,7 +19,7 @@ export default function Wallet() {
   return (
     <>
       <Head><title>Wallet · Shopstr</title></Head>
-      <SheetHeader title="Wallet" backTo="/marketplace" />
+      <SheetHeader title="Wallet" backTo="/marketplace" contentMax="max-w-[760px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
         {claim && (
           <Link href="/wallet/claim" className="ds-press mb-3 flex items-center gap-3 rounded-lg border-2 border-ink bg-green p-3">

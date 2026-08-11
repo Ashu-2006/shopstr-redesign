@@ -21,7 +21,7 @@ export default function Settings() {
   return (
     <>
       <Head><title>Settings · Shopstr</title></Head>
-      <SheetHeader title="Settings" backTo="/profile" />
+      <SheetHeader title="Settings" backTo="/profile" contentMax="max-w-[760px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-3 md:pb-12">
         <div className="flex flex-col gap-2.5">
           {ITEMS.map((it) => {

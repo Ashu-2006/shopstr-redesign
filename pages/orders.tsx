@@ -27,7 +27,7 @@ export default function Orders() {
   return (
     <>
       <Head><title>Orders · Shopstr</title></Head>
-      <SheetHeader title="Your orders" backTo="/marketplace" />
+      <SheetHeader title="Your orders" backTo="/marketplace" contentMax="max-w-[760px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
         <div className="no-scrollbar mb-3 flex gap-2 overflow-x-auto">
           {FILTERS.map((f) => (

@@ -19,7 +19,7 @@ export default function Claim() {
   return (
     <>
       <Head><title>Sale claimed · Shopstr</title></Head>
-      <SheetHeader title="Sale claimed" backTo="/wallet" />
+      <SheetHeader title="Sale claimed" backTo="/wallet" contentMax="max-w-[760px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
         <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-green p-6 text-center text-ink">
           <Sticker name="shape-sparkle-4pt" className="absolute left-4 top-3.5 h-12 w-12" />

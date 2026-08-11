@@ -26,7 +26,7 @@ export default function OrderDetail() {
     return (
       <>
         <Head><title>Order not found · Shopstr</title></Head>
-        <SheetHeader title="Order" backTo="/orders" />
+        <SheetHeader title="Order" backTo="/orders" contentMax="max-w-[760px]" />
         <main className="mx-auto max-w-[760px] px-4 py-12">
           <EmptyState
             sticker="shape-daisy-yellow"
@@ -48,7 +48,7 @@ export default function OrderDetail() {
     return (
       <>
         <Head><title>Order · Shopstr</title></Head>
-        <SheetHeader title="Order" backTo="/orders" />
+        <SheetHeader title="Order" backTo="/orders" contentMax="max-w-[760px]" />
         <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12" aria-hidden="true">
           <RowSkeleton />
           <h2 className="ds-display mb-3 mt-6 text-xl">Timeline</h2>
@@ -80,7 +80,7 @@ export default function OrderDetail() {
   return (
     <>
       <Head><title>Order #{order.id} · Shopstr</title></Head>
-      <SheetHeader title={`Order #${order.id}`} backTo="/orders" />
+      <SheetHeader title={`Order #${order.id}`} backTo="/orders" contentMax="max-w-[760px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
         <div className="flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}

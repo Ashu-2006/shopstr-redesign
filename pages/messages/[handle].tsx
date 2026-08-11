@@ -59,6 +59,7 @@ export default function Thread() {
         <SheetHeader
           title={`@${handle}`}
           backTo="/messages"
+          contentMax="max-w-[760px] lg:max-w-[1200px]"
           right={<button aria-label="More" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">⋯</button>}
         />
 

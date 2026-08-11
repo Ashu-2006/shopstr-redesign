@@ -17,7 +17,7 @@ export default function Messages() {
   return (
     <>
       <Head><title>Inbox · Shopstr</title></Head>
-      <SheetHeader title="Inbox" backTo="/marketplace" />
+      <SheetHeader title="Inbox" backTo="/marketplace" contentMax="max-w-[760px] lg:max-w-[1200px]" />
       <main className="mx-auto max-w-[760px] px-4 pb-28 pt-1 md:pb-12 lg:grid lg:max-w-[1200px] lg:grid-cols-[400px_1fr] lg:gap-8 lg:px-6">
         {isLoading ? (
           <div className="flex flex-col" aria-hidden="true">

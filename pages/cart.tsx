@@ -40,7 +40,7 @@ export default function Cart() {
   return (
     <>
       <Head><title>Cart · Shopstr</title></Head>
-      <SheetHeader title="Your cart" backTo="/marketplace" />
+      <SheetHeader title="Your cart" backTo="/marketplace" contentMax="max-w-[760px] lg:max-w-[1100px]" />
 
       {/* Desktop: line items left, sticky order summary right. */}
       <main
