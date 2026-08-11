@@ -1,9 +1,9 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useChats } from "@/data/hooks";
-import { timeAgo } from "@/lib/format";
+import { ChatCircle } from "@phosphor-icons/react";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { InboxList } from "@/components/InboxList";
 
 // Fixed reference time so relative stamps are stable (no SSR/CSR mismatch).
 const NOW = 1717372800000;
@@ -14,29 +14,18 @@ export default function Messages() {
     <>
       <Head><title>Inbox · Shopstr</title></Head>
       <SheetHeader title="Inbox" backTo="/marketplace" />
-      <main className="mx-auto max-w-[760px] px-4 pb-28 pt-1 md:pb-12">
-        {chats.map((t) => (
-          <Link
-            key={t.id}
-            href={`/messages/${t.counterpartyHandle}`}
-            className="flex items-center gap-3 border-b-2 border-ink py-3.5"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={t.counterpartyPicture} alt="" className="h-12 w-12 shrink-0 rounded-[13px] border-2 border-ink object-cover" />
-            <div className="min-w-0 flex-1">
-              <div className="font-bold">@{t.counterpartyHandle}</div>
-              <div className="truncate text-sm text-text-muted">{t.lastMessage}</div>
-            </div>
-            <div className="shrink-0 text-right">
-              <div className="font-mono text-[0.64rem] text-text-subtle">{timeAgo(t.lastMessageAt, NOW)}</div>
-              {t.unread > 0 && (
-                <span className="mt-1.5 inline-block min-w-5 rounded-[9px] bg-purple px-1.5 py-0.5 text-center font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">
-                  {t.unread}
-                </span>
-              )}
-            </div>
-          </Link>
-        ))}
+      <main className="mx-auto max-w-[760px] px-4 pb-28 pt-1 md:pb-12 lg:grid lg:max-w-[1200px] lg:grid-cols-[400px_1fr] lg:gap-8 lg:px-6">
+        <InboxList chats={chats} now={NOW} />
+        {/* Desktop split view: the right pane waits for a thread. */}
+        <div className="hidden min-h-[70vh] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-ink bg-paper-pure lg:flex">
+          <span className="grid h-16 w-16 place-items-center rounded-full border-2 border-ink bg-green">
+            <ChatCircle size={30} />
+          </span>
+          <p className="ds-display text-2xl">Pick a conversation</p>
+          <p className="max-w-[300px] text-center text-sm text-text-muted">
+            Encrypted DMs over Nostr. Choose a thread on the left to keep talking.
+          </p>
+        </div>
       </main>
       <BottomNav active="/messages" />
     </>

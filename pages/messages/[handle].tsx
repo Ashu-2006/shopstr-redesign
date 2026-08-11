@@ -2,11 +2,15 @@ import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useListing, profileByHandle } from "@/data/hooks";
+import { useListing, useChats, profileByHandle } from "@/data/hooks";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
+import { InboxList } from "@/components/InboxList";
 import { Star, Check, PaperPlaneTilt } from "@phosphor-icons/react";
+
+// Fixed reference time so relative stamps are stable (no SSR/CSR mismatch).
+const NOW = 1717372800000;
 
 function QuotedCard({ pid }: { pid: string }) {
   const product = MOCK_LISTINGS.find((l) => l.id === pid);
@@ -30,6 +34,7 @@ export default function Thread() {
   const fromListing = router.query.from === "listing";
 
   const seller = profileByHandle(handle);
+  const { data: chats } = useChats();
   // The product this thread is about: explicit pid, else the seller's first listing.
   const fallbackPid = MOCK_LISTINGS.find((l) => l.pubkey === seller?.pubkey)?.id ?? "lst_007";
   const { data: product } = useListing(pid || fallbackPid);
@@ -57,15 +62,25 @@ export default function Thread() {
           right={<button aria-label="More" className="ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-paper-pure">⋯</button>}
         />
 
-        <div className="mx-auto w-full max-w-[760px] flex-1 overflow-y-auto px-4 pb-4">
-          <div className="flex flex-col gap-2.5 py-4">
+        <div className="mx-auto w-full max-w-[760px] flex-1 lg:grid lg:max-w-[1200px] lg:grid-cols-[400px_1fr] lg:items-start lg:gap-8 lg:px-6 lg:pb-10">
+          {/* Desktop split view: inbox rail stays visible next to the open thread. */}
+          <aside className="hidden lg:block">
+            <InboxList chats={chats} now={NOW} activeHandle={handle} />
+          </aside>
+
+          <section className="flex min-h-0 flex-col lg:h-[calc(100dvh-140px)] lg:overflow-hidden lg:rounded-2xl lg:border-2 lg:border-ink lg:bg-paper">
+        <div className="w-full flex-1 overflow-y-auto px-4 pb-4">
+          {/* .stagger gives every bubble the ds-rise entrance (rises from the
+              composer edge). Seed history staggers 55ms/bubble on mount; a
+              newly sent message mounts with no delay, so it rises immediately. */}
+          <div className="stagger flex flex-col gap-2.5 py-4">
             {fromListing ? (
               <>
                 <div className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">
                   {product && <QuotedCard pid={product.id} />}
                   Hi! Is this still available?
                 </div>
-                <div className="text-center font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">
+                <div style={{ animationDelay: "55ms" }} className="text-center font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">
                   Draft ready. Your question is grounded in the listing.
                 </div>
               </>
@@ -75,13 +90,13 @@ export default function Thread() {
                   {product && <QuotedCard pid={product.id} />}
                   Hey! Thanks for your interest
                 </div>
-                <div className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">
+                <div style={{ animationDelay: "55ms" }} className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">
                   Hi! Is this still available? Could you combine shipping if I take two?
                 </div>
-                <div className="max-w-[80%] self-start rounded-lg rounded-bl-[5px] border-2 border-ink bg-paper-pure p-3">
+                <div style={{ animationDelay: "110ms" }} className="max-w-[80%] self-start rounded-lg rounded-bl-[5px] border-2 border-ink bg-paper-pure p-3">
                   Yes, I can ship two together to save on postage. Want me to send an updated invoice?
                 </div>
-                <div className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">Perfect, yes please.</div>
+                <div style={{ animationDelay: "165ms" }} className="max-w-[80%] self-end rounded-lg rounded-br-[5px] bg-purple p-3 text-on-purple">Perfect, yes please.</div>
               </>
             )}
 
@@ -120,7 +135,8 @@ export default function Thread() {
           </div>
         </div>
 
-        <div className="sticky bottom-0 flex gap-2.5 border-t-2 border-ink bg-paper px-4 py-3">
+        {/* Sticky to the viewport on mobile; a static footer of the thread panel at lg+. */}
+        <div className="sticky bottom-0 flex gap-2.5 border-t-2 border-ink bg-paper px-4 py-3 lg:static">
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -131,6 +147,8 @@ export default function Thread() {
           <button onClick={send} aria-label="Send" className="ds-press grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-purple bg-purple text-white">
             <PaperPlaneTilt size={18} />
           </button>
+        </div>
+          </section>
         </div>
       </div>
     </>
