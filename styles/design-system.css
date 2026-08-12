@@ -20,27 +20,37 @@
      Neutral is PRIMARY. Primary button + primary bg are neutral (ink / paper).
      Purple is the accent for secondary actions and structural emphasis. */
 
-  /* Neutrals (the workhorses) */
+  /* Neutrals (the workhorses)
+     A light-GREY ramp on a faintly cool hue (~220deg, chroma near zero), not a
+     warm//yellow paper. The hint of blue keeps purple and the six accents
+     reading punchy; a dead-neutral grey makes them look dingy next to it.
+     Steps are spaced by LIGHTNESS, so depth comes from weight, never warmth. */
   --ds-ink: #121212;          /* near-black: text, primary buttons, strokes */
   --ds-ink-soft: #3a3a3a;
-  --ds-paper: #f4f3ef;        /* off-white app background */
+  --ds-paper: #f4f5f7;        /* app background (lightest grey step) */
   --ds-paper-pure: #ffffff;   /* card / sheet surfaces */
-  --ds-paper-warm: #efe9df;   /* warm tinted surface */
-  --ds-paper-2: #ece9e1;      /* subtle sunken surface */
+  --ds-paper-2: #e8eaee;      /* subtle sunken surface: wells, skeletons, hover */
+  --ds-paper-3: #dcdfe5;      /* deeper well: empty media, soft separators */
   --ds-line: #121212;         /* stroke color = ink (used at low width) */
   --ds-line-soft: rgba(18, 18, 18, 0.12);
 
-  /* Text */
+  /* Text — neutral greys on the same cool hue as the paper ramp, so body copy
+     never reads olive against the background. */
   --ds-text: #121212;         /* mostly black */
-  --ds-text-muted: #5c5b55;
-  --ds-text-subtle: #8a897f;
-  --ds-text-on-dark: #f4f3ef; /* over ink + over purple, text is white-ish */
+  --ds-text-muted: #5b5f66;
+  /* Darkened one notch vs the old warm value so it clears WCAG AA-large (3:1)
+     on ALL THREE paper steps, not just the lightest. Small mono captions inherit
+     it inside paper-2 wells (checkout summary), where the old value failed. */
+  --ds-text-subtle: #767c86;
+  --ds-text-on-dark: #f4f5f7; /* over ink + over purple, text is white-ish */
+  --ds-text-on-dark-muted: #b6bbc4; /* secondary labels over ink / purple */
 
   /* Primary accent — purple */
   --ds-purple: #5a51e5;
   --ds-purple-press: #4a42c9;
   --ds-purple-soft: #e7e5fb;
   --ds-on-purple: #ffffff;
+  --ds-on-purple-muted: #cfcbff; /* secondary labels over purple */
 
   /* Playful accent set — the ONLY six accents. Use them EVERY chance, be
      creative. Some double as full-bleed "mode" backgrounds. */

@@ -128,7 +128,7 @@ export default function ListingDetail() {
       )}
       <div className="flex items-center gap-2.5 rounded-2xl border-2 border-ink bg-ink p-3">
         <div className="hidden flex-col pl-2 pr-3 text-text-on-dark sm:flex">
-          <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-[#bdbcb4]">
+          <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-text-on-dark-muted">
             {walletCovers ? "From wallet" : "Price"}
           </span>
           <span className="font-mono text-lg font-bold leading-none tabular-nums">{groupInt(product.price)}</span>
@@ -206,11 +206,11 @@ export default function ListingDetail() {
                 isFav ? "bg-pink" : "bg-paper-pure"
               }`}
             >
-              <Heart size={18} weight={isFav ? "fill" : "duotone"} />
+              <Heart size={18} weight={isFav ? "fill" : "bold"} />
             </button>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-2">
+          <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={product.images[activeImg]} alt={product.title} className="aspect-square w-full object-cover" />
             {type && (

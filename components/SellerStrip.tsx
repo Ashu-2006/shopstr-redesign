@@ -36,7 +36,7 @@ export function SellerStrip({
             <SealCheck size={14} color="#25c26e" aria-label="verified" className="shrink-0" />
           )}
         </div>
-        <div className="font-mono text-[0.72rem] text-[#bdbcb4]">
+        <div className="font-mono text-[0.72rem] text-text-on-dark-muted">
           <Stars avg={avg} count={count} />
         </div>
       </div>

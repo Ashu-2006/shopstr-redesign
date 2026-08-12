@@ -68,7 +68,7 @@ export function CategoryFeature({
         <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
       </div>
       <div className="flex flex-col justify-between p-[18px]">
-        <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em] text-[#cfcbff]">{kicker}</span>
+        <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em] text-on-purple-muted">{kicker}</span>
         <h3 className="ds-display mt-auto text-2xl leading-[0.92]">{title}</h3>
         <span className="mt-2 font-mono text-[1.05rem] font-bold tabular-nums">from {priceLabel(product)}</span>
         <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-pill bg-white px-4 py-2 text-sm font-bold text-purple">

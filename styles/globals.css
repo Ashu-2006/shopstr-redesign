@@ -30,8 +30,8 @@
   --color-ink-soft: var(--ds-ink-soft);
   --color-paper: var(--ds-paper);
   --color-paper-pure: var(--ds-paper-pure);
-  --color-paper-warm: var(--ds-paper-warm);
   --color-paper-2: var(--ds-paper-2);
+  --color-paper-3: var(--ds-paper-3);
   --color-line: var(--ds-line);
 
   /* text */
@@ -39,12 +39,14 @@
   --color-text-muted: var(--ds-text-muted);
   --color-text-subtle: var(--ds-text-subtle);
   --color-text-on-dark: var(--ds-text-on-dark);
+  --color-text-on-dark-muted: var(--ds-text-on-dark-muted);
 
   /* purple (primary accent) */
   --color-purple: var(--ds-purple);
   --color-purple-press: var(--ds-purple-press);
   --color-purple-soft: var(--ds-purple-soft);
   --color-on-purple: var(--ds-on-purple);
+  --color-on-purple-muted: var(--ds-on-purple-muted);
 
   /* playful accents — the only six */
   --color-orange: var(--ds-orange);
@@ -411,19 +413,22 @@ select:focus-visible {
    - Drop decorative image outlines and ink "hairline" gap fills.
    ========================================================================== */
 body.soft-sep {
-  /* deeper warm page so paper-pure (#fff) surfaces pop by contrast */
-  --ds-paper: #e6e2d7;
-  /* paper-2 sits a touch deeper so empty media wells separate from BOTH the
-     white cards above them and the warm page behind them (the listing gallery
-     reads as a real surface even before its image loads) */
-  --ds-paper-2: #d4cdbb;
+  /* deeper grey page so paper-pure (#fff) surfaces pop by contrast. Same cool
+     neutral hue as the default ramp, just two steps heavier. */
+  --ds-paper: #e4e7ec;
+  /* paper-2/-3 sit deeper still so empty media wells separate from BOTH the
+     white cards above them and the page behind them (the listing gallery reads
+     as a real surface even before its image loads) */
+  --ds-paper-2: #ced3db;
+  --ds-paper-3: #bcc3cd;
   background: var(--ds-paper);
 }
 /* The html canvas must match, or pages shorter than the viewport show a seam
    where the body's deepened paper ends and the default paper shows through. */
 html:has(body.soft-sep) {
-  --ds-paper: #e6e2d7;
-  --ds-paper-2: #d4cdbb;
+  --ds-paper: #e4e7ec;
+  --ds-paper-2: #ced3db;
+  --ds-paper-3: #bcc3cd;
   background: var(--ds-paper);
 }
 .soft-sep *,

@@ -34,7 +34,7 @@ export default function Wallet() {
 
         <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-ink p-6 text-text-on-dark">
           <Sticker name="shape-sunstar-yellow" className="absolute right-3.5 top-3.5 h-14 w-14" />
-          <div className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-[#bdbcb4]">Spendable balance</div>
+          <div className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-on-dark-muted">Spendable balance</div>
           {/* Keyed on the balance so any change replays the bump. Origin-left keeps
               the tabular digits anchored while it pops. */}
           <motion.div
@@ -43,7 +43,7 @@ export default function Wallet() {
             style={{ transformOrigin: "left center" }}
             className="mt-1.5 font-mono text-5xl font-bold leading-none tabular-nums"
           >
-            {groupInt(walletBalance)} <span className="text-base text-[#bdbcb4]">sats</span>
+            {groupInt(walletBalance)} <span className="text-base text-text-on-dark-muted">sats</span>
           </motion.div>
           <div className="mt-4 flex gap-2.5">
             <Link href="/wallet/receive" className="ds-press inline-flex flex-1 items-center justify-center rounded-pill border-2 border-ink bg-paper-pure py-3 font-bold text-ink">Receive</Link>

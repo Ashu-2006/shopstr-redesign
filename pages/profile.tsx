@@ -104,9 +104,9 @@ export default function Profile() {
           <div className="flex flex-col gap-6">
             <div className="relative flex items-center justify-between overflow-hidden rounded-2xl border-2 border-ink bg-ink p-6 text-text-on-dark">
               <div>
-                <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[#bdbcb4]">Spendable balance</p>
+                <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-text-on-dark-muted">Spendable balance</p>
                 <p className="mt-2 font-mono text-4xl font-bold leading-none tabular-nums">
-                  {groupInt(walletBalance)} <span className="text-sm font-normal text-[#bdbcb4]">sats</span>
+                  {groupInt(walletBalance)} <span className="text-sm font-normal text-text-on-dark-muted">sats</span>
                 </p>
               </div>
               <Link href="/wallet" className="ds-press inline-flex items-center gap-1.5 rounded-pill bg-paper-pure px-5 py-2.5 text-sm font-bold text-ink">
