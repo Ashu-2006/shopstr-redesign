@@ -4,14 +4,17 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { shake, tEnter } from "@/lib/motion";
-import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowRight, ArrowsClockwise } from "@phosphor-icons/react";
+import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
+import { CheckoutSummary } from "@/components/CheckoutSummary";
 
-const SHIPPING = 4000;
-type Step = "type" | "ship" | "pickup" | "account" | "pay" | "review";
-const INDEX: Record<Step, number> = { type: 0, ship: 1, pickup: 1, account: 2, pay: 3, review: 4 };
+/* Order of the flow. Review comes BEFORE pay: in a sats checkout the payment
+   IS the order placement, so everything must be confirmable first, and the
+   pay step is terminal (it resolves straight into /paid). */
+type Step = "type" | "ship" | "pickup" | "account" | "review" | "pay";
+const INDEX: Record<Step, number> = { type: 0, ship: 1, pickup: 1, account: 2, review: 3, pay: 4 };
 
 const goStep = (router: ReturnType<typeof useRouter>, step: Step) =>
   router.push(`/checkout?step=${step}`, undefined, { shallow: true });
@@ -43,14 +46,6 @@ function WideBtn({ children, onClick, disabled }: { children: ReactNode; onClick
     </button>
   );
 }
-function Nav({ label, children }: { label: string; children?: ReactNode }) {
-  return (
-    <div className="mt-4 flex items-center justify-between">
-      <span className="font-mono text-sm text-text-muted">{label}</span>
-      {children}
-    </div>
-  );
-}
 function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string }) {
   return (
     <button onClick={onClick} className={`ds-press flex items-center gap-3 rounded-lg border-2 border-ink p-3.5 text-left ${selected ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
@@ -63,11 +58,20 @@ function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; o
     </button>
   );
 }
-function NextCircle({ onClick }: { onClick: () => void }) {
+/** Review row: a labeled fact with an Edit link back into its step. */
+function ReviewRow({ label, onEdit, children }: { label: string; onEdit?: () => void; children: ReactNode }) {
   return (
-    <button onClick={onClick} aria-label="Continue" className="ds-press grid h-[54px] w-[54px] place-items-center rounded-full bg-ink text-text-on-dark">
-      <ArrowRight size={22} />
-    </button>
+    <div className="flex items-start justify-between gap-3 border-b-2 border-paper-2 py-2.5 text-[0.9rem]">
+      <div className="min-w-0">
+        <div className="font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">{label}</div>
+        <div className="mt-0.5">{children}</div>
+      </div>
+      {onEdit && (
+        <button onClick={onEdit} className="ds-press shrink-0 font-mono text-[0.7rem] font-bold text-purple underline">
+          Edit
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -82,7 +86,14 @@ export default function Checkout() {
   const step = (typeof router.query.step === "string" ? router.query.step : "type") as Step;
   const cart = useCartStore();
   const { draft, set } = useCheckout();
-  const total = cart.subtotal + SHIPPING;
+
+  // Real money math: per-line shipping from the listings themselves (combined
+  // per item, not per unit), zeroed for local pickup.
+  const shipping =
+    draft.fulfilment === "pickup"
+      ? 0
+      : cart.items.reduce((s, i) => s + (i.product.shippingCost ?? 0), 0);
+  const total = cart.subtotal + shipping;
 
   // Direction for the slide: compare this step's index with the previous render's.
   const prevIdx = useRef(0);
@@ -112,14 +123,21 @@ export default function Checkout() {
     ship: "/checkout?step=type",
     pickup: "/checkout?step=type",
     account: `/checkout?step=${draft.fulfilment === "pickup" ? "pickup" : "ship"}`,
-    pay: "/checkout?step=account",
-    review: "/checkout?step=pay",
+    review: "/checkout?step=account",
+    pay: "/checkout?step=review",
   };
 
   return (
     <>
       <Head><title>Checkout · Shopstr</title></Head>
-      <OneWayFrame tone="purple" step="Checkout" current={idx + 1} total={5} closeTo={prevHref[step]}>
+      <OneWayFrame
+        tone="purple"
+        step="Checkout"
+        current={idx + 1}
+        total={5}
+        closeTo={prevHref[step]}
+        aside={<CheckoutSummary items={cart.items} shipping={shipping} fulfilment={draft.fulfilment} />}
+      >
         <AnimatePresence mode="popLayout" custom={dir} initial={false}>
           <motion.div
             key={step}
@@ -132,15 +150,15 @@ export default function Checkout() {
           >
             {step === "type" && (
               <>
-                <FlowLead>Step 1 of 5 · how do you want it</FlowLead>
+                <FlowLead>Step 1 of 5 · fulfilment</FlowLead>
                 <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Ship it or<br />pick it up?</h3>
                 <div className="mt-4 flex flex-col gap-2.5">
                   <OptCard selected={draft.fulfilment === "ship"} onClick={() => set("fulfilment", "ship")} icon={<Box />} title="Ship to me" sub="Enter an address · tracked delivery" />
-                  <OptCard selected={draft.fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Local pickup" sub="Arrange a spot over DM" />
+                  <OptCard selected={draft.fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Local pickup" sub="Arrange a spot over DM · no shipping cost" />
                 </div>
-                <Nav label="01 / 05">
-                  <NextCircle onClick={() => goStep(router, draft.fulfilment === "pickup" ? "pickup" : "ship")} />
-                </Nav>
+                <div className="mt-4">
+                  <WideBtn onClick={() => goStep(router, draft.fulfilment === "pickup" ? "pickup" : "ship")}>Continue →</WideBtn>
+                </div>
               </>
             )}
 
@@ -154,8 +172,8 @@ export default function Checkout() {
                   <Field label="Display name"><input className={`${inputBase} border-ink focus:border-purple`} value={draft.name} onChange={(e) => set("name", e.target.value)} /></Field>
                   <Field label="Note to seller (optional)"><textarea rows={3} className={`${inputBase} border-ink focus:border-purple`} value={draft.note} onChange={(e) => set("note", e.target.value)} placeholder="Can pick up evenings near Görlitzer Park." /></Field>
                   <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><Spark /></span><span>You&apos;ll agree a time and place with the seller in an encrypted DM after payment.</span></div>
+                  <WideBtn onClick={() => goStep(router, "account")}>Continue →</WideBtn>
                 </div>
-                <Nav label="02 / 05"><NextCircle onClick={() => goStep(router, "account")} /></Nav>
               </>
             )}
 
@@ -166,45 +184,65 @@ export default function Checkout() {
                 <p className="mt-2 text-[0.92rem] text-text-muted">A key was created for you in the background. Set a passphrase so you can get back to your orders and sats on any device.</p>
                 <div className="mt-4 flex flex-col gap-3">
                   <Field label="Passphrase"><input type="password" defaultValue="············" className={`${inputBase} border-ink focus:border-purple`} /></Field>
-                  <WideBtn onClick={() => goStep(router, "pay")}>Save &amp; continue →</WideBtn>
+                  <WideBtn onClick={() => goStep(router, "review")}>Save &amp; continue →</WideBtn>
+                  <button onClick={() => goStep(router, "review")} className="ds-press mx-auto font-mono text-[0.72rem] font-bold text-text-muted underline">
+                    Skip for now
+                  </button>
                 </div>
-                <div className="mt-3 flex items-center justify-between font-mono text-sm text-text-muted">
-                  <span>03 / 05</span>
+                <div className="mt-3 flex items-center justify-end font-mono text-sm text-text-muted">
                   <span className="inline-flex items-center gap-1.5"><KeyIcon /> npub1ekko…q8r7</span>
-                </div>
-              </>
-            )}
-
-            {step === "pay" && (
-              <>
-                <FlowLead>Step 4 of 5 · pay {groupInt(total)} sats</FlowLead>
-                <PayStep pay={draft.pay} onPay={(p) => set("pay", p)} onPaid={() => goStep(router, "review")} />
-                <div className="mt-3 flex items-center justify-between font-mono text-sm text-text-muted">
-                  <span>04 / 05</span>
-                  <span className="tabular-nums">{groupInt(total)} sats</span>
                 </div>
               </>
             )}
 
             {step === "review" && (
               <>
-                <FlowLead>Step 5 of 5 · confirm</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Review &amp;<br />confirm</h3>
-                <div className="mt-4">
-                  {[
-                    ["Seller", `@${cart.items[0]?.product.pubkey.replace("pk_", "") ?? "ekko"}`],
-                    ["Items", String(cart.count)],
-                    ["Fulfilment", draft.fulfilment === "pickup" ? "Local pickup" : "Shipping"],
-                    ["Payment", draft.pay === "cashu" ? "Cashu" : "Lightning"],
-                  ].map(([k, v]) => (
-                    <div key={k} className="flex justify-between border-b-2 border-paper-2 py-2.5 text-[0.92rem]"><span className="text-text-muted">{k}</span><span>{v}</span></div>
-                  ))}
-                  <div className="flex justify-between py-2.5 text-[0.92rem]"><span className="text-text-muted">Total</span><span className="font-mono font-bold tabular-nums">{groupInt(total)} sats</span></div>
-                </div>
+                <FlowLead>Step 4 of 5 · check everything</FlowLead>
+                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">One last<br />look</h3>
                 <div className="mt-3">
-                  <WideBtn onClick={() => router.push("/paid")}><span className="inline-flex items-center gap-2">Place order <Spark /></span></WideBtn>
+                  {draft.fulfilment === "pickup" ? (
+                    <ReviewRow label="Local pickup" onEdit={() => goStep(router, "pickup")}>
+                      <span className="font-bold">{draft.name || "No name yet"}</span>
+                      {draft.note && <span className="block text-[0.82rem] text-text-muted">&ldquo;{draft.note}&rdquo;</span>}
+                    </ReviewRow>
+                  ) : (
+                    <ReviewRow label="Ships to" onEdit={() => goStep(router, "ship")}>
+                      <span className="font-bold">{draft.name || "No name yet"}</span>
+                      <span className="block text-[0.82rem] text-text-muted">
+                        {[draft.address, draft.city, draft.zip].filter(Boolean).join(", ") || "No address yet"}
+                      </span>
+                    </ReviewRow>
+                  )}
+                  <ReviewRow label="Account" onEdit={() => goStep(router, "account")}>
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[0.84rem]"><KeyIcon /> npub1ekko…q8r7</span>
+                  </ReviewRow>
+                  <div className="flex items-baseline justify-between py-3">
+                    <span className="font-bold">Total</span>
+                    <span className="font-mono text-lg font-bold tabular-nums">
+                      {groupInt(total)} <span className="text-xs font-normal text-text-muted">sats</span>
+                    </span>
+                  </div>
                 </div>
-                <span className="mt-4 block font-mono text-sm text-text-muted">05 / 05</span>
+                <WideBtn onClick={() => goStep(router, "pay")}>
+                  <span className="inline-flex items-center gap-2">Pay {groupInt(total)} sats <Bolt /></span>
+                </WideBtn>
+                <p className="mt-3 flex items-start gap-1.5 font-mono text-[0.62rem] leading-relaxed text-text-subtle">
+                  <LockIcon />
+                  Paying places the order. Your details go to the seller as an encrypted DM.
+                </p>
+              </>
+            )}
+
+            {step === "pay" && (
+              <>
+                <FlowLead>Step 5 of 5 · payment</FlowLead>
+                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Pay<br />in sats</h3>
+                <PayStep
+                  total={total}
+                  pay={draft.pay}
+                  onPay={(p) => set("pay", p)}
+                  onPaid={() => router.push("/paid")}
+                />
               </>
             )}
           </motion.div>
@@ -250,15 +288,16 @@ function ShipStep() {
           <div className="w-28"><Field label="Postcode" invalid={errs.zip}><input className={fieldCls("zip")} value={draft.zip} onChange={(e) => { set("zip", e.target.value); setErrs((p) => ({ ...p, zip: false })); }} /></Field></div>
         </div>
         <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><LockIcon /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
+        <WideBtn onClick={submit}>Continue →</WideBtn>
       </div>
-      <Nav label="02 / 05"><NextCircle onClick={submit} /></Nav>
     </motion.div>
   );
 }
 
 /* Lightning QR with a live countdown, an explicit EXPIRED state + regenerate
-   (edge case), and a brief "confirming payment" transient after "I've paid". */
-function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p: "lightning" | "cashu") => void; onPaid: () => void }) {
+   (edge case), and a brief "confirming payment" transient after "I've paid".
+   Terminal: confirming resolves into /paid via onPaid. */
+function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning" | "cashu"; onPay: (p: "lightning" | "cashu") => void; onPaid: () => void }) {
   const [secs, setSecs] = useState(298);
   const [expired, setExpired] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -296,7 +335,7 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
   }
 
   return (
-    <div className="mt-2">
+    <div className="mt-3">
       <div className="flex overflow-hidden rounded-pill border-2 border-ink">
         {(["lightning", "cashu"] as const).map((p) => (
           <button key={p} onClick={() => onPay(p)} className={`flex-1 py-3 font-bold ${pay === p ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
@@ -309,8 +348,12 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
         ))}
       </div>
 
+      <div className="mt-3 text-center font-mono text-2xl font-bold tabular-nums">
+        {groupInt(total)} <span className="text-sm font-normal text-text-muted">sats</span>
+      </div>
+
       {pay === "lightning" ? (
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="relative mx-auto h-[200px] w-[200px]">
             <div
               className={`grid h-full w-full place-items-center rounded-lg border-2 border-ink transition-[filter,opacity] duration-(--ds-dur-moderate) ${expired ? "opacity-30 blur-[2px]" : ""}`}
@@ -342,7 +385,7 @@ function PayStep({ pay, onPay, onPaid }: { pay: "lightning" | "cashu"; onPay: (p
           )}
         </div>
       ) : (
-        <div className="mt-4">
+        <div className="mt-3">
           <textarea rows={4} placeholder="Paste your Cashu token (cashuA…)" className="w-full resize-none rounded-lg border-2 border-dashed border-ink bg-paper-pure p-3.5 font-mono text-[0.8rem] text-text-muted outline-none" />
           <p className="mt-2 text-[0.84rem] text-text-muted">We&apos;ll redeem the token at the seller&apos;s mint and confirm instantly.</p>
         </div>

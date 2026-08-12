@@ -26,6 +26,7 @@ export function OneWayFrame({
   total,
   closeTo,
   sticker = "shape-sparkle-4pt",
+  aside,
   children,
 }: {
   tone?: Tone;
@@ -34,6 +35,8 @@ export function OneWayFrame({
   total?: number;
   closeTo?: string;
   sticker?: StickerName;
+  /** Companion card (e.g. an order summary): above the card on mobile, a rail beside it at lg+. */
+  aside?: ReactNode;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -73,9 +76,16 @@ export function OneWayFrame({
           the header, with balanced gutters. It grows to fit tall steps (the page
           scrolls rather than clipping) and respects the bottom safe-area inset. */}
       <div
-        className="flex flex-1 items-center justify-center px-6 pt-2"
+        className={
+          aside
+            ? "flex flex-1 flex-col items-center justify-center gap-3 px-6 pt-2 lg:flex-row-reverse lg:items-center lg:gap-5"
+            : "flex flex-1 items-center justify-center px-6 pt-2"
+        }
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1.5rem)" }}
       >
+        {/* aside sits first in the DOM: on mobile it stacks above the card (context
+            before form); at lg the row is reversed so it reads as a right rail. */}
+        {aside && <div className="z-10 w-full max-w-[440px] lg:w-[340px] lg:max-w-none lg:shrink-0">{aside}</div>}
         {/* The card PERSISTS across steps. `layout` smart-animates its height as the
             inner content swaps, so steps don't pop in as fresh cards. */}
         <motion.div
