@@ -76,12 +76,28 @@ export interface ChatThread {
   counterpartyPubkey: string;
   counterpartyHandle: string;
   counterpartyPicture?: string;
+  /** Whether I'm the buyer or the seller in this conversation. */
+  kind: "buying" | "selling";
   /** Optional listing this conversation is about. */
   productId?: string;
+  /** Denormalized listing preview (relay events carry these inline). */
+  productTitle?: string;
+  productImage?: string;
   lastMessage: string;
   /** Unix seconds. */
   lastMessageAt: number;
   unread: number;
+}
+
+/** One message inside a DM thread. */
+export interface ChatMessage {
+  id: string;
+  from: "me" | "them";
+  text: string;
+  /** Unix seconds. */
+  at: number;
+  /** Listing quoted inside this bubble (usually the opener). */
+  productId?: string;
 }
 
 /** The standard hook return envelope. Mechanical to wire to Context later. */

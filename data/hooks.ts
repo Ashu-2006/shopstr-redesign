@@ -18,6 +18,7 @@ import type {
   SellerReviews,
   CartItem,
   ChatThread,
+  ChatMessage,
   AsyncResult,
 } from "@/data/types";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
@@ -26,6 +27,7 @@ import {
   MOCK_REVIEWS,
   MOCK_CHATS,
 } from "@/data/mock/profiles";
+import { MOCK_THREAD_MESSAGES } from "@/data/mock/messages";
 import {
   MOCK_COMMUNITIES,
   MOCK_ORDERS,
@@ -123,10 +125,30 @@ export function useCart(): AsyncResult<CartItem[]> {
   return { data: items, isLoading: false };
 }
 
-/** The current user's DM threads. */
+/** The current user's DM threads, newest first. */
 export function useChats(): AsyncResult<ChatThread[]> {
   const isLoading = useSimulatedLoad("chats");
-  const data = useMemo(() => MOCK_CHATS, []);
+  const data = useMemo(
+    () => [...MOCK_CHATS].sort((a, b) => b.lastMessageAt - a.lastMessageAt),
+    []
+  );
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/** One DM thread's summary, by counterparty handle. */
+export function useThreadFor(handle: string): AsyncResult<ChatThread | null> {
+  const isLoading = useSimulatedLoad("chats");
+  const data = useMemo(
+    () => MOCK_CHATS.find((t) => t.counterpartyHandle === handle) ?? null,
+    [handle]
+  );
+  return { data: isLoading ? null : data, isLoading };
+}
+
+/** The message history of one DM thread, oldest first. */
+export function useThreadMessages(handle: string): AsyncResult<ChatMessage[]> {
+  const isLoading = useSimulatedLoad("chats");
+  const data = useMemo(() => MOCK_THREAD_MESSAGES[handle] ?? [], [handle]);
   return { data: isLoading ? [] : data, isLoading };
 }
 

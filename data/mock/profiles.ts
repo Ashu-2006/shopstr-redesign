@@ -137,10 +137,29 @@ export const MOCK_CHATS: ChatThread[] = [
     counterpartyHandle: "alice",
     counterpartyPicture:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200",
+    kind: "buying",
     productId: "lst_001",
+    productTitle: "Hand-thrown stoneware mug",
+    productImage:
+      "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=200",
     lastMessage: "Yes, I can ship two mugs together to save on postage.",
     lastMessageAt: 1717286400,
     unread: 2,
+  },
+  {
+    id: "chat_003",
+    counterpartyPubkey: "pk_mara",
+    counterpartyHandle: "mara.knits",
+    counterpartyPicture:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200",
+    kind: "selling",
+    productId: "lst_007",
+    productTitle: 'Risograph zine: "Soft Static" no. 4',
+    productImage:
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200",
+    lastMessage: "Works for me. Is no. 4 the latest issue?",
+    lastMessageAt: 1717310000,
+    unread: 1,
   },
   {
     id: "chat_002",
@@ -148,7 +167,11 @@ export const MOCK_CHATS: ChatThread[] = [
     counterpartyHandle: "daveshoots",
     counterpartyPicture:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200",
+    kind: "buying",
     productId: "lst_005",
+    productTitle: "Vintage 35mm rangefinder camera",
+    productImage:
+      "https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=200",
     lastMessage: "The light meter was recalibrated last month.",
     lastMessageAt: 1717200000,
     unread: 0,
