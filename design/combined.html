@@ -1,0 +1,1245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopstr — Combined Explorations (static)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f4f3ef;color:#121212;font-family:"Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .page-head{border-bottom:2px solid #121212;padding:16px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .page-head .brand{font-family:"Archivo Black",system-ui,sans-serif;text-transform:uppercase;letter-spacing:-.02em;font-size:1.25rem;display:flex;align-items:center}
+  .page-head .brand img{height:.78em;vertical-align:-.12em;margin:0 .02em}
+  .page-head .kick{font-family:"Space Mono",monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:#5c5b55}
+  .shead{padding:14px 22px;display:flex;align-items:center;gap:12px;background:#fff;border-bottom:2px solid #121212;border-top:2px solid #121212}
+  .shead .n{font-family:"Space Mono",monospace;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#5c5b55;border:2px solid #121212;border-radius:999px;padding:4px 11px}
+  .shead .lead{font-family:"Archivo Black",system-ui,sans-serif;text-transform:uppercase;letter-spacing:-.02em;font-size:1.15rem}
+</style>
+</head>
+<body>
+  <header class="page-head">
+    <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+    <span class="kick">combined explorations · static · one page</span>
+  </header>
+
+  <!-- ============================================================ 01 EDITORIAL & SWIPE -->
+  <div class="shead"><span class="n">01</span><span class="lead">Editorial &amp; Swipe</span></div>
+  <div>
+    <template shadowrootmode="open">
+<style>
+:root{
+  --ink:#121212; --paper:#f4f3ef; --pp:#fff; --p2:#ece9e1;
+  --muted:#5c5b55; --subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-soft:#e7e5fb;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e; --blue:#00aeff; --pink:#ff3dac;
+  --ys:#fff1cc; --gs:#d3f5e3; --ps:#ffdcef; --bs:#cdeeff;
+  --fd:"Archivo Black",system-ui,sans-serif; --fb:"Space Grotesk",system-ui,sans-serif; --fm:"Space Mono",monospace;
+  --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --st:2px; --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:host{display:block;background:var(--paper);color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased;padding:44px 0 120px}
+.display{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;line-height:.92}
+.val{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 28px}
+img{display:block}
+.intro{margin-bottom:18px}
+.intro .tag{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center;margin-bottom:14px}
+.intro .tag::before{content:"";width:12px;height:12px;background:var(--purple);border-radius:3px}
+.intro h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.03em;line-height:.86;font-size:clamp(2.4rem,6vw,4.4rem)}
+.intro p{max-width:720px;margin-top:12px;color:var(--muted);font-size:1.05rem}
+.sec{margin-top:64px;border-top:var(--st) solid var(--ink);padding-top:22px}
+.sec .lead{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(1.6rem,4vw,2.4rem)}
+.sec .sub{font-family:var(--fm);font-size:.78rem;color:var(--muted);max-width:640px;margin-top:6px}
+.label{font-family:var(--fm);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:5px 12px;display:inline-block;margin:28px 0 14px;background:var(--pp)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.76rem;padding:6px 12px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);background:var(--pp);white-space:nowrap}
+.pill.ink{background:var(--ink);color:var(--on-dark)}
+.pill.y{background:var(--yellow)}.pill.g{background:var(--green)}.pill.p{background:var(--pink)}.pill.b{background:var(--blue)}.pill.pu{background:var(--purple);color:#fff;border-color:var(--purple)}
+.press{cursor:default}
+.imgwrap{position:relative;overflow:hidden}
+.imgwrap img{width:100%;height:100%;object-fit:cover}
+.imgoutline{outline:1px solid rgba(0,0,0,.08);outline-offset:-1px}
+.cardgrid{display:grid;gap:22px}
+.cardgrid.hero5{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
+.cardgrid.pair5{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.cardgrid.swipe5{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.cardgrid.compact5{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.cardcell{display:flex;flex-direction:column;gap:10px}
+.cardcell .cap{font-family:var(--fm);font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.hero-base{border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative}
+.h1c{height:340px}
+.h1c .imgwrap{position:absolute;inset:0}
+.h1c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(0,0,0,.78))}
+.h1c .num{position:absolute;top:14px;left:16px;z-index:2;font-family:var(--fd);font-size:2.6rem;color:#fff;mix-blend-mode:difference}
+.h1c .chips{position:absolute;top:16px;right:16px;z-index:2;display:flex;gap:6px}
+.h1c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px;color:#fff}
+.h1c .cap h3{font-family:var(--fd);text-transform:uppercase;font-size:1.9rem;line-height:.92;letter-spacing:-.02em}
+.h1c .cap .meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.h1c .cap .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+.h1c .cap .loc{font-family:var(--fm);font-size:.74rem;opacity:.85}
+.h2c{display:grid;grid-template-columns:1.1fr 1fr;height:300px;background:var(--purple);color:#fff}
+.h2c .imgwrap{height:100%}
+.h2c .side{padding:22px;display:flex;flex-direction:column;justify-content:space-between}
+.h2c .side .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:#cfcbff}
+.h2c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em;margin-top:auto}
+.h2c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.5rem;margin-top:10px}
+.h2c .side .buy{margin-top:14px;align-self:flex-start;background:#fff;color:var(--purple);border:none;border-radius:var(--r-pill);padding:11px 22px;font-weight:700;font-family:var(--fb)}
+.h2c .side .stk{position:absolute;right:18px;top:18px;width:48px;height:48px}
+.h3c{background:var(--pp)}
+.h3c .imgwrap{height:240px;border-bottom:var(--st) solid var(--ink)}
+.h3c .bar{display:flex;align-items:center;gap:16px;padding:16px 18px}
+.h3c .bar .num{font-family:var(--fd);font-size:2.4rem;line-height:.8;color:var(--purple)}
+.h3c .bar .mid{flex:1;min-width:0}
+.h3c .bar h3{font-family:var(--fd);text-transform:uppercase;font-size:1.25rem;line-height:.95;letter-spacing:-.02em}
+.h3c .bar .loc{font-family:var(--fm);font-size:.72rem;color:var(--subtle);margin-top:3px}
+.h3c .bar .pr{font-family:var(--fm);font-weight:700;font-size:1.2rem;text-align:right;white-space:nowrap}
+.h4c{background:var(--green);padding:18px;height:340px;display:flex;flex-direction:column}
+.h4c .top{display:flex;justify-content:space-between;align-items:flex-start}
+.h4c .top .k{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
+.h4c .imgwrap{flex:1;border-radius:var(--r-lg);border:var(--st) solid var(--ink);margin:14px 0;min-height:0}
+.h4c h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.92;letter-spacing:-.02em}
+.h4c .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
+.h4c .pr{font-family:var(--fm);font-weight:700;font-size:1.15rem}
+.h5c{display:grid;grid-template-columns:1fr 1.2fr;height:320px;background:var(--pp)}
+.h5c .imgwrap{height:100%;border-right:var(--st) solid var(--ink)}
+.h5c .side{padding:24px;display:flex;flex-direction:column}
+.h5c .side .tagrow{display:flex;gap:6px;margin-bottom:14px}
+.h5c .side h3{font-family:var(--fd);text-transform:uppercase;font-size:1.8rem;line-height:.92;letter-spacing:-.02em}
+.h5c .side p{color:var(--muted);font-size:.9rem;margin-top:10px;line-height:1.45}
+.h5c .side .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:14px}
+.h5c .side .pr{font-family:var(--fm);font-weight:700;font-size:1.5rem}
+.h5c .side .buy{background:var(--ink);color:#fff;border:none;border-radius:var(--r-pill);padding:11px 22px;font-weight:700;font-family:var(--fb)}
+.p-base{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp)}
+.p1c .imgwrap{height:200px}
+.p1c .b{padding:14px}
+.p1c .t{font-weight:700;font-size:1rem;line-height:1.12}
+.p1c .row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.p1c .pr{font-family:var(--fm);font-weight:700;font-size:.95rem;background:var(--yellow);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:5px 12px}
+.p1c .loc{font-family:var(--fm);font-size:.68rem;color:var(--subtle)}
+.p2c{position:relative;height:280px;color:#fff}
+.p2c .imgwrap{position:absolute;inset:0}
+.p2c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.75))}
+.p2c .tag{position:absolute;top:12px;left:12px;z-index:2}
+.p2c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:14px}
+.p2c .t{font-weight:700;font-size:1rem;line-height:1.1}
+.p2c .pr{font-family:var(--fm);font-weight:700;margin-top:6px}
+.p3c{display:grid;grid-template-columns:auto 1fr;align-items:stretch}
+.p3c .imgwrap{width:120px;height:140px;border-right:var(--st) solid var(--ink)}
+.p3c .b{padding:14px;display:flex;flex-direction:column}
+.p3c .t{font-weight:700;font-size:.95rem;line-height:1.12}
+.p3c .loc{font-family:var(--fm);font-size:.66rem;color:var(--subtle);margin-top:4px}
+.p3c .pr{font-family:var(--fm);font-weight:700;font-size:1.05rem;margin-top:auto}
+.p4c .top{height:150px;background:var(--blue);position:relative;border-bottom:var(--st) solid var(--ink)}
+.p4c .top .imgwrap{position:absolute;inset:14px;border-radius:var(--r-md);border:var(--st) solid var(--ink)}
+.p4c .top .stk{position:absolute;top:-10px;right:-10px;width:44px;height:44px;z-index:2}
+.p4c .b{padding:13px}
+.p4c .t{font-weight:700;font-size:.95rem;line-height:1.12}
+.p4c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
+.p4c .pr{font-family:var(--fm);font-weight:700}
+.p4c .loc{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+.p5c .imgwrap{height:190px;border-bottom:var(--st) solid var(--ink)}
+.p5c .b{padding:14px}
+.p5c .pr{font-family:var(--fd);font-size:1.5rem;line-height:.9}
+.p5c .pr span{font-family:var(--fm);font-size:.7rem;color:var(--muted)}
+.p5c .t{font-weight:600;font-size:.9rem;margin-top:6px;color:var(--muted)}
+.p5c .tagrow{display:flex;gap:6px;margin-top:10px}
+.s-base{border-radius:var(--r-2xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative;height:520px}
+.s1c .imgwrap{position:absolute;inset:0}
+.s1c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.82))}
+.s1c .counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--fm);font-size:.66rem;background:rgba(0,0,0,.5);color:#fff;padding:5px 13px;border-radius:var(--r-pill)}
+.s1c .chips{position:absolute;top:16px;left:16px;z-index:2}
+.s1c .stk{position:absolute;top:14px;right:14px;z-index:2;width:52px;height:52px}
+.s1c .meta{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:20px;color:#fff}
+.s1c .meta h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em}
+.s1c .meta .pr{font-family:var(--fm);font-weight:700;font-size:1.4rem;margin-top:6px}
+.s1c .meta .seller{font-family:var(--fm);font-size:.74rem;opacity:.85;margin-top:6px}
+.s2c{display:flex;flex-direction:column;background:var(--pp)}
+.s2c .imgwrap{height:58%}
+.s2c .panel{flex:1;padding:18px;display:flex;flex-direction:column}
+.s2c .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:1.45rem;line-height:.92;letter-spacing:-.02em}
+.s2c .panel .pr{font-family:var(--fm);font-weight:700;font-size:1.3rem;margin-top:6px}
+.s2c .panel .seller{display:flex;align-items:center;gap:8px;margin-top:auto;font-family:var(--fm);font-size:.72rem;color:var(--muted)}
+.s2c .panel .seller .av{width:28px;height:28px;border-radius:8px;background:var(--yellow);border:var(--st) solid var(--ink)}
+.s3c{background:var(--pink);display:flex;flex-direction:column;padding:20px}
+.s3c .counter{font-family:var(--fm);font-size:.66rem;align-self:flex-start;background:var(--ink);color:#fff;padding:5px 13px;border-radius:var(--r-pill)}
+.s3c .imgwrap{height:240px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);margin:16px 0}
+.s3c h3{font-family:var(--fd);text-transform:uppercase;font-size:2rem;line-height:.9;letter-spacing:-.02em}
+.s3c .pr{font-family:var(--fm);font-weight:700;font-size:1.6rem;margin-top:8px}
+.s3c .seller{font-family:var(--fm);font-size:.76rem;margin-top:auto}
+.s3c .stk{position:absolute;right:16px;top:60px;width:56px;height:56px;z-index:2}
+.s4c{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:16px}
+.s4c .imgwrap{flex:1;border-radius:var(--r-xl);min-height:0}
+.s4c .ribbons{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.s4c .rb{font-family:var(--fm);font-size:.68rem;background:#262521;border-radius:var(--r-pill);padding:6px 12px}
+.s4c h3{font-family:var(--fd);text-transform:uppercase;font-size:1.4rem;line-height:.92;letter-spacing:-.02em;margin-top:12px}
+.s4c .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:6px}
+.s4c .pr{font-family:var(--fm);font-weight:700;font-size:1.3rem;color:var(--yellow)}
+.s5c .imgwrap{position:absolute;inset:0}
+.s5c .counter{position:absolute;top:16px;right:16px;z-index:2;font-family:var(--fm);font-size:.66rem;background:rgba(255,255,255,.85);color:var(--ink);padding:5px 13px;border-radius:var(--r-pill)}
+.s5c .chips{position:absolute;top:16px;left:16px;z-index:2}
+.s5c .floatcard{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;background:var(--pp);border:var(--st) solid var(--ink);border-radius:var(--r-xl);padding:16px}
+.s5c .floatcard h3{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;line-height:.92;letter-spacing:-.02em}
+.s5c .floatcard .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px}
+.s5c .floatcard .pr{font-family:var(--fm);font-weight:700;font-size:1.2rem}
+.s5c .floatcard .loc{font-family:var(--fm);font-size:.7rem;color:var(--subtle)}
+.c-base{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp)}
+.c1c .imgwrap{height:170px}
+.c1c .b{padding:12px}
+.c1c .t{font-weight:700;font-size:.9rem;line-height:1.12}
+.c1c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
+.c1c .pr{font-family:var(--fm);font-weight:700;font-size:.9rem}
+.c1c .loc{font-family:var(--fm);font-size:.64rem;color:var(--subtle)}
+.c2c{display:flex;align-items:center;gap:12px;padding:10px}
+.c2c .imgwrap{width:64px;height:64px;border-radius:var(--r-md);border:var(--st) solid var(--ink);flex:0 0 auto}
+.c2c .mid{flex:1;min-width:0}
+.c2c .t{font-weight:700;font-size:.9rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c2c .sub{font-family:var(--fm);font-size:.64rem;color:var(--subtle);margin-top:3px}
+.c2c .pr{font-family:var(--fd);font-size:1.05rem;line-height:.9;text-align:right;white-space:nowrap}
+.c3c{position:relative;height:240px;color:#fff}
+.c3c .imgwrap{position:absolute;inset:0}
+.c3c::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.7))}
+.c3c .pr{position:absolute;top:10px;right:10px;z-index:2;font-family:var(--fm);font-weight:700;font-size:.82rem;background:var(--yellow);color:var(--ink);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:4px 10px}
+.c3c .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:12px}
+.c3c .t{font-weight:700;font-size:.9rem;line-height:1.1}
+.c4c{background:var(--ys);padding:10px}
+.c4c .imgwrap{height:150px;border-radius:var(--r-md);border:var(--st) solid var(--ink)}
+.c4c .b{padding:10px 4px 4px}
+.c4c .t{font-weight:700;font-size:.88rem;line-height:1.12}
+.c4c .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.c4c .pr{font-family:var(--fm);font-weight:700;font-size:.88rem}
+.c4c .loc{font-family:var(--fm);font-size:.62rem;color:var(--muted)}
+.c5c .imgwrap{height:150px;border-bottom:var(--st) solid var(--ink)}
+.c5c .b{padding:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.c5c .pr{font-family:var(--fd);font-size:1.4rem;line-height:.85}
+.c5c .pr span{font-family:var(--fm);font-size:.6rem;color:var(--muted);display:block;margin-top:2px}
+.c5c .t{font-size:.82rem;font-weight:600;text-align:right;line-height:1.1}
+.browser{border:var(--st) solid var(--ink);border-radius:var(--r-xl);overflow:hidden;background:var(--paper);margin-top:6px}
+.bchrome{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:var(--st) solid var(--ink);background:var(--pp)}
+.bchrome .d{width:11px;height:11px;border-radius:50%;border:var(--st) solid var(--ink)}
+.bchrome .url{margin-left:10px;font-family:var(--fm);font-size:.72rem;color:var(--muted);background:var(--paper);border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:4px 14px}
+.dnav{display:flex;align-items:center;gap:16px;padding:16px 26px;border-bottom:var(--st) solid var(--ink);background:var(--paper);position:relative}
+.dnav .brand{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;letter-spacing:-.02em;display:flex;align-items:center}
+.dnav .brand img{height:.78em;vertical-align:-.12em;margin:0 .02em}
+.dnav .navlinks{display:flex;gap:22px;font-weight:600;font-size:.92rem;margin-left:14px}
+.dnav .navlinks a{color:var(--ink);text-decoration:none;padding-bottom:2px}
+.dnav .navlinks a.on{border-bottom:3px solid var(--purple)}
+.dnav .spacer{flex:1}
+.dnav .ic{width:42px;height:42px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--pp);display:flex;align-items:center;justify-content:center;cursor:default}
+.dnav .cart{background:var(--yellow);position:relative}
+.dnav .cart b{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;font-family:var(--fm);font-size:.58rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.eda{display:grid;grid-template-columns:230px 1fr;gap:0}
+.eda .rail{border-right:var(--st) solid var(--ink);padding:24px 18px;display:flex;flex-direction:column;gap:8px;background:var(--pp)}
+.eda .rail .h{font-family:var(--fm);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+.eda .rail a{font-weight:600;font-size:.92rem;color:var(--ink);text-decoration:none;padding:7px 10px;border-radius:var(--r-md);cursor:default}
+.eda .rail a.on{background:var(--ink);color:#fff}
+.eda .stage{padding:24px}
+.eda .heroRow{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:18px}
+.eda .pairRow{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.edb{max-width:920px;margin:0 auto;padding:26px}
+.edb .kick{font-family:var(--fm);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:8px}
+.edb .bighead{font-family:var(--fd);text-transform:uppercase;text-align:center;font-size:clamp(2rem,4vw,3.2rem);line-height:.9;letter-spacing:-.02em;margin-bottom:24px}
+.edb .row1{margin-bottom:18px}
+.edb .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.edb .row3{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
+.edc{padding:24px;columns:3;column-gap:18px}
+.edc>*{break-inside:avoid;margin-bottom:18px}
+@media(max-width:1000px){.edc{columns:2}}
+.swa{display:grid;grid-template-columns:1.3fr .9fr;gap:0;min-height:620px}
+.swa .stagewrap{padding:26px;border-right:var(--st) solid var(--ink);display:flex;flex-direction:column;gap:16px;background:var(--ps)}
+.swa .actions{display:flex;align-items:center;gap:12px;justify-content:center}
+.swa .actions .x{width:58px;height:58px;border-radius:50%;background:var(--pp);border:var(--st) solid var(--ink);font-size:1.4rem;cursor:default}
+.swa .actions .save{background:var(--purple);color:#fff;border:var(--st) solid var(--purple);border-radius:var(--r-pill);padding:17px 40px;font-weight:700;font-family:var(--fb);font-size:1.05rem;cursor:default}
+.swa .actions .like{width:58px;height:58px;border:none;background:none;cursor:default;padding:0}
+.swa .actions .like img{width:58px;height:58px}
+.swa .queue{padding:22px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.swa .queue .h{font-family:var(--fd);text-transform:uppercase;font-size:1.1rem}
+.swa .qrow{display:flex;align-items:center;gap:12px;padding:9px;border:var(--st) solid var(--ink);border-radius:var(--r-md);background:var(--pp);cursor:default}
+.swa .qrow.cur{background:var(--ink);color:#fff}
+.swa .qrow img{width:50px;height:50px;border-radius:8px;object-fit:cover;flex:0 0 auto}
+.swa .qrow .t{font-weight:700;font-size:.84rem;line-height:1.05}
+.swa .qrow .pr{font-family:var(--fm);font-size:.72rem;margin-left:auto;white-space:nowrap}
+.swb{padding:34px 24px;display:flex;align-items:center;justify-content:center;gap:18px;background:var(--bs);min-height:620px}
+.swb .peek{width:150px;height:430px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;opacity:.55;flex:0 0 auto}
+.swb .peek img{width:100%;height:100%;object-fit:cover}
+.swb .center{width:380px;flex:0 0 auto;display:flex;flex-direction:column;gap:14px}
+.swb .center .actions{display:flex;gap:12px;justify-content:center}
+.swb .center .actions button{border:var(--st) solid var(--ink);background:var(--pp);border-radius:50%;width:54px;height:54px;font-size:1.3rem;cursor:default}
+.swb .center .actions .save{width:auto;border-radius:var(--r-pill);background:var(--ink);color:#fff;padding:0 34px;font-weight:700;font-family:var(--fb)}
+.swc{position:relative;min-height:640px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;overflow:hidden}
+.swc .bg{position:absolute;inset:0}.swc .bg img{width:100%;height:100%;object-fit:cover}
+.swc::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent 55%),linear-gradient(transparent 50%,rgba(0,0,0,.8))}
+.swc .panel{position:relative;z-index:2;max-width:560px;padding:34px}
+.swc .panel .counter{font-family:var(--fm);font-size:.7rem;background:rgba(255,255,255,.2);padding:5px 14px;border-radius:var(--r-pill);display:inline-block;margin-bottom:14px}
+.swc .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:2.6rem;line-height:.9;letter-spacing:-.02em}
+.swc .panel .pr{font-family:var(--fm);font-weight:700;font-size:1.8rem;margin-top:10px}
+.swc .panel .seller{font-family:var(--fm);font-size:.84rem;opacity:.9;margin-top:8px}
+.swc .panel .cta{display:flex;gap:12px;margin-top:20px}
+.swc .panel .cta .save{background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:15px 34px;font-weight:700;font-family:var(--fb);cursor:default}
+.swc .panel .cta .skip{background:rgba(255,255,255,.15);color:#fff;border:2px solid #fff;border-radius:var(--r-pill);padding:15px 28px;font-weight:700;font-family:var(--fb);cursor:default}
+.swc .strip{position:absolute;right:24px;top:24px;z-index:2;display:flex;flex-direction:column;gap:10px}
+.swc .strip img{width:64px;height:64px;border-radius:var(--r-md);border:2px solid #fff;object-fit:cover;opacity:.8;cursor:default}
+.swc .strip img.cur{opacity:1;outline:3px solid var(--yellow)}
+footer{margin-top:60px;font-family:var(--fm);font-size:.78rem;color:var(--muted)}
+</style>
+<div class="wrap">
+  <div class="intro">
+    <span class="tag">Shopstr · editorial + swipe · desktop &amp; cards</span>
+    <h1>Editorial &amp; Swipe<br>desktop + card sets</h1>
+    <p>Two parts. First, the <b>card redesigns</b> — 5 variations each of the four card types used across the Editorial and Swipe layouts (Hero, Pair, Swipe, Compact). Then <b>desktop/web breakpoint layouts</b> — 3 genuinely different compositions each for Editorial rows and Swipe.</p>
+  </div>
+
+  <div class="sec">
+    <div class="lead">Part 1 — Card redesigns</div>
+    <div class="sub">5 variations of each card type. The Pair cards are the ones that looked cramped before — these give them room, hierarchy, and rhythm.</div>
+
+    <span class="label">Hero card · 5 variations</span>
+    <div class="cardgrid hero5">
+      <div class="cardcell"><span class="cap">H1 · overlay-bottom + numeral</span>
+        <div class="hero-base h1c press">
+          <span class="num">01</span>
+          <span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span>
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=800" alt=""></div>
+          <div class="cap"><h3>Vintage 35mm<br>rangefinder</h3><div class="meta"><span class="pr">240,000 sats</span><span class="loc">★ 4.9 · Tokyo</span></div></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H2 · split, text on purple</span>
+        <div class="hero-base h2c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600" alt=""></div>
+          <div class="side"><span class="k">Featured · apparel</span><h3>Organic cotton tee</h3><span class="pr">32,000 sats</span><button class="buy">Buy now</button></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H3 · magazine caption bar</span>
+        <div class="hero-base h3c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800" alt=""></div>
+          <div class="bar"><span class="num">04</span><div class="mid"><h3>Riso zine — Soft Static</h3><div class="loc">★ 4.8 · Berlin · @ekko</div></div><span class="pr">12,000<br>sats</span></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H4 · full-bleed accent, inset photo</span>
+        <div class="hero-base h4c press">
+          <div class="top"><span class="k">New this week</span><span class="pill ink" style="font-size:.66rem">Ceramics</span></div>
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700" alt=""></div>
+          <h3>Glazed ramen bowl, pair</h3>
+          <div class="row"><span class="pr">33,000 sats</span><span class="val" style="font-size:.74rem">Lisbon</span></div>
+        </div>
+      </div>
+      <div class="cardcell"><span class="cap">H5 · wide editorial w/ description</span>
+        <div class="hero-base h5c press">
+          <div class="imgwrap"><img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600" alt=""></div>
+          <div class="side"><div class="tagrow"><span class="pill p">Art &amp; print</span><span class="pill">Edition of 12</span></div><h3>Silver gelatin print</h3><p>Hand-printed 8×10, archival, signed verso. Darkroom-made in Tokyo.</p><div class="foot"><span class="pr">120,000 sats</span><button class="buy">Buy</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="label">Pair card · 5 variations</span>
+    <div class="cardgrid pair5">
+      <div class="cardcell"><span class="cap">P1 · roomy, price chip</span>
+        <div class="p-base p1c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="t">Linen apron, cross-back</div><div class="row"><span class="pr">38,000 sats</span><span class="loc">Austin</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P2 · overlay caption</span>
+        <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">New</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500" alt=""></div><div class="cap"><div class="t">Merino beanie</div><div class="pr">26,000 sats</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P3 · horizontal split</span>
+        <div class="p-base p3c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=300" alt=""></div><div class="b"><div class="t">Cast-iron skillet</div><div class="loc">Reykjavik · used</div><div class="pr">42,000 sats</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P4 · color block + sticker</span>
+        <div class="p-base p4c press"><div class="top"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" alt=""></div><img class="stk" src="assets/shape-sparkle-4pt.svg" alt=""></div><div class="b"><div class="t">Synthwave sample pack</div><div class="row"><span class="pr">35,000 sats</span><span class="loc">Remote</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">P5 · price-first minimal</span>
+        <div class="p-base p5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500" alt=""></div><div class="b"><div class="pr">18,000 <span>sats</span></div><div class="t">Hand-thrown stoneware mug</div><div class="tagrow"><span class="pill g" style="font-size:.66rem">New</span><span class="pill" style="font-size:.66rem">Lisbon</span></div></div></div>
+      </div>
+    </div>
+
+    <span class="label">Swipe card · 5 variations</span>
+    <div class="cardgrid swipe5">
+      <div class="cardcell"><span class="cap">S1 · full-bleed photo + meta</span>
+        <div class="s-base s1c press"><span class="counter">3 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><img class="stk" src="assets/badge-bff-star.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=700" alt=""></div><div class="meta"><h3>35mm rangefinder</h3><div class="pr">240,000 sats</div><div class="seller">★ 4.9 · @daveshoots · Tokyo</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S2 · photo + solid info panel</span>
+        <div class="s-base s2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=600" alt=""></div><div class="panel"><h3>Merino beanie</h3><div class="pr">26,000 sats</div><div class="seller"><span class="av"></span>@mara.knits · Reykjavik</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S3 · full-bleed accent poster</span>
+        <div class="s-base s3c press"><span class="counter">5 / 24</span><img class="stk" src="assets/shape-sunstar-yellow.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600" alt=""></div><h3>Riso zine no.4</h3><div class="pr">12,000 sats</div><div class="seller">★ 4.8 · @ekko · Berlin</div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S4 · ink frame + stat ribbons</span>
+        <div class="s-base s4c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=600" alt=""></div><div class="ribbons"><span class="rb">Used · good</span><span class="rb">Ships tracked</span><span class="rb">★ 4.7</span></div><h3>Cast-iron skillet</h3><div class="row"><span class="pr">42,000 sats</span><span class="val" style="font-size:.72rem;color:#bdbcb4">Reykjavik</span></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">S5 · photo + floating info card</span>
+        <div class="s-base s5c press"><span class="counter">8 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700" alt=""></div><div class="floatcard"><h3>Organic cotton tee</h3><div class="row"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div>
+      </div>
+    </div>
+
+    <span class="label">Compact card · 5 variations</span>
+    <div class="cardgrid compact5">
+      <div class="cardcell"><span class="cap">C1 · classic</span>
+        <div class="c-base c1c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400" alt=""></div><div class="b"><div class="t">Cold-brew concentrate · 1L</div><div class="row"><span class="pr">14,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C2 · horizontal row</span>
+        <div class="c-base c2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=200" alt=""></div><div class="mid"><div class="t">Refurbished 65% keyboard</div><div class="sub">Resale · Berlin · ★ 4.6</div></div><div class="pr">95,000<br><span class="val" style="font-size:.56rem;color:var(--muted)">sats</span></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C3 · tall poster overlay</span>
+        <div class="c-base c3c press"><span class="pr">8,000 sats</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400" alt=""></div><div class="cap"><div class="t">Die-cut vinyl stickers (10)</div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C4 · color-tint frame</span>
+        <div class="c-base c4c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400" alt=""></div><div class="b"><div class="t">Glazed ramen bowl, pair</div><div class="row"><span class="pr">33,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+      <div class="cardcell"><span class="cap">C5 · price-first big number</span>
+        <div class="c-base c5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=400" alt=""></div><div class="b"><div class="pr">78,000<span>sats</span></div><div class="t">Wool throw blanket</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="lead">Part 2 — Editorial, desktop</div>
+    <div class="sub">3 genuinely different web compositions of the editorial layout. Search is progressive-disclosure (the magnifier in the top bar).</div>
+
+    <span class="label">Editorial A · sticky category rail + hero &amp; pair grid</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <span class="spacer"></span>
+        <span class="ic" title="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="eda">
+        <aside class="rail">
+          <div class="h">Browse</div>
+          <a class="on">All listings</a><a>New this week</a><a>Near me</a><a>Following</a>
+          <div class="h">Category</div>
+          <a>Ceramics</a><a>Apparel</a><a>Photography</a><a>Home</a><a>Coffee</a><a>Music</a>
+          <div class="h">Type</div>
+          <a>Physical</a><a>Digital</a><a>Service</a>
+        </aside>
+        <div class="stage">
+          <div class="heroRow">
+            <div class="hero-base h1c press"><span class="num">01</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=800" alt=""></div><div class="cap"><h3>Vintage 35mm rangefinder</h3><div class="meta"><span class="pr">240,000 sats</span><span class="loc">★ 4.9 · Tokyo</span></div></div></div>
+            <div class="hero-base h4c press"><div class="top"><span class="k">New this week</span><span class="pill ink" style="font-size:.66rem">Ceramics</span></div><div class="imgwrap"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=700" alt=""></div><h3>Glazed ramen bowl</h3><div class="row"><span class="pr">33,000 sats</span><span class="val" style="font-size:.74rem">Lisbon</span></div></div>
+          </div>
+          <div class="pairRow">
+            <div class="p-base p1c press"><div class="imgwrap" style="height:170px"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="t">Linen apron</div><div class="row"><span class="pr">38,000 sats</span><span class="loc">Austin</span></div></div></div>
+            <div class="p-base p4c press"><div class="top"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" alt=""></div><img class="stk" src="assets/shape-sparkle-4pt.svg" alt=""></div><div class="b"><div class="t">Synthwave pack</div><div class="row"><span class="pr">35,000 sats</span><span class="loc">Remote</span></div></div></div>
+            <div class="p-base p1c press"><div class="imgwrap" style="height:170px"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500" alt=""></div><div class="b"><div class="t">Merino beanie</div><div class="row"><span class="pr">26,000 sats</span><span class="loc">Reykjavik</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span class="label">Editorial B · centered magazine column, alternating rows</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <nav class="navlinks"><a class="on">Browse</a><a>New</a><a>Following</a><a>Communities</a></nav>
+        <span class="spacer"></span>
+        <span class="ic" title="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="edb">
+        <div class="kick">Circular · Bitcoin-native · curated daily</div>
+        <div class="bighead">Found things,<br>worth keeping</div>
+        <div class="row1"><div class="hero-base h1c press" style="height:380px"><span class="num">01</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900" alt=""></div><div class="cap"><h3>Organic cotton tee</h3><div class="meta"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div></div>
+        <div class="row2">
+          <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">Resale</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500" alt=""></div><div class="cap"><div class="t">Refurb 65% keyboard</div><div class="pr">95,000 sats</div></div></div>
+          <div class="p-base p2c press"><span class="tag pill ink" style="font-size:.66rem">Used</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=500" alt=""></div><div class="cap"><div class="t">Cast-iron skillet</div><div class="pr">42,000 sats</div></div></div>
+        </div>
+        <div class="row3">
+          <div class="hero-base h3c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600" alt=""></div><div class="bar"><span class="num">04</span><div class="mid"><h3>Riso zine no.4</h3><div class="loc">Berlin · @ekko</div></div><span class="pr">12,000<br>sats</span></div></div>
+          <div class="hero-base h2c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600" alt=""></div><div class="side"><span class="k">Edition of 12</span><h3>Silver gelatin print</h3><span class="pr">120,000 sats</span><button class="buy">Buy now</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="label">Editorial C · 3-column magazine masonry</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/marketplace</span></div>
+      <div class="dnav">
+        <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+        <nav class="navlinks"><a class="on">Browse</a><a>New</a><a>Near me</a><a>Following</a></nav>
+        <span class="spacer"></span>
+        <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="ic cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+      </div>
+      <div class="edc">
+        <div class="hero-base h1c press" style="height:300px"><span class="num">01</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=600" alt=""></div><div class="cap"><h3>35mm rangefinder</h3><div class="meta"><span class="pr">240,000</span><span class="loc">Tokyo</span></div></div></div>
+        <div class="p-base p1c press"><div class="imgwrap" style="height:200px"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500" alt=""></div><div class="b"><div class="t">Stoneware mug</div><div class="row"><span class="pr">18,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+        <div class="hero-base h4c press" style="height:300px"><div class="top"><span class="k">New</span><span class="pill ink" style="font-size:.66rem">Home</span></div><div class="imgwrap"><img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=500" alt=""></div><h3>Wool throw</h3><div class="row"><span class="pr">78,000 sats</span><span class="val" style="font-size:.72rem">Reykjavik</span></div></div>
+        <div class="p-base p5c press"><div class="imgwrap"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500" alt=""></div><div class="b"><div class="pr">38,000 <span>sats</span></div><div class="t">Linen apron</div></div></div>
+        <div class="p-base p2c press" style="height:240px"><span class="tag pill ink" style="font-size:.66rem">Digital</span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" alt=""></div><div class="cap"><div class="t">Synthwave pack</div><div class="pr">35,000 sats</div></div></div>
+        <div class="p-base p1c press"><div class="imgwrap" style="height:180px"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500" alt=""></div><div class="b"><div class="t">Ramen bowl pair</div><div class="row"><span class="pr">33,000 sats</span><span class="loc">Lisbon</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="lead">Part 2 — Swipe, desktop</div>
+    <div class="sub">3 genuinely different web compositions of the swipe experience. Desktop has room, so the single card gets context (a queue, side-peeks, or an immersive stage).</div>
+
+    <span class="label">Swipe A · split-screen card + up-next queue</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swa">
+        <div class="stagewrap">
+          <div class="s-base s1c" style="height:480px"><span class="counter">3 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Photography</span></span><img class="stk" src="assets/badge-bff-star.svg" alt=""><div class="imgwrap"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=800" alt=""></div><div class="meta"><h3>35mm rangefinder</h3><div class="pr">240,000 sats</div><div class="seller">★ 4.9 · @daveshoots · Tokyo</div></div></div>
+          <div class="actions"><button class="x">✕</button><button class="save">Save it</button><button class="like"><img src="assets/shape-daisy-yellow.svg" alt="like"></button></div>
+        </div>
+        <div class="queue">
+          <div class="h">Up next</div>
+          <div class="qrow cur"><img src="https://images.unsplash.com/photo-1496664444929-8c75efb9546f?w=120" alt=""><div><div class="t">35mm rangefinder</div></div><span class="pr">240,000</span></div>
+          <div class="qrow"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=120" alt=""><div><div class="t">Merino beanie</div></div><span class="pr">26,000</span></div>
+          <div class="qrow"><img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=120" alt=""><div><div class="t">Riso zine no.4</div></div><span class="pr">12,000</span></div>
+          <div class="qrow"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=120" alt=""><div><div class="t">Cast-iron skillet</div></div><span class="pr">42,000</span></div>
+          <div class="qrow"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120" alt=""><div><div class="t">Organic cotton tee</div></div><span class="pr">32,000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="label">Swipe B · centered stage with prev/next peek</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swb">
+        <div class="peek"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=300" alt=""></div>
+        <div class="center">
+          <div class="s-base s5c" style="height:430px"><span class="counter">8 / 24</span><span class="chips"><span class="pill ink" style="font-size:.66rem">Apparel</span></span><div class="imgwrap"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700" alt=""></div><div class="floatcard"><h3>Organic cotton tee</h3><div class="row"><span class="pr">32,000 sats</span><span class="loc">★ 4.9 · Austin</span></div></div></div>
+          <div class="actions"><button>✕</button><button class="save">Save it</button><button>♡</button></div>
+        </div>
+        <div class="peek"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=300" alt=""></div>
+      </div>
+    </div>
+
+    <span class="label">Swipe C · immersive full-bleed stage + thumbnail strip</span>
+    <div class="browser">
+      <div class="bchrome"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">shopstr.market/discover</span></div>
+      <div class="swc">
+        <div class="bg"><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=1200" alt=""></div>
+        <div class="strip">
+          <img class="cur" src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=140" alt="">
+          <img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=140" alt="">
+        </div>
+        <div class="panel">
+          <span class="counter">3 / 24 · Photography</span>
+          <h3>Vintage 35mm<br>rangefinder</h3>
+          <div class="pr">240,000 sats</div>
+          <div class="seller">★ 4.9 · @daveshoots · serviced, light meter recalibrated · Tokyo</div>
+          <div class="cta"><button class="save">Save it</button><button class="skip">Skip →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>SHOPSTR · 20 card variations · 3 editorial + 3 swipe desktop layouts · progressive-disclosure search · stickers from design/assets</footer>
+</div>
+    </template>
+  </div>
+
+  <!-- ============================================================ 02 MARKETPLACE VARIATIONS -->
+  <div class="shead"><span class="n">02</span><span class="lead">Marketplace Variations</span></div>
+  <div>
+    <template shadowrootmode="open">
+<style>
+:root{
+  --ink:#121212; --paper:#f4f3ef; --pp:#fff; --p2:#ece9e1;
+  --muted:#5c5b55; --subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-soft:#e7e5fb;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e; --blue:#00aeff; --pink:#ff3dac;
+  --ys:#fff1cc; --gs:#d3f5e3; --ps:#ffdcef; --bs:#cdeeff;
+  --fd:"Archivo Black",system-ui,sans-serif; --fb:"Space Grotesk",system-ui,sans-serif; --fm:"Space Mono",monospace;
+  --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --st:2px; --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:host{display:block;background:var(--paper);color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased;padding:44px 0 120px}
+.display{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;line-height:.92}
+.val{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1380px;margin:0 auto;padding:0 24px}
+.intro{margin-bottom:40px}
+.intro .tag{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center;margin-bottom:14px}
+.intro .tag::before{content:"";width:12px;height:12px;background:var(--purple);border-radius:3px}
+.intro h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.03em;line-height:.86;font-size:clamp(2.4rem,6vw,4.4rem)}
+.intro p{max-width:660px;margin-top:12px;color:var(--muted);font-size:1.05rem}
+.rail{display:flex;gap:30px;overflow-x:auto;padding:8px 0 28px;align-items:flex-start}
+.col{flex:0 0 auto;width:360px}
+.col h2.vt{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;font-size:1.5rem;margin-bottom:4px}
+.col .vmeta{font-family:var(--fm);font-size:.74rem;color:var(--muted);margin-bottom:14px;min-height:48px}
+.vnum{font-family:var(--fm);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:inline-block;border:var(--st) solid var(--ink);border-radius:var(--r-pill);padding:4px 11px;margin-bottom:10px}
+.screen{width:360px;height:760px;border-radius:40px;border:var(--st) solid var(--ink);overflow:hidden;position:relative;background:var(--pp);display:flex;flex-direction:column}
+.sb{height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-family:var(--fm);font-size:.7rem;font-weight:700;flex:0 0 auto;z-index:6}
+.sb .dots{display:flex;gap:5px}.sb .dots i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;position:relative}
+.body::-webkit-scrollbar{width:0}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.78rem;padding:7px 13px;border-radius:var(--r-pill);border:var(--st) solid var(--ink);background:var(--pp);white-space:nowrap;cursor:default}
+.pill.ink{background:var(--ink);color:var(--on-dark)}
+.pill.y{background:var(--yellow)}.pill.g{background:var(--green)}.pill.p{background:var(--pink)}.pill.b{background:var(--blue)}.pill.o{background:var(--orange)}.pill.pu{background:var(--purple);color:#fff;border-color:var(--purple)}
+.ic{width:42px;height:42px;border-radius:50%;border:var(--st) solid var(--ink);display:flex;align-items:center;justify-content:center;background:var(--pp);cursor:default;flex:0 0 auto}
+.bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:var(--st) solid var(--ink)}
+.bar .row{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.brand{font-family:var(--fd);text-transform:uppercase;font-size:1.05rem;letter-spacing:-.02em;display:flex;align-items:center;margin-right:auto}
+.brand img{height:.78em;vertical-align:-.12em;margin:0 .02em}
+.cart{width:40px;height:40px;border-radius:50%;border:var(--st) solid var(--ink);background:var(--yellow);display:flex;align-items:center;justify-content:center;position:relative;cursor:default}
+.cart b{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;font-family:var(--fm);font-size:.58rem;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.disc{display:grid;grid-template-rows:1fr}
+.disc>div{overflow:hidden}
+.search{display:flex;align-items:center;gap:8px;margin:0 16px 12px;padding:11px 15px;border:var(--st) solid var(--ink);border-radius:var(--r-pill);background:var(--pp)}
+.search input{border:none;outline:none;font-family:var(--fb);font-size:.9rem;width:100%;background:none}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px}
+.filters::-webkit-scrollbar{height:0}
+.v1 .body{padding:14px;background:var(--paper)}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px;grid-auto-rows:118px}
+.bt{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;cursor:default}
+.bt .k{font-family:var(--fm);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.bt .t{font-weight:700;font-size:.92rem;line-height:1.05;margin-top:2px}
+.bt .pr{font-family:var(--fm);font-weight:700;font-size:.82rem;margin-top:3px}
+.bt.img{justify-content:flex-end;color:#fff}
+.bt.img::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.6));z-index:0}
+.bt.img>*{position:relative;z-index:1}
+.bt.img img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.bt.tall{grid-row:span 2}.bt.wide{grid-column:span 2}
+.bt.purple{background:var(--purple);color:#fff}.bt.green{background:var(--green)}.bt.yellow{background:var(--yellow)}.bt.pink{background:var(--pink)}.bt.blue{background:var(--blue)}
+.bt .stk{position:absolute;top:8px;right:8px;width:46px;height:46px;z-index:1}
+.v2 .body{background:var(--paper)}
+.ed-hero{margin:14px;border-radius:var(--r-xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative;cursor:default}
+.ed-hero img{width:100%;height:300px;object-fit:cover;display:block}
+.ed-hero .cap{position:absolute;left:0;right:0;bottom:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff}
+.ed-hero .cap h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.95;letter-spacing:-.02em}
+.ed-hero .cap .pr{font-family:var(--fm);font-weight:700;margin-top:6px}
+.ed-hero .num{position:absolute;top:12px;left:14px;font-family:var(--fd);font-size:2.4rem;color:#fff;mix-blend-mode:difference}
+.ed-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 14px 16px}
+.ed-card{border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;cursor:default;background:var(--pp)}
+.ed-card img{width:100%;height:130px;object-fit:cover;display:block}
+.ed-card .b{padding:11px}.ed-card .t{font-weight:700;font-size:.86rem;line-height:1.1}
+.ed-card .pr{font-family:var(--fm);font-weight:700;font-size:.82rem;margin-top:6px}
+.ed-band{margin:0 14px 16px;background:var(--ink);color:#fff;border-radius:var(--r-lg);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.ed-band .display{font-size:1.3rem}.ed-band .stk{width:42px;height:42px;margin-left:auto}
+.v3 .body{background:var(--paper);padding:14px}
+.masonry{columns:2;column-gap:10px}
+.ms{break-inside:avoid;margin-bottom:10px;border-radius:var(--r-lg);border:var(--st) solid var(--ink);overflow:hidden;background:var(--pp);cursor:default;position:relative}
+.ms img{width:100%;display:block}
+.ms .b{padding:10px}.ms .t{font-weight:700;font-size:.82rem;line-height:1.12}
+.ms .r{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.ms .pr{font-family:var(--fm);font-weight:700;font-size:.8rem}.ms .loc{font-family:var(--fm);font-size:.6rem;color:var(--subtle)}
+.ms .tag{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:.58rem;font-weight:700;text-transform:uppercase;background:var(--ink);color:#fff;padding:4px 8px;border-radius:var(--r-pill)}
+.ms.note{background:var(--purple);color:#fff;padding:16px}
+.ms.note .display{font-size:1.2rem}.ms.note p{font-family:var(--fm);font-size:.7rem;opacity:.85;margin-top:6px}
+.v4 .body{background:var(--pink);display:flex;flex-direction:column;padding:14px;gap:12px}
+.swipe{flex:1;border-radius:var(--r-2xl);border:var(--st) solid var(--ink);overflow:hidden;position:relative;background:#111;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
+.swipe img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.swipe::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.8))}
+.swipe .meta{position:relative;z-index:1;padding:18px;color:#fff}
+.swipe .meta h3{font-family:var(--fd);text-transform:uppercase;font-size:1.6rem;line-height:.95;letter-spacing:-.02em}
+.swipe .meta .pr{font-family:var(--fm);font-weight:700;font-size:1.4rem;margin-top:6px}
+.swipe .chips{position:absolute;top:14px;left:14px;z-index:1;display:flex;gap:6px}
+.swipe .stk{position:absolute;top:14px;right:14px;z-index:1;width:54px;height:54px}
+.swipe .counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--fm);font-size:.66rem;background:rgba(0,0,0,.5);color:#fff;padding:4px 12px;border-radius:var(--r-pill)}
+.swrow{display:flex;align-items:center;gap:12px;background:var(--ink);border-radius:var(--r-2xl);padding:12px}
+.swrow .x{width:54px;height:54px;border-radius:50%;background:var(--pp);border:none;display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:default}
+.swrow .save{flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:15px;font-weight:700;font-family:var(--fb);cursor:default;font-size:1rem}
+.swrow .like{width:54px;height:54px;border-radius:50%;border:none;cursor:default;padding:0;background:none}
+.swrow .like img{width:54px;height:54px}
+.v5 .body{background:var(--paper);padding:8px 0}
+.lrow{display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:var(--st) solid var(--ink);cursor:default}
+.lrow .th{width:60px;height:60px;border-radius:var(--r-md);border:var(--st) solid var(--ink);object-fit:cover;flex:0 0 auto}
+.lrow .mid{flex:1;min-width:0}
+.lrow .t{font-weight:700;font-size:.92rem;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .sub{font-family:var(--fm);font-size:.68rem;color:var(--subtle);margin-top:3px;display:flex;gap:8px}
+.lrow .tag{background:var(--ink);color:#fff;padding:2px 7px;border-radius:var(--r-pill);font-size:.56rem;text-transform:uppercase}
+.lrow .pr{text-align:right;flex:0 0 auto}
+.lrow .pr .n{font-family:var(--fd);font-size:1.2rem;line-height:.9}
+.lrow .pr .u{font-family:var(--fm);font-size:.58rem;color:var(--muted)}
+.v5 .feature{margin:8px 16px 0;background:var(--green);border:var(--st) solid var(--ink);border-radius:var(--r-lg);padding:16px;position:relative;overflow:hidden;cursor:default}
+.v5 .feature .k{font-family:var(--fm);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase}
+.v5 .feature .display{font-size:1.5rem;margin-top:2px}
+.v5 .feature .big{font-family:var(--fd);font-size:2.4rem;line-height:.9;margin-top:8px}
+.v5 .feature .stk{position:absolute;right:10px;top:10px;width:48px;height:48px}
+footer{margin-top:40px;font-family:var(--fm);font-size:.78rem;color:var(--muted)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--fm);font-size:.74rem;color:var(--muted);margin-top:8px}
+</style>
+<div class="wrap">
+  <div class="intro">
+    <span class="tag">Shopstr · marketplace · 5 layout directions</span>
+    <h1>Five ways<br>to browse</h1>
+    <p>Five distinct marketplace layouts so browsing never feels monotonous, each grounded in a Pinterest reference and built in Sticker Brutalism. <b>Search + filters are progressive disclosure</b>. Scroll inside each phone.</p>
+    <div class="legend">
+      <span>① Bento mixed</span><span>② Editorial rows</span><span>③ Masonry</span><span>④ Swipe card</span><span>⑤ List + big number</span>
+    </div>
+  </div>
+
+  <div class="rail">
+
+    <div class="col">
+      <span class="vnum">Variation 1 · ref: bento home</span>
+      <h2 class="vt">Bento mixed</h2>
+      <div class="vmeta">Varied tile sizes — tall, wide, square — so the rhythm never reads as a flat grid. Image tiles, color tiles, price tiles intermixed.</div>
+      <div class="screen v1">
+        <div class="sb"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="bar">
+            <div class="row">
+              <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+              <button class="ic" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <span class="cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+            </div>
+            <div class="disc"><div>
+              <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a897f" stroke-width="2"/><path d="M20 20l-3-3" stroke="#8a897f" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search the market…"></div>
+              <div class="filters"><span class="pill ink">All</span><span class="pill">Ceramics</span><span class="pill y">Coffee</span><span class="pill g">Tech</span><span class="pill p">Apparel</span></div>
+            </div></div>
+          </div>
+          <div style="padding:14px">
+            <div class="bento">
+              <div class="bt tall img"><img class="ph" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500" alt=""><img class="stk" src="assets/badge-bff-star.svg" alt=""><span class="k">Featured</span><span class="t">Riso zine — Soft Static</span><span class="pr">12,000 sats</span></div>
+              <div class="bt green"><span class="k">Category</span><span class="t" style="font-family:var(--fd);text-transform:uppercase">Ceramics</span></div>
+              <div class="bt yellow"><span class="k">Category</span><span class="t" style="font-family:var(--fd);text-transform:uppercase">Coffee</span></div>
+              <div class="bt wide img"><img class="ph" src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600" alt=""><span class="k">Resale</span><span class="t">Refurb 65% keyboard</span><span class="pr">95,000 sats</span></div>
+              <div class="bt purple"><img class="stk" src="assets/shape-sunstar-yellow.svg" alt=""><span class="k">New</span><span class="t">Cold brew · 1L</span><span class="pr">14,000 sats</span></div>
+              <div class="bt img"><img class="ph" src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400" alt=""><span class="t">Merino beanie</span><span class="pr">26,000</span></div>
+              <div class="bt pink"><img class="stk" src="assets/shape-daisy-yellow.svg" alt=""><span class="k">Trending</span><span class="t" style="font-family:var(--fd);text-transform:uppercase">Zines</span></div>
+              <div class="bt wide img"><img class="ph" src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=600" alt=""><span class="k">Used · excellent</span><span class="t">35mm rangefinder</span><span class="pr">240,000 sats</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <span class="vnum">Variation 2 · ref: fashion editorial</span>
+      <h2 class="vt">Editorial rows</h2>
+      <div class="vmeta">Magazine rhythm: a full-bleed hero listing, then a stacked pair, then an ink band. Big imagery, big type — feels curated, not a catalog.</div>
+      <div class="screen v2">
+        <div class="sb"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="bar">
+            <div class="row">
+              <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+              <button class="ic" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <span class="cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+            </div>
+            <div class="disc"><div>
+              <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a897f" stroke-width="2"/><path d="M20 20l-3-3" stroke="#8a897f" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search the market…"></div>
+              <div class="filters"><span class="pill ink">All</span><span class="pill">Apparel</span><span class="pill b">Photography</span><span class="pill o">Home</span></div>
+            </div></div>
+          </div>
+          <div class="ed-hero">
+            <span class="num">01</span>
+            <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700" alt="">
+            <div class="cap"><h3>Organic<br>cotton tee</h3><span class="pr">32,000 sats · Austin</span></div>
+          </div>
+          <div class="ed-pair">
+            <div class="ed-card"><img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400" alt=""><div class="b"><div class="t">Linen apron</div><div class="pr">38,000 sats</div></div></div>
+            <div class="ed-card"><img src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400" alt=""><div class="b"><div class="t">Merino beanie</div><div class="pr">26,000 sats</div></div></div>
+          </div>
+          <div class="ed-band"><div><div class="val" style="font-size:.6rem;opacity:.7">CATEGORY</div><div class="display">Ceramics →</div></div><img class="stk" src="assets/shape-daisy-yellow.svg" alt=""></div>
+          <div class="ed-hero" style="margin-top:0">
+            <span class="num">02</span>
+            <img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=700" alt="">
+            <div class="cap"><h3>Silver gelatin<br>print</h3><span class="pr">120,000 sats · Tokyo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <span class="vnum">Variation 3 · ref: sticker / catalog</span>
+      <h2 class="vt">Masonry</h2>
+      <div class="vmeta">Pinterest-style variable-height cards in two columns. Dense and scannable; an occasional color note tile breaks the flow.</div>
+      <div class="screen v3">
+        <div class="sb"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="bar">
+            <div class="row">
+              <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+              <button class="ic" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <span class="cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+            </div>
+            <div class="disc"><div>
+              <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a897f" stroke-width="2"/><path d="M20 20l-3-3" stroke="#8a897f" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search the market…"></div>
+              <div class="filters"><span class="pill ink">All</span><span class="pill g">Home</span><span class="pill y">Kitchen</span><span class="pill b">Music</span></div>
+            </div></div>
+          </div>
+          <div style="padding:14px">
+            <div class="masonry">
+              <div class="ms"><span class="tag">Resale</span><img src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=400" alt=""><div class="b"><div class="t">35mm rangefinder</div><div class="r"><span class="pr">240,000</span><span class="loc">Tokyo</span></div></div></div>
+              <div class="ms"><img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400" alt=""><div class="b"><div class="t">Stoneware mug</div><div class="r"><span class="pr">18,000</span><span class="loc">Lisbon</span></div></div></div>
+              <div class="ms note"><div class="display">New this week</div><p>14 fresh listings from makers you follow</p></div>
+              <div class="ms"><img src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=400" alt=""><div class="b"><div class="t">Cast-iron skillet</div><div class="r"><span class="pr">42,000</span><span class="loc">Reykjavik</span></div></div></div>
+              <div class="ms"><span class="tag">Digital</span><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400" alt=""><div class="b"><div class="t">Synthwave sample pack</div><div class="r"><span class="pr">35,000</span><span class="loc">Remote</span></div></div></div>
+              <div class="ms"><img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400" alt=""><div class="b"><div class="t">Ramen bowl pair</div><div class="r"><span class="pr">33,000</span><span class="loc">Lisbon</span></div></div></div>
+              <div class="ms"><img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=400" alt=""><div class="b"><div class="t">Wool throw</div><div class="r"><span class="pr">78,000</span><span class="loc">Reykjavik</span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <span class="vnum">Variation 4 · ref: profile card</span>
+      <h2 class="vt">Swipe card</h2>
+      <div class="vmeta">One immersive full-bleed listing at a time. Save / skip / message at the bottom. For lean-back, discovery-first browsing. Full-bleed accent mode.</div>
+      <div class="screen v4">
+        <div class="sb"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="body" style="display:flex;flex-direction:column;padding:0">
+          <div class="bar" style="background:var(--pink)">
+            <div class="row">
+              <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+              <button class="ic" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <span class="cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+            </div>
+            <div class="disc"><div>
+              <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a897f" stroke-width="2"/><path d="M20 20l-3-3" stroke="#8a897f" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search the market…"></div>
+              <div class="filters"><span class="pill ink">For you</span><span class="pill">Nearby</span><span class="pill">New</span><span class="pill">Following</span></div>
+            </div></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:12px;min-height:0">
+            <div class="swipe">
+              <span class="counter">3 / 24</span>
+              <div class="chips"><span class="pill ink" style="font-size:.66rem;padding:5px 11px">Photography</span></div>
+              <img class="stk" src="assets/badge-bff-star.svg" alt="">
+              <img class="ph" src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=700" alt="">
+              <div class="meta"><h3>35mm rangefinder<br>camera</h3><span class="pr">240,000 sats</span><div class="val" style="font-size:.72rem;opacity:.85;margin-top:4px">★ 4.9 · @daveshoots · Tokyo</div></div>
+            </div>
+            <div class="swrow">
+              <button class="x">✕</button>
+              <button class="save">Save it</button>
+              <button class="like"><img src="assets/shape-daisy-yellow.svg" alt="like"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <span class="vnum">Variation 5 · ref: stats list</span>
+      <h2 class="vt">List + big number</h2>
+      <div class="vmeta">Data-dense rows with the sat price set huge in display type — value-forward. A featured banner up top. Fast to scan many listings.</div>
+      <div class="screen v5">
+        <div class="sb"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="body">
+          <div class="bar">
+            <div class="row">
+              <span class="brand">sh<img src="assets/shape-sparkle-4pt.svg" alt="">pstr</span>
+              <button class="ic" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#121212" stroke-width="2"/><path d="M20 20l-3-3" stroke="#121212" stroke-width="2" stroke-linecap="round"/></svg></button>
+              <span class="cart"><b>3</b><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.4 11H6.4L5 7z" stroke="#121212" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 7a3.5 3.5 0 017 0" stroke="#121212" stroke-width="2"/></svg></span>
+            </div>
+            <div class="disc"><div>
+              <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#8a897f" stroke-width="2"/><path d="M20 20l-3-3" stroke="#8a897f" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search the market…"></div>
+              <div class="filters"><span class="pill ink">Recent</span><span class="pill">Price ↑</span><span class="pill">Price ↓</span><span class="pill">Popular</span></div>
+            </div></div>
+          </div>
+          <div class="feature">
+            <img class="stk" src="assets/shape-sunstar-purple.svg" alt="">
+            <div class="k">Featured drop</div>
+            <div class="display">Riso zine no. 4</div>
+            <div class="big">12,000<span style="font-family:var(--fm);font-size:.9rem"> sats</span></div>
+          </div>
+          <div style="padding:8px 0 0">
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=120" alt=""><div class="mid"><div class="t">Hand-thrown stoneware mug</div><div class="sub"><span class="tag">New</span><span>Lisbon</span><span>★ 4.8</span></div></div><div class="pr"><div class="n">18,000</div><div class="u">sats</div></div></div>
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=120" alt=""><div class="mid"><div class="t">Refurbished 65% keyboard</div><div class="sub"><span class="tag">Resale</span><span>Berlin</span><span>★ 4.6</span></div></div><div class="pr"><div class="n">95,000</div><div class="u">sats</div></div></div>
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=120" alt=""><div class="mid"><div class="t">Vintage 35mm rangefinder</div><div class="sub"><span class="tag">Used</span><span>Tokyo</span><span>★ 4.9</span></div></div><div class="pr"><div class="n">240k</div><div class="u">sats</div></div></div>
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=120" alt=""><div class="mid"><div class="t">Cold-brew concentrate · 1L</div><div class="sub"><span class="tag">Pickup</span><span>Lisbon</span><span>★ 4.8</span></div></div><div class="pr"><div class="n">14,000</div><div class="u">sats</div></div></div>
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=120" alt=""><div class="mid"><div class="t">Merino beanie, hand-knit</div><div class="sub"><span class="tag">New</span><span>Reykjavik</span><span>★ 4.9</span></div></div><div class="pr"><div class="n">26,000</div><div class="u">sats</div></div></div>
+            <div class="lrow"><img class="th" src="https://images.unsplash.com/photo-1593618998160-e34014e67546?w=120" alt=""><div class="mid"><div class="t">Cast-iron skillet, seasoned</div><div class="sub"><span class="tag">Resale</span><span>Reykjavik</span><span>★ 4.7</span></div></div><div class="pr"><div class="n">42,000</div><div class="u">sats</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>SHOPSTR · 5 marketplace variations · progressive-disclosure search · scroll inside each phone · stickers from design/assets</footer>
+</div>
+    </template>
+  </div>
+
+  <!-- ============================================================ 03 SCREENS -->
+  <div class="shead"><span class="n">03</span><span class="lead">Screens</span></div>
+  <div>
+    <template shadowrootmode="open">
+<style>
+:root{
+  --ink:#121212; --paper:#f4f3ef; --paper-pure:#fff; --paper-2:#ece9e1;
+  --text:#121212; --muted:#5c5b55; --subtle:#8a897f; --on-dark:#f4f3ef;
+  --purple:#5a51e5; --purple-press:#4a42c9; --purple-soft:#e7e5fb;
+  --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e; --blue:#00aeff; --pink:#ff3dac;
+  --yellow-soft:#fff1cc; --green-soft:#d3f5e3; --pink-soft:#ffdcef; --blue-soft:#cdeeff;
+  --fd:"Archivo Black",system-ui,sans-serif; --fb:"Space Grotesk",system-ui,sans-serif; --fm:"Space Mono",monospace;
+  --r-md:.875rem; --r-lg:1.25rem; --r-xl:1.75rem; --r-2xl:2.25rem; --r-pill:999px;
+  --stroke:2px; --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:host{display:block;background:var(--paper);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding:48px 0 120px}
+.display{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;line-height:.92;text-wrap:balance}
+.value{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+.intro{margin-bottom:56px}
+.intro .tag{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:10px;margin-bottom:16px}
+.intro .tag::before{content:"";width:12px;height:12px;background:var(--purple);border-radius:3px}
+.intro h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.03em;line-height:.86;font-size:clamp(2.6rem,7vw,5rem)}
+.intro p{max-width:640px;margin-top:14px;color:var(--muted);font-size:1.1rem}
+.vhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:72px 0 28px;border-top:var(--stroke) solid var(--ink);padding-top:22px;flex-wrap:wrap}
+.vhead .lead{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(1.6rem,4vw,2.4rem)}
+.vhead .meta{font-family:var(--fm);font-size:.78rem;color:var(--muted);max-width:520px}
+.vbadge{font-family:var(--fm);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);background:var(--paper-pure)}
+.row{display:flex;gap:32px;flex-wrap:wrap}
+.phone{width:340px;flex:0 0 340px}
+.phone .label{font-family:var(--fm);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;gap:8px;align-items:center}
+.phone .label b{color:var(--ink);font-family:var(--fb);font-weight:700;letter-spacing:0;text-transform:none;font-size:.86rem}
+.screen{width:340px;height:720px;border-radius:42px;border:var(--stroke) solid var(--ink);overflow:hidden;position:relative;background:var(--paper-pure);display:flex;flex-direction:column}
+.statusbar{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-family:var(--fm);font-size:.72rem;font-weight:700;flex:0 0 auto;z-index:5}
+.statusbar .dots{display:flex;gap:5px;align-items:center}
+.statusbar .dots i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+.scr-body{flex:1;overflow:hidden;position:relative}
+.pill{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.82rem;padding:8px 14px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);background:var(--paper-pure);white-space:nowrap}
+.pill.ink{background:var(--ink);color:var(--on-dark)}
+.pill.purple{background:var(--purple);color:#fff;border-color:var(--purple)}
+.pill.y{background:var(--yellow)} .pill.g{background:var(--green)} .pill.p{background:var(--pink)} .pill.b{background:var(--blue)} .pill.o{background:var(--orange)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:1rem;padding:15px 24px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);cursor:default;background:var(--ink);color:var(--on-dark);font-family:var(--fb)}
+.btn.purple{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn.full{width:100%}
+.value-lg{font-family:var(--fm);font-variant-numeric:tabular-nums;font-weight:700}
+.sticker{position:absolute;pointer-events:none;z-index:1}
+.sticker img{display:block;width:100%;height:100%}
+.sbtn{border:none;background:none;cursor:default;padding:0;display:inline-block;line-height:0;-webkit-tap-highlight-color:transparent}
+.sbtn img{display:block}
+.swap{display:inline-block;vertical-align:baseline;position:relative}
+.swap img{height:.78em;width:auto;display:inline-block;vertical-align:-.12em;margin:0 .02em}
+.A .scr-body{background:var(--paper);padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.A .topbar{display:flex;align-items:center;justify-content:space-between}
+.A .brand{font-family:var(--fd);text-transform:uppercase;font-size:1.15rem;letter-spacing:-.02em;display:flex;align-items:center;gap:4px}
+.A .cart{width:42px;height:42px;border-radius:50%;background:var(--yellow);border:var(--stroke) solid var(--ink);display:flex;align-items:center;justify-content:center;position:relative}
+.A .cart b{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;font-family:var(--fm);font-size:.6rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.bento{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(86px,auto);gap:10px}
+.tile{border-radius:var(--r-lg);border:var(--stroke) solid var(--ink);padding:14px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:96px}
+.tile .k{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.tile .t{font-family:var(--fd);text-transform:uppercase;font-size:1.05rem;line-height:.95;letter-spacing:-.02em}
+.tile.big{grid-row:span 2;min-height:200px;justify-content:flex-end}
+.tile.purple{background:var(--purple);color:#fff} .tile.purple .k{color:#cfcbff}
+.tile.green{background:var(--green)} .tile.yellow{background:var(--yellow)}
+.tile.pink{background:var(--pink)} .tile.paper{background:var(--paper-pure)}
+.tile .price{font-family:var(--fm);font-weight:700;font-size:.92rem;margin-top:4px}
+.A .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0}
+.A .filters .pill{flex:0 0 auto;font-size:.78rem;padding:7px 13px}
+.B .scr-body{background:var(--yellow);overflow-y:auto}
+.B .bbar{display:flex;align-items:center;justify-content:space-between;padding:16px 18px}
+.B .bbar .x{width:34px;height:34px;border-radius:50%;border:var(--stroke) solid var(--ink);display:flex;align-items:center;justify-content:center;background:var(--paper-pure);cursor:default}
+.B .bbar .ttl{font-family:var(--fm);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}
+.tilts{padding:8px 18px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;position:relative;min-height:330px}
+.tilt-pill{font-family:var(--fd);text-transform:uppercase;letter-spacing:-.01em;font-size:1.5rem;padding:10px 22px;border-radius:var(--r-pill);border:var(--stroke) solid var(--ink);background:var(--paper-pure);cursor:default}
+.tilt-pill:nth-child(1){transform:rotate(-4deg);align-self:flex-start;background:var(--ink);color:#fff}
+.tilt-pill:nth-child(2){transform:rotate(2deg);background:var(--pink);margin-left:30px}
+.tilt-pill:nth-child(3){transform:rotate(-2deg);background:var(--green);margin-left:10px}
+.tilt-pill:nth-child(4){transform:rotate(3deg);background:var(--paper-pure);margin-left:50px}
+.tilt-pill:nth-child(5){transform:rotate(-3deg);background:var(--blue);margin-left:18px}
+.B .sheet{background:var(--paper-pure);border-top-left-radius:var(--r-2xl);border-top-right-radius:var(--r-2xl);border-top:var(--stroke) solid var(--ink);margin-top:auto;padding:18px;display:flex;gap:12px}
+.B .sheet .qa{flex:1;border-radius:var(--r-lg);border:var(--stroke) solid var(--ink);padding:14px;min-height:104px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.B .sheet .qa.pink{background:var(--pink)} .B .sheet .qa.purple{background:var(--purple);color:#fff}
+.B .sheet .qa .n{font-weight:700;font-size:.9rem;line-height:1.1}
+.B2 .scr-body{background:var(--yellow);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative}
+.ob-card{background:var(--paper-pure);border:var(--stroke) solid var(--ink);border-radius:var(--r-2xl);padding:26px 22px;width:100%;display:flex;flex-direction:column;gap:14px;position:relative;z-index:2}
+.ob-card .step{font-family:var(--fm);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ob-card h3{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.95;letter-spacing:-.02em}
+.ob-card p{color:var(--muted);font-size:.92rem}
+.ob-card .nav{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.ob-card .next{width:54px;height:54px;border-radius:50%;background:var(--ink);border:none;display:flex;align-items:center;justify-content:center;cursor:default}
+.B3 .scr-body{background:var(--purple);display:flex;align-items:center;justify-content:center;padding:22px;position:relative}
+.modal{background:var(--paper-pure);border:var(--stroke) solid var(--ink);border-radius:var(--r-2xl);padding:24px 20px;width:100%;text-align:center;position:relative;z-index:2}
+.modal .bubbles{display:flex;justify-content:center;gap:6px;margin-bottom:8px}
+.modal h3{font-family:var(--fd);text-transform:uppercase;font-size:1.5rem;line-height:.95;margin:6px 0}
+.modal p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+.modal .opts{display:flex;flex-direction:column;gap:10px}
+.C .scr-body{background:var(--pink);display:flex;flex-direction:column;overflow-y:auto}
+.C .ctop{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.C .back{width:40px;height:40px;border-radius:50%;background:var(--paper-pure);border:var(--stroke) solid var(--ink);display:flex;align-items:center;justify-content:center;cursor:default}
+.C .prodimg{margin:4px 16px 0;height:240px;border-radius:var(--r-2xl);border:var(--stroke) solid var(--ink);background:#111 center/cover;position:relative;overflow:hidden}
+.C .prodimg .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);text-transform:uppercase;color:rgba(255,255,255,.2);font-size:2rem}
+.C .pbody{padding:16px;display:flex;flex-direction:column;gap:10px}
+.C h2.title{font-family:var(--fd);text-transform:uppercase;font-size:1.75rem;line-height:.92;letter-spacing:-.02em}
+.C .price{font-family:var(--fm);font-variant-numeric:tabular-nums;font-weight:700;font-size:2.4rem;line-height:1}
+.C .price span{font-size:1rem}
+.C .seller{background:var(--ink);color:var(--on-dark);border-radius:var(--r-lg);padding:11px;display:flex;align-items:center;gap:10px}
+.C .seller .av{width:40px;height:40px;border-radius:11px;background:var(--yellow);color:var(--ink);font-family:var(--fd);display:flex;align-items:center;justify-content:center}
+.C .seller .meta{font-family:var(--fm);font-size:.7rem;color:#bdbcb4}
+.C .seller .view{margin-left:auto;background:var(--paper-pure);color:var(--ink);border:none;border-radius:var(--r-pill);padding:8px 14px;font-weight:700;cursor:default;font-family:var(--fb)}
+.ctrl{margin:auto 16px 18px;background:var(--ink);border-radius:var(--r-2xl);padding:12px;display:flex;align-items:center;gap:10px}
+.ctrl .buy{flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-pill);padding:16px;font-weight:700;font-size:1.05rem;cursor:default;font-family:var(--fb)}
+.ctrl .cc{width:52px;height:52px;border-radius:50%;border:none;cursor:default;display:flex;align-items:center;justify-content:center;padding:0;background:none}
+.ctrl .cc img{width:52px;height:52px}
+.C2 .scr-body{background:var(--paper);padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.C2 .hero{background:var(--ink);color:#fff;border-radius:var(--r-2xl);padding:20px;position:relative;overflow:hidden}
+.C2 .hero .lead-h{font-family:var(--fd);text-transform:uppercase;font-size:1.7rem;line-height:.92;letter-spacing:-.02em}
+.feedcard{border-radius:var(--r-xl);border:var(--stroke) solid var(--ink);overflow:hidden;background:var(--paper-pure)}
+.feedcard .img{height:150px;position:relative;display:flex;align-items:center;justify-content:center;font-family:var(--fd);text-transform:uppercase;color:rgba(0,0,0,.18);font-size:1.4rem}
+.feedcard .fb{padding:13px;display:flex;flex-direction:column;gap:5px}
+.feedcard .ttl{font-weight:700;line-height:1.15}
+.feedcard .r{display:flex;justify-content:space-between;align-items:baseline}
+.feedcard .pr{font-family:var(--fm);font-weight:700}
+.feedcard .loc{font-family:var(--fm);font-size:.68rem;color:var(--subtle)}
+.C3 .scr-body{background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:16px;position:relative}
+.C3 .check{width:120px;height:120px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;position:relative;z-index:2;cursor:default}
+.C3 h2{font-family:var(--fd);text-transform:uppercase;font-size:1.9rem;line-height:.95;z-index:2}
+.C3 .amt{font-family:var(--fm);font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1rem;background:var(--paper-pure);border:var(--stroke) solid var(--ink);padding:8px 16px;border-radius:var(--r-pill);z-index:2}
+.C3 .receipt{background:var(--paper-pure);border:var(--stroke) solid var(--ink);border-radius:var(--r-lg);padding:14px 16px;width:100%;z-index:2;font-family:var(--fm);font-size:.8rem;display:flex;flex-direction:column;gap:8px}
+.C3 .receipt .ln{display:flex;justify-content:space-between}
+footer{margin-top:80px;font-family:var(--fm);font-size:.78rem;color:var(--muted)}
+</style>
+<div class="wrap">
+
+  <div class="intro">
+    <span class="tag">Shopstr · screen variations</span>
+    <h1>Three layouts,<br>one loud system</h1>
+    <p>Nine phone screens across three layout directions — each built faithfully from a single reference, all in the Shopstr "Sticker Brutalism" system: neutral-first, purple accent, the six loud accents, no shadows, stickers as decoration <em>and</em> as buttons.</p>
+  </div>
+
+  <div class="vhead">
+    <div>
+      <div class="vbadge">Variation A · ref: bento home</div>
+      <div class="lead" style="margin-top:10px">Bento Home</div>
+    </div>
+    <div class="meta">A modular bento grid of category + product tiles, big editorial product page, and a cart checklist. Faithful to the nerds-app reference: stacked tiles, one image-led hero tile, pill filters.</div>
+  </div>
+  <div class="row">
+    <div class="phone A">
+      <div class="label"><b>A1</b> · Home</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <div class="topbar">
+            <div class="brand">shop<span class="swap"><img src="assets/shape-sparkle-4pt.svg" alt="*"></span>str</div>
+            <div class="cart"><b>2</b>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.5 11H6.5L5 7zM8 7a4 4 0 018 0" stroke="#121212" stroke-width="2"/></svg>
+            </div>
+          </div>
+          <div class="filters">
+            <span class="pill ink">All</span><span class="pill">Home</span><span class="pill y">Apparel</span><span class="pill g">Coffee</span><span class="pill b">Tech</span>
+          </div>
+          <div class="bento">
+            <div class="tile big purple" style="grid-row:span 2;padding:16px">
+              <span class="sticker" style="width:62px;height:62px;top:14px;right:12px;opacity:.95"><img src="assets/shape-sunstar-yellow.svg" alt=""></span>
+              <div><div class="k">Featured</div><div class="t" style="font-size:1.45rem;line-height:.94;margin-top:6px">Stuff<br>that<br>sticks</div><div class="price" style="margin-top:8px">from 12,000 sats</div></div>
+            </div>
+            <div class="tile green"><div class="k">Category</div><div class="t">Ceramics</div></div>
+            <div class="tile yellow"><div class="k">Category</div><div class="t">Coffee</div></div>
+            <div class="tile paper"><div class="k">New</div><div class="t">Keyboards</div><div class="price">95,000 sats</div></div>
+            <div class="tile pink">
+              <span class="sticker" style="width:54px;height:54px;bottom:8px;right:8px"><img src="assets/shape-daisy-yellow.svg" alt=""></span>
+              <div class="k">Trending</div><div class="t">Zines</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone A">
+      <div class="label"><b>A2</b> · Product</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body" style="padding:0;gap:0;background:var(--paper-pure)">
+          <div style="height:300px;background:var(--blue-soft);position:relative;display:flex;align-items:center;justify-content:center;border-bottom:var(--stroke) solid var(--ink)">
+            <span class="display" style="color:rgba(0,0,0,.16);font-size:2.2rem">Keyboard</span>
+            <div style="position:absolute;top:14px;left:14px" class="pill">← Back</div>
+            <span class="sticker" style="width:62px;height:62px;top:16px;right:16px"><img src="assets/badge-new-round.svg" alt=""></span>
+          </div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+            <h2 class="display" style="font-size:1.9rem">Refurbished<br>mech keyboard</h2>
+            <div class="value-lg" style="font-size:1.6rem">95,000 <span style="font-size:.8rem;color:var(--muted)">sats</span></div>
+            <p style="color:var(--muted);font-size:.9rem">65% layout, lubed tactile switches, PBT keycaps. Cleaned and tested.</p>
+            <button class="btn full">Add to cart →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone A">
+      <div class="label"><b>A3</b> · Cart</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <div class="topbar"><div class="brand" style="font-size:1rem">Your cart</div><span class="pill ink">2 items</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div class="tile paper" style="flex-direction:row;align-items:center;gap:12px;min-height:auto">
+              <div style="width:48px;height:48px;border-radius:11px;background:var(--yellow-soft);border:var(--stroke) solid var(--ink);flex:0 0 auto"></div>
+              <div style="flex:1"><div style="font-weight:700;font-size:.9rem">Stoneware mug</div><div class="value" style="font-size:.78rem;color:var(--muted)">18,000 sats</div></div>
+              <div class="pill">1</div>
+            </div>
+            <div class="tile paper" style="flex-direction:row;align-items:center;gap:12px;min-height:auto">
+              <div style="width:48px;height:48px;border-radius:11px;background:var(--green-soft);border:var(--stroke) solid var(--ink);flex:0 0 auto"></div>
+              <div style="flex:1"><div style="font-weight:700;font-size:.9rem">Organic tee · M</div><div class="value" style="font-size:.78rem;color:var(--muted)">32,000 sats</div></div>
+              <div class="pill">2</div>
+            </div>
+          </div>
+          <div class="tile purple" style="margin-top:auto;min-height:auto;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="k">Total</span><span class="value-lg" style="font-size:1.4rem">82,000 sats</span></div>
+            <button class="btn purple full" style="background:#fff;color:var(--purple);border-color:#fff">Pay with Lightning ⚡</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vhead">
+    <div>
+      <div class="vbadge">Variation B · ref: sticker profile</div>
+      <div class="lead" style="margin-top:10px">Sticker Profile</div>
+    </div>
+    <div class="meta">Full-bleed yellow surface, tilted stacked pills for navigation, a paper sheet of quick-actions, plus onboarding and a choice modal. Faithful to the yellow-app reference: rotated pills, sticker accents, big rounded cards.</div>
+  </div>
+  <div class="row">
+    <div class="phone B">
+      <div class="label"><b>B1</b> · Profile</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <div class="bbar"><div class="x">✕</div><div class="ttl">Profile</div><div class="x">⚙</div></div>
+          <div class="tilts">
+            <span class="sticker" style="width:70px;height:70px;top:0;right:14px;z-index:0"><img src="assets/shape-starburst.svg" alt=""></span>
+            <button class="tilt-pill">@ekko</button>
+            <button class="tilt-pill">My listings</button>
+            <button class="tilt-pill">Reviews</button>
+            <button class="tilt-pill">Wallet</button>
+            <button class="tilt-pill">Support</button>
+          </div>
+          <div class="sheet">
+            <div class="qa pink">
+              <span class="qa-ic">★</span><div class="n">Rate Shopstr</div>
+            </div>
+            <div class="qa purple">
+              <div class="n">Share your shop</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone B2">
+      <div class="label"><b>B2</b> · Onboarding</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <span class="sticker" style="width:90px;height:90px;top:40px;left:24px;z-index:1"><img src="assets/badge-new-speech.svg" alt=""></span>
+          <span class="sticker" style="width:64px;height:64px;bottom:80px;right:20px;z-index:1"><img src="assets/shape-sparkle-4pt.svg" alt=""></span>
+          <div class="ob-card">
+            <span class="step">1 of 3</span>
+            <h3>Pick what<br>you sell</h3>
+            <p>This helps buyers find your shop and tunes your feed to your niche.</p>
+            <div class="nav"><span class="value" style="font-size:.8rem;color:var(--muted)">01 / 03</span>
+              <button class="next"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#f4f3ef" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone B3">
+      <div class="label"><b>B3</b> · Choice modal</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#fff"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <span class="sticker" style="width:80px;height:80px;top:54px;left:30px;z-index:1"><img src="assets/shape-sunstar-purple.svg" alt=""></span>
+          <div class="modal">
+            <div class="bubbles">
+              <img src="assets/badge-new-speech.svg" alt="" style="height:46px">
+            </div>
+            <h3>Choose a<br>payout method</h3>
+            <p>Pick how you want to get paid for this sale.</p>
+            <div class="opts">
+              <button class="btn purple full">Lightning ⚡</button>
+              <button class="btn full" style="background:var(--paper-pure);color:var(--ink);border-color:var(--ink)">On-chain</button>
+              <button class="pill" style="align-self:center;border:none;color:var(--muted)">Maybe later</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vhead">
+    <div>
+      <div class="vbadge">Variation C · original</div>
+      <div class="lead" style="margin-top:10px">Original — full-bleed pop</div>
+    </div>
+    <div class="meta">My own Sticker Brutalism take: a full-bleed accent product screen with the ink "buy / chat / more" control row, a letter-swap editorial feed, and a celebratory checkout with a drawn check.</div>
+  </div>
+  <div class="row">
+    <div class="phone C">
+      <div class="label"><b>C1</b> · Product (full-bleed)</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <div class="ctop"><div class="back">←</div><div class="back" style="background:var(--ink);color:#fff">♡</div></div>
+          <div class="prodimg" style="background-image:linear-gradient(135deg,#2a2a2a,#111)">
+            <span class="ph">DJ Mixer</span>
+            <span class="sticker" style="width:58px;height:58px;top:12px;right:12px"><img src="assets/badge-bff-star.svg" alt=""></span>
+          </div>
+          <div class="pbody">
+            <h2 class="title">Risograph zine —<br>"Soft Static" no.4</h2>
+            <div class="price">12,000 <span>sats</span></div>
+            <div class="seller">
+              <span class="av">E</span>
+              <div><div style="font-weight:700;font-size:.85rem">@ekko</div><div class="meta">★ 4.9 · 81 reviews · Berlin</div></div>
+              <button class="view">View →</button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <button class="buy">Buy now</button>
+            <button class="cc sbtn" title="Chat"><img src="assets/shape-daisy-yellow.svg" alt="chat"></button>
+            <button class="cc sbtn" title="More"><img src="assets/shape-sunstar-purple.svg" alt="more"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone C2">
+      <div class="label"><b>C2</b> · Feed (letter-swap)</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <div class="hero">
+            <span class="sticker" style="width:64px;height:64px;top:-8px;right:-6px"><img src="assets/shape-starburst.svg" alt=""></span>
+            <div class="lead-h">Find g<span class="swap"><img src="assets/shape-sunstar-yellow.svg" alt="o"></span><span class="swap"><img src="assets/shape-radial-disc.svg" alt="o"></span>ds<br>worth keeping</div>
+            <p style="color:#cfcbff;font-size:.84rem;margin-top:8px;font-family:var(--fm)">Circular. Bitcoin-native. Yours.</p>
+          </div>
+          <div class="feedcard">
+            <div class="img" style="background:var(--pink-soft)">Mug
+              <span class="sticker" style="width:46px;height:46px;bottom:8px;right:8px"><img src="assets/badge-love-heart.svg" alt=""></span>
+            </div>
+            <div class="fb"><div class="ttl">Hand-thrown stoneware mug</div><div class="r"><span class="pr">18,000 sats</span><span class="loc">Lisbon</span></div></div>
+          </div>
+          <div class="feedcard">
+            <div class="img" style="background:var(--green-soft)">Tee</div>
+            <div class="fb"><div class="ttl">Organic cotton tee</div><div class="r"><span class="pr">32,000 sats</span><span class="loc">Austin</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone C3">
+      <div class="label"><b>C3</b> · Paid (success)</div>
+      <div class="screen">
+        <div class="statusbar" style="color:#121212"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="scr-body">
+          <span class="sticker" style="width:78px;height:78px;top:60px;left:28px;z-index:1"><img src="assets/shape-sparkle-4pt.svg" alt=""></span>
+          <span class="sticker" style="width:60px;height:60px;top:120px;right:30px;z-index:1"><img src="assets/shape-daisy-yellow.svg" alt=""></span>
+          <div class="check" title="paid">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#25c26e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h2>Paid in<br>full ⚡</h2>
+          <div class="amt">- 12,000 sats</div>
+          <div class="receipt">
+            <div class="ln"><span style="color:var(--muted)">To</span><span>@ekko</span></div>
+            <div class="ln"><span style="color:var(--muted)">Item</span><span>Riso zine no.4</span></div>
+            <div class="ln"><span style="color:var(--muted)">Network</span><span>Lightning</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    SHOPSTR · Sticker Brutalism · 9 screens / 3 variations · assets in design/assets · Archivo Black / Space Grotesk / Space Mono
+  </footer>
+</div>
+    </template>
+  </div>
+</body>
+</html>
