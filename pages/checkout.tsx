@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { shake, tEnter } from "@/lib/motion";
+import { shake, tEnter, tExit } from "@/lib/motion";
 import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
@@ -23,9 +23,9 @@ const goStep = (router: ReturnType<typeof useRouter>, step: Step) =>
 const ic = "shrink-0";
 const Box = () => <Package className={ic} size={20} />;
 const Pin = () => <MapPin className={ic} size={20} />;
-const LockIcon = () => <Lock className={ic} size={16} />;
+const LockIcon = () => <Lock className={ic} size={14} />;
 const Bolt = () => <Lightning className={ic} size={18} />;
-const KeyIcon = () => <Key className={ic} size={16} />;
+const KeyIcon = () => <Key className={ic} size={14} />;
 const Spark = () => <Sparkle className={ic} size={16} />;
 
 /* ------------------------------------------------------------- primitives -- */
@@ -39,11 +39,21 @@ function Field({ label, invalid, children }: { label: string; invalid?: boolean;
     </label>
   );
 }
+/** The one CTA shape in this flow. Lives in the panel's docked footer. */
 function WideBtn({ children, onClick, disabled }: { children: ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
     <button onClick={onClick} disabled={disabled} className="ds-press w-full rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark disabled:opacity-40">
       {children}
     </button>
+  );
+}
+/** Fine print under a footer CTA. Tight leading: it is a caption, not prose. */
+function FootNote({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+  return (
+    <p className="mt-2.5 flex items-start gap-1.5 font-mono text-[0.62rem] leading-[1.35] text-text-subtle">
+      <span className="mt-px shrink-0">{icon}</span>
+      <span>{children}</span>
+    </p>
   );
 }
 function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string }) {
@@ -61,10 +71,10 @@ function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; o
 /** Review row: a labeled fact with an Edit link back into its step. */
 function ReviewRow({ label, onEdit, children }: { label: string; onEdit?: () => void; children: ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b-2 border-paper-2 py-2.5 text-[0.9rem]">
+    <div className="flex items-start justify-between gap-3 border-b-2 border-paper-2 py-3 text-[0.9rem]">
       <div className="min-w-0">
         <div className="font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">{label}</div>
-        <div className="mt-0.5">{children}</div>
+        <div className="mt-0.5 leading-snug">{children}</div>
       </div>
       {onEdit && (
         <button onClick={onEdit} className="ds-press shrink-0 font-mono text-[0.7rem] font-bold text-purple underline">
@@ -75,10 +85,14 @@ function ReviewRow({ label, onEdit, children }: { label: string; onEdit?: () => 
   );
 }
 
-const slide = {
-  enter: (d: number) => ({ x: d > 0 ? 26 : -26, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (d: number) => ({ x: d > 0 ? -26 : 26, opacity: 0 }),
+/* Step change = a content crossfade with a short rise, per the motion system
+   (tEnter in, tExit out). Deliberately NOT a horizontal slide with popLayout:
+   that fought the panel's own layout animation and read as a lurch. The panel
+   is now fixed-height, so only the content inside it moves. */
+const stepMotion = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0, transition: tEnter },
+  exit: { opacity: 0, y: -6, transition: tExit },
 };
 
 export default function Checkout() {
@@ -95,20 +109,23 @@ export default function Checkout() {
       : cart.items.reduce((s, i) => s + (i.product.shippingCost ?? 0), 0);
   const total = cart.subtotal + shipping;
 
-  // Direction for the slide: compare this step's index with the previous render's.
-  const prevIdx = useRef(0);
   const idx = INDEX[step] ?? 0;
-  const dir = idx >= prevIdx.current ? 1 : -1;
-  prevIdx.current = idx;
 
-  // Edge case: nothing to check out.
+  // Each step change scrolls the panel's scroll region back to the top.
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const region = scrollRef.current?.closest(".overflow-y-auto");
+    if (region) region.scrollTop = 0;
+  }, [step]);
+
+  // Edge case: nothing to check out. No context header, so the plain card layout.
   if (cart.count === 0) {
     return (
       <>
         <Head><title>Checkout · Shopstr</title></Head>
         <OneWayFrame tone="purple" step="Checkout" closeTo="/marketplace">
           <FlowLead>Nothing to pay for</FlowLead>
-          <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Your cart<br />is empty</h3>
+          <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Your cart<br />is empty</h3>
           <p className="mt-2 text-[0.92rem] text-text-muted">Add something worth keeping, then come back to check out in sats.</p>
           <Link href="/marketplace" className="ds-press mt-4 block w-full rounded-pill border-2 border-ink bg-ink py-3.5 text-center font-bold text-text-on-dark">
             Browse the market
@@ -127,6 +144,171 @@ export default function Checkout() {
     pay: "/checkout?step=review",
   };
 
+  /* ---- Step content and its docked footer, chosen together. ---- */
+
+  let body: ReactNode = null;
+  let footer: ReactNode = null;
+
+  if (step === "type") {
+    body = (
+      <>
+        <FlowLead>Step 1 of 5 · fulfilment</FlowLead>
+        <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Ship it or<br />pick it up?</h3>
+        <div className="mt-4 flex flex-col gap-2.5">
+          <OptCard selected={draft.fulfilment === "ship"} onClick={() => set("fulfilment", "ship")} icon={<Box />} title="Ship to me" sub="Enter an address · tracked delivery" />
+          <OptCard selected={draft.fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Local pickup" sub="Arrange a spot over DM · no shipping cost" />
+        </div>
+      </>
+    );
+    footer = <WideBtn onClick={() => goStep(router, draft.fulfilment === "pickup" ? "pickup" : "ship")}>Continue →</WideBtn>;
+  }
+
+  if (step === "ship") {
+    return (
+      <>
+        <Head><title>Checkout · Shopstr</title></Head>
+        <ShipStep
+          idx={idx}
+          closeTo={prevHref.ship}
+          summary={<CheckoutSummary items={cart.items} shipping={shipping} fulfilment={draft.fulfilment} />}
+        />
+      </>
+    );
+  }
+
+  if (step === "pickup") {
+    body = (
+      <>
+        <FlowLead>Step 2 of 5 · pickup details</FlowLead>
+        <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">How to<br />reach you</h3>
+        <div className="mt-4 flex flex-col gap-3">
+          <Field label="Display name"><input className={`${inputBase} border-ink focus:border-purple`} value={draft.name} onChange={(e) => set("name", e.target.value)} /></Field>
+          <Field label="Note to seller (optional)"><textarea rows={3} className={`${inputBase} border-ink focus:border-purple`} value={draft.note} onChange={(e) => set("note", e.target.value)} placeholder="Can pick up evenings near Görlitzer Park." /></Field>
+          <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem] leading-snug"><span className="mt-0.5"><Spark /></span><span>You&apos;ll agree a time and place with the seller in an encrypted DM after payment.</span></div>
+        </div>
+      </>
+    );
+    footer = <WideBtn onClick={() => goStep(router, "account")}>Continue →</WideBtn>;
+  }
+
+  if (step === "account") {
+    body = (
+      <>
+        <FlowLead>Step 3 of 5 · secure your account</FlowLead>
+        <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Save your<br />account</h3>
+        <p className="mt-2 text-[0.92rem] leading-snug text-text-muted">A key was created for you in the background. Set a passphrase so you can get back to your orders and sats on any device.</p>
+        <div className="mt-4 flex flex-col gap-3">
+          <Field label="Passphrase"><input type="password" defaultValue="············" className={`${inputBase} border-ink focus:border-purple`} /></Field>
+          <div className="flex items-center gap-1.5 font-mono text-[0.72rem] text-text-muted"><KeyIcon /> npub1ekko…q8r7</div>
+        </div>
+      </>
+    );
+    footer = (
+      <>
+        <WideBtn onClick={() => goStep(router, "review")}>Save &amp; continue →</WideBtn>
+        <button onClick={() => goStep(router, "review")} className="ds-press mx-auto mt-2.5 block font-mono text-[0.72rem] font-bold text-text-muted underline">
+          Skip for now
+        </button>
+      </>
+    );
+  }
+
+  if (step === "review") {
+    body = (
+      <>
+        <FlowLead>Step 4 of 5 · check everything</FlowLead>
+        <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">One last<br />look</h3>
+        <div className="mt-3">
+          {draft.fulfilment === "pickup" ? (
+            <ReviewRow label="Local pickup" onEdit={() => goStep(router, "pickup")}>
+              <span className="font-bold">{draft.name || "No name yet"}</span>
+              {draft.note && <span className="block text-[0.82rem] text-text-muted">&ldquo;{draft.note}&rdquo;</span>}
+            </ReviewRow>
+          ) : (
+            <ReviewRow label="Ships to" onEdit={() => goStep(router, "ship")}>
+              <span className="font-bold">{draft.name || "No name yet"}</span>
+              <span className="block text-[0.82rem] text-text-muted">
+                {[draft.address, draft.city, draft.zip].filter(Boolean).join(", ") || "No address yet"}
+              </span>
+            </ReviewRow>
+          )}
+          <ReviewRow label="Account" onEdit={() => goStep(router, "account")}>
+            <span className="inline-flex items-center gap-1.5 font-mono text-[0.84rem]"><KeyIcon /> npub1ekko…q8r7</span>
+          </ReviewRow>
+          <ReviewRow label="Payment">
+            <span className="font-bold">{draft.pay === "cashu" ? "Cashu token" : "Lightning"}</span>
+            <span className="block text-[0.82rem] text-text-muted">Chosen on the next step</span>
+          </ReviewRow>
+
+          {/* The items again, in full. This is the last look before money moves,
+              so the goods are stated outright rather than left in the collapsed
+              header. Doubles as the content that fills the fixed-height panel. */}
+          <div className="border-b-2 border-paper-2 py-3">
+            <div className="font-mono text-[0.62rem] uppercase tracking-[0.1em] text-text-subtle">
+              {cart.count} item{cart.count === 1 ? "" : "s"}
+            </div>
+            <ul className="mt-2 flex flex-col gap-2.5">
+              {cart.items.map((i) => (
+                <li key={i.product.id + (i.size ?? "")} className="flex items-center gap-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={i.product.images[0]} alt="" className="h-10 w-10 shrink-0 rounded-lg border-2 border-ink object-cover" />
+                  <div className="min-w-0 flex-1 leading-tight">
+                    <div className="truncate text-[0.86rem] font-bold">{i.product.title}</div>
+                    <div className="font-mono text-[0.64rem] text-text-subtle">
+                      @{i.product.pubkey.replace("pk_", "")} · ×{i.quantity}
+                      {i.size ? ` · ${i.size}` : ""}
+                    </div>
+                  </div>
+                  <span className="shrink-0 font-mono text-[0.82rem] tabular-nums">{groupInt(i.product.price * i.quantity)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex justify-between py-2 text-[0.86rem]">
+            <span className="text-text-muted">Subtotal</span>
+            <span className="font-mono tabular-nums">{groupInt(cart.subtotal)} sats</span>
+          </div>
+          <div className="flex justify-between pb-2 text-[0.86rem]">
+            <span className="text-text-muted">{draft.fulfilment === "pickup" ? "Local pickup" : "Shipping"}</span>
+            <span className="font-mono tabular-nums">{shipping === 0 ? "free" : `${groupInt(shipping)} sats`}</span>
+          </div>
+          <div className="flex items-baseline justify-between border-t-2 border-ink pt-3">
+            <span className="font-bold">Total</span>
+            <span className="font-mono text-lg font-bold tabular-nums">
+              {groupInt(total)} <span className="text-xs font-normal text-text-muted">sats</span>
+            </span>
+          </div>
+        </div>
+      </>
+    );
+    footer = (
+      <>
+        <WideBtn onClick={() => goStep(router, "pay")}>
+          <span className="inline-flex items-center gap-2">Pay {groupInt(total)} sats <Bolt /></span>
+        </WideBtn>
+        <FootNote icon={<LockIcon />}>Paying places the order. Your details go to the seller as an encrypted DM.</FootNote>
+      </>
+    );
+  }
+
+  if (step === "pay") {
+    return (
+      <>
+        <Head><title>Checkout · Shopstr</title></Head>
+        <PayStep
+          idx={idx}
+          closeTo={prevHref.pay}
+          total={total}
+          pay={draft.pay}
+          onPay={(p) => set("pay", p)}
+          onPaid={() => router.push("/paid")}
+          summary={<CheckoutSummary items={cart.items} shipping={shipping} fulfilment={draft.fulfilment} />}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <Head><title>Checkout · Shopstr</title></Head>
@@ -136,124 +318,25 @@ export default function Checkout() {
         current={idx + 1}
         total={5}
         closeTo={prevHref[step]}
-        aside={<CheckoutSummary items={cart.items} shipping={shipping} fulfilment={draft.fulfilment} />}
+        header={<CheckoutSummary items={cart.items} shipping={shipping} fulfilment={draft.fulfilment} />}
+        footer={footer}
       >
-        <AnimatePresence mode="popLayout" custom={dir} initial={false}>
-          <motion.div
-            key={step}
-            custom={dir}
-            variants={slide}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={tEnter}
-          >
-            {step === "type" && (
-              <>
-                <FlowLead>Step 1 of 5 · fulfilment</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Ship it or<br />pick it up?</h3>
-                <div className="mt-4 flex flex-col gap-2.5">
-                  <OptCard selected={draft.fulfilment === "ship"} onClick={() => set("fulfilment", "ship")} icon={<Box />} title="Ship to me" sub="Enter an address · tracked delivery" />
-                  <OptCard selected={draft.fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Local pickup" sub="Arrange a spot over DM · no shipping cost" />
-                </div>
-                <div className="mt-4">
-                  <WideBtn onClick={() => goStep(router, draft.fulfilment === "pickup" ? "pickup" : "ship")}>Continue →</WideBtn>
-                </div>
-              </>
-            )}
-
-            {step === "ship" && <ShipStep />}
-
-            {step === "pickup" && (
-              <>
-                <FlowLead>Step 2 of 5 · pickup details</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">How to<br />reach you</h3>
-                <div className="mt-4 flex flex-col gap-3">
-                  <Field label="Display name"><input className={`${inputBase} border-ink focus:border-purple`} value={draft.name} onChange={(e) => set("name", e.target.value)} /></Field>
-                  <Field label="Note to seller (optional)"><textarea rows={3} className={`${inputBase} border-ink focus:border-purple`} value={draft.note} onChange={(e) => set("note", e.target.value)} placeholder="Can pick up evenings near Görlitzer Park." /></Field>
-                  <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><Spark /></span><span>You&apos;ll agree a time and place with the seller in an encrypted DM after payment.</span></div>
-                  <WideBtn onClick={() => goStep(router, "account")}>Continue →</WideBtn>
-                </div>
-              </>
-            )}
-
-            {step === "account" && (
-              <>
-                <FlowLead>Step 3 of 5 · secure your account</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Save your<br />account</h3>
-                <p className="mt-2 text-[0.92rem] text-text-muted">A key was created for you in the background. Set a passphrase so you can get back to your orders and sats on any device.</p>
-                <div className="mt-4 flex flex-col gap-3">
-                  <Field label="Passphrase"><input type="password" defaultValue="············" className={`${inputBase} border-ink focus:border-purple`} /></Field>
-                  <WideBtn onClick={() => goStep(router, "review")}>Save &amp; continue →</WideBtn>
-                  <button onClick={() => goStep(router, "review")} className="ds-press mx-auto font-mono text-[0.72rem] font-bold text-text-muted underline">
-                    Skip for now
-                  </button>
-                </div>
-                <div className="mt-3 flex items-center justify-end font-mono text-sm text-text-muted">
-                  <span className="inline-flex items-center gap-1.5"><KeyIcon /> npub1ekko…q8r7</span>
-                </div>
-              </>
-            )}
-
-            {step === "review" && (
-              <>
-                <FlowLead>Step 4 of 5 · check everything</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">One last<br />look</h3>
-                <div className="mt-3">
-                  {draft.fulfilment === "pickup" ? (
-                    <ReviewRow label="Local pickup" onEdit={() => goStep(router, "pickup")}>
-                      <span className="font-bold">{draft.name || "No name yet"}</span>
-                      {draft.note && <span className="block text-[0.82rem] text-text-muted">&ldquo;{draft.note}&rdquo;</span>}
-                    </ReviewRow>
-                  ) : (
-                    <ReviewRow label="Ships to" onEdit={() => goStep(router, "ship")}>
-                      <span className="font-bold">{draft.name || "No name yet"}</span>
-                      <span className="block text-[0.82rem] text-text-muted">
-                        {[draft.address, draft.city, draft.zip].filter(Boolean).join(", ") || "No address yet"}
-                      </span>
-                    </ReviewRow>
-                  )}
-                  <ReviewRow label="Account" onEdit={() => goStep(router, "account")}>
-                    <span className="inline-flex items-center gap-1.5 font-mono text-[0.84rem]"><KeyIcon /> npub1ekko…q8r7</span>
-                  </ReviewRow>
-                  <div className="flex items-baseline justify-between py-3">
-                    <span className="font-bold">Total</span>
-                    <span className="font-mono text-lg font-bold tabular-nums">
-                      {groupInt(total)} <span className="text-xs font-normal text-text-muted">sats</span>
-                    </span>
-                  </div>
-                </div>
-                <WideBtn onClick={() => goStep(router, "pay")}>
-                  <span className="inline-flex items-center gap-2">Pay {groupInt(total)} sats <Bolt /></span>
-                </WideBtn>
-                <p className="mt-3 flex items-start gap-1.5 font-mono text-[0.62rem] leading-relaxed text-text-subtle">
-                  <LockIcon />
-                  Paying places the order. Your details go to the seller as an encrypted DM.
-                </p>
-              </>
-            )}
-
-            {step === "pay" && (
-              <>
-                <FlowLead>Step 5 of 5 · payment</FlowLead>
-                <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Pay<br />in sats</h3>
-                <PayStep
-                  total={total}
-                  pay={draft.pay}
-                  onPay={(p) => set("pay", p)}
-                  onPaid={() => router.push("/paid")}
-                />
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
+        <div ref={scrollRef}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={step} variants={stepMotion} initial="initial" animate="animate" exit="exit">
+              {body}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </OneWayFrame>
     </>
   );
 }
 
-/* Shipping step with field validation + a shake on invalid submit (edge case). */
-function ShipStep() {
+/* Shipping step with field validation + a shake on invalid submit (edge case).
+   Owns its own frame so the shake can move the panel and the CTA can live in
+   the docked footer while `submit` stays local. */
+function ShipStep({ idx, closeTo, summary }: { idx: number; closeTo: string; summary: ReactNode }) {
   const router = useRouter();
   const { draft, set } = useCheckout();
   const controls = useAnimationControls();
@@ -277,27 +360,53 @@ function ShipStep() {
   };
 
   return (
-    <motion.div animate={controls}>
-      <FlowLead>Step 2 of 5 · where to</FlowLead>
-      <h3 className="ds-display mt-2 text-2xl leading-[0.95]">Shipping<br />address</h3>
-      <div className="mt-4 flex flex-col gap-3">
-        <Field label="Full name" invalid={errs.name}><input className={fieldCls("name")} value={draft.name} onChange={(e) => { set("name", e.target.value); setErrs((p) => ({ ...p, name: false })); }} /></Field>
-        <Field label="Address" invalid={errs.address}><input className={fieldCls("address")} value={draft.address} onChange={(e) => { set("address", e.target.value); setErrs((p) => ({ ...p, address: false })); }} /></Field>
-        <div className="flex gap-2.5">
-          <div className="flex-1"><Field label="City" invalid={errs.city}><input className={fieldCls("city")} value={draft.city} onChange={(e) => { set("city", e.target.value); setErrs((p) => ({ ...p, city: false })); }} /></Field></div>
-          <div className="w-28"><Field label="Postcode" invalid={errs.zip}><input className={fieldCls("zip")} value={draft.zip} onChange={(e) => { set("zip", e.target.value); setErrs((p) => ({ ...p, zip: false })); }} /></Field></div>
+    <OneWayFrame
+      tone="purple"
+      step="Checkout"
+      current={idx + 1}
+      total={5}
+      closeTo={closeTo}
+      header={summary}
+      footer={<WideBtn onClick={submit}>Continue →</WideBtn>}
+    >
+      <motion.div animate={controls}>
+        <FlowLead>Step 2 of 5 · where to</FlowLead>
+        <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Shipping<br />address</h3>
+        <div className="mt-4 flex flex-col gap-3">
+          <Field label="Full name" invalid={errs.name}><input className={fieldCls("name")} value={draft.name} onChange={(e) => { set("name", e.target.value); setErrs((p) => ({ ...p, name: false })); }} /></Field>
+          <Field label="Address" invalid={errs.address}><input className={fieldCls("address")} value={draft.address} onChange={(e) => { set("address", e.target.value); setErrs((p) => ({ ...p, address: false })); }} /></Field>
+          <div className="flex gap-2.5">
+            <div className="flex-1"><Field label="City" invalid={errs.city}><input className={fieldCls("city")} value={draft.city} onChange={(e) => { set("city", e.target.value); setErrs((p) => ({ ...p, city: false })); }} /></Field></div>
+            <div className="w-28"><Field label="Postcode" invalid={errs.zip}><input className={fieldCls("zip")} value={draft.zip} onChange={(e) => { set("zip", e.target.value); setErrs((p) => ({ ...p, zip: false })); }} /></Field></div>
+          </div>
+          <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem] leading-snug"><span className="mt-0.5"><LockIcon /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
         </div>
-        <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem]"><span className="mt-0.5"><LockIcon /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
-        <WideBtn onClick={submit}>Continue →</WideBtn>
-      </div>
-    </motion.div>
+      </motion.div>
+    </OneWayFrame>
   );
 }
 
 /* Lightning QR with a live countdown, an explicit EXPIRED state + regenerate
    (edge case), and a brief "confirming payment" transient after "I've paid".
-   Terminal: confirming resolves into /paid via onPaid. */
-function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning" | "cashu"; onPay: (p: "lightning" | "cashu") => void; onPaid: () => void }) {
+   Terminal: confirming resolves into /paid via onPaid. Owns its frame so the
+   confirming state can replace the whole panel body and footer. */
+function PayStep({
+  idx,
+  closeTo,
+  total,
+  pay,
+  onPay,
+  onPaid,
+  summary,
+}: {
+  idx: number;
+  closeTo: string;
+  total: number;
+  pay: "lightning" | "cashu";
+  onPay: (p: "lightning" | "cashu") => void;
+  onPaid: () => void;
+  summary: ReactNode;
+}) {
   const [secs, setSecs] = useState(298);
   const [expired, setExpired] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -326,17 +435,35 @@ function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning
 
   if (confirming) {
     return (
-      <div className="flex flex-col items-center gap-3 py-8">
-        <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, ease: "linear", duration: 0.9 }} className="grid h-12 w-12 place-items-center rounded-full border-[3px] border-ink border-t-transparent" />
-        <div className="font-bold">Confirming payment…</div>
-        <p className="text-center text-[0.84rem] text-text-muted">Waiting for the network to confirm. This is usually instant.</p>
-      </div>
+      <OneWayFrame tone="purple" step="Checkout" current={idx + 1} total={5} header={summary}>
+        <div className="flex flex-col items-center gap-3 py-10">
+          <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, ease: "linear", duration: 0.9 }} className="grid h-12 w-12 place-items-center rounded-full border-[3px] border-ink border-t-transparent" />
+          <div className="font-bold">Confirming payment…</div>
+          <p className="text-center text-[0.84rem] leading-snug text-text-muted">Waiting for the network to confirm. This is usually instant.</p>
+        </div>
+      </OneWayFrame>
     );
   }
 
   return (
-    <div className="mt-3">
-      <div className="flex overflow-hidden rounded-pill border-2 border-ink">
+    <OneWayFrame
+      tone="purple"
+      step="Checkout"
+      current={idx + 1}
+      total={5}
+      closeTo={closeTo}
+      header={summary}
+      footer={
+        <>
+          <WideBtn onClick={pay_} disabled={pay === "lightning" && expired}>I&apos;ve paid →</WideBtn>
+          <FootNote icon={<LockIcon />}>Paid peer-to-peer in sats. Nothing is held by Shopstr.</FootNote>
+        </>
+      }
+    >
+      <FlowLead>Step 5 of 5 · payment</FlowLead>
+      <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Pay<br />in sats</h3>
+
+      <div className="mt-4 flex overflow-hidden rounded-pill border-2 border-ink">
         {(["lightning", "cashu"] as const).map((p) => (
           <button key={p} onClick={() => onPay(p)} className={`flex-1 py-3 font-bold ${pay === p ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
             {p === "lightning" ? (
@@ -354,7 +481,7 @@ function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning
 
       {pay === "lightning" ? (
         <div className="mt-3">
-          <div className="relative mx-auto h-[200px] w-[200px]">
+          <div className="relative mx-auto h-[190px] w-[190px]">
             <div
               className={`grid h-full w-full place-items-center rounded-lg border-2 border-ink transition-[filter,opacity] duration-(--ds-dur-moderate) ${expired ? "opacity-30 blur-[2px]" : ""}`}
               style={{ background: "conic-gradient(from 0deg,#121212 0 25%,#fff 0 50%,#121212 0 75%,#fff 0),repeating-conic-gradient(#121212 0 12.5%,#fff 0 25%)", backgroundSize: "24px 24px" }}
@@ -371,7 +498,7 @@ function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning
           {expired ? (
             <div className="mt-3 text-center">
               <div className="font-mono font-bold text-red">Invoice expired</div>
-              <p className="mt-1 text-[0.82rem] text-text-muted">Refreshing automatically, or generate one now.</p>
+              <p className="mt-1 text-[0.82rem] leading-snug text-text-muted">Refreshing automatically, or generate one now.</p>
               <button onClick={regen} className="ds-press mt-2.5 inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5 font-bold">
                 <ArrowsClockwise size={16} />
                 Generate fresh invoice
@@ -380,20 +507,16 @@ function PayStep({ total, pay, onPay, onPaid }: { total: number; pay: "lightning
           ) : (
             <>
               <div className="mt-2.5 text-center font-mono font-bold tabular-nums">Invoice expires in {`0${mm}:${ss}`}</div>
-              <p className="mt-1.5 text-center text-[0.84rem] text-text-muted">Scan with any Lightning wallet. Auto-confirms on payment.</p>
+              <p className="mt-1.5 text-center text-[0.84rem] leading-snug text-text-muted">Scan with any Lightning wallet. Auto-confirms on payment.</p>
             </>
           )}
         </div>
       ) : (
         <div className="mt-3">
           <textarea rows={4} placeholder="Paste your Cashu token (cashuA…)" className="w-full resize-none rounded-lg border-2 border-dashed border-ink bg-paper-pure p-3.5 font-mono text-[0.8rem] text-text-muted outline-none" />
-          <p className="mt-2 text-[0.84rem] text-text-muted">We&apos;ll redeem the token at the seller&apos;s mint and confirm instantly.</p>
+          <p className="mt-2 text-[0.84rem] leading-snug text-text-muted">We&apos;ll redeem the token at the seller&apos;s mint and confirm instantly.</p>
         </div>
       )}
-
-      <button onClick={pay_} disabled={pay === "lightning" && expired} className="ds-press mt-4 w-full rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark disabled:opacity-40">
-        I&apos;ve paid →
-      </button>
-    </div>
+    </OneWayFrame>
   );
 }

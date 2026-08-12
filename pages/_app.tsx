@@ -12,10 +12,12 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   return (
     <AppProviders>
-      {/* Every Phosphor icon defaults to the duotone weight and inherits the
-          current text color + font size (1em). Per-icon size/color overrides
-          still win. Set once here so the whole app is consistent. */}
-      <IconContext.Provider value={{ weight: "duotone", color: "currentColor", size: "1em" }}>
+      {/* Every Phosphor icon defaults to the regular weight and inherits the
+          current text color + font size (1em). Per-icon size/color/weight
+          overrides still win. Regular, not duotone: duotone's second tone
+          reads as a rendering artifact on functional glyphs (close, chevron,
+          caret) where a single clean stroke is what the control needs. */}
+      <IconContext.Provider value={{ weight: "regular", color: "currentColor", size: "1em" }}>
       {/* reducedMotion="user" makes every framer animation respect the OS setting.
           Default transition is the 140ms/smooth workhorse from lib/motion. */}
       <MotionConfig reducedMotion="user" transition={tFast}>
