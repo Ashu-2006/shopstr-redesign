@@ -34,7 +34,7 @@
   --ds-line: #121212;         /* stroke color = ink (used at low width) */
   --ds-line-soft: rgba(18, 18, 18, 0.12);
 
-  /* Text — neutral greys on the same cool hue as the paper ramp, so body copy
+  /* Text: neutral greys on the same cool hue as the paper ramp, so body copy
      never reads olive against the background. */
   --ds-text: #121212;         /* mostly black */
   --ds-text-muted: #5b5f66;
