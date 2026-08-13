@@ -37,7 +37,7 @@ export function InboxList({
           >
             <span className="relative shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={t.counterpartyPicture} alt="" className="h-12 w-12 rounded-[13px] border-2 border-ink object-cover" />
+              <img src={t.counterpartyPicture} alt="" className="h-12 w-12 rounded-[8px] border-2 border-ink object-cover" />
               {t.productImage && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -65,7 +65,7 @@ export function InboxList({
             <div className="flex shrink-0 flex-col items-end gap-1.5">
               <span className="font-mono text-[0.64rem] text-text-subtle">{timeAgo(t.lastMessageAt, now)}</span>
               {unread && (
-                <span className="grid min-w-5 place-items-center rounded-[9px] bg-purple px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">
+                <span className="grid min-w-5 place-items-center rounded-[6px] bg-purple px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-on-purple tabular-nums">
                   {t.unread}
                 </span>
               )}

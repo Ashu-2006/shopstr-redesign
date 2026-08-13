@@ -70,7 +70,7 @@ export default function Shop() {
         <div className="mx-auto max-w-[1100px] px-4 pb-1">
           <div className="flex items-end gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={profile.picture} alt="" className="-mt-11 h-[74px] w-[74px] rounded-[18px] border-2 border-ink object-cover md:-mt-14 md:h-[92px] md:w-[92px]" />
+            <img src={profile.picture} alt="" className="-mt-11 h-[74px] w-[74px] rounded-[8px] border-2 border-ink object-cover md:-mt-14 md:h-[92px] md:w-[92px]" />
             {/* Mobile: Follow rides the avatar row. md+: it docks beside the
                 name, so the action stays with the identity it acts on. */}
             <button

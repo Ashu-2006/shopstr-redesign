@@ -77,7 +77,7 @@ export function SellerCardSkeleton() {
   return (
     <div className="flex w-[212px] shrink-0 snap-start flex-col gap-3.5 rounded-xl border-2 border-ink bg-paper-pure p-4">
       <div className="flex items-start justify-between">
-        <Skeleton shape="rect" w={56} h={56} className="!rounded-[15px]" />
+        <Skeleton shape="rect" w={56} h={56} className="!rounded-[8px]" />
         <Skeleton shape="rect" w={62} h={30} className="!rounded-pill" />
       </div>
       <div>

@@ -13,7 +13,7 @@ export default function Payout() {
       onClick={() => setPayout(value)}
       className={`ds-press flex items-center gap-3 rounded-lg border-2 border-ink p-3.5 text-left ${payout === value ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}
     >
-      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[10px] text-lg ${value === "shopstr" ? "bg-green text-ink" : "border-2 border-current"}`}><IconGlyph size={20} /></span>
+      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[8px] text-lg ${value === "shopstr" ? "bg-green text-ink" : "border-2 border-current"}`}><IconGlyph size={20} /></span>
       <span>
         <span className="font-bold">
           {title}

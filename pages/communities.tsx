@@ -110,7 +110,7 @@ export default function Communities() {
                           href={`/communities/${e.community.slug}/queue`}
                           className="ds-press flex items-center gap-3 rounded-xl border-2 border-ink bg-yellow p-3.5"
                         >
-                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] border-2 border-ink bg-paper-pure">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure">
                             {CIcon && <CIcon size={20} />}
                           </span>
                           <div className="min-w-0 flex-1">
@@ -196,7 +196,7 @@ export default function Communities() {
                   return (
                     <li key={e.community.slug}>
                       <Link href={`/communities/${e.community.slug}`} className="flex items-center gap-2.5">
-                        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[11px] border-2 border-ink ${TONE[e.community.tone]}`}>
+                        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[8px] border-2 border-ink ${TONE[e.community.tone]}`}>
                           {CIcon && <CIcon size={17} />}
                         </span>
                         <div className="min-w-0 flex-1">

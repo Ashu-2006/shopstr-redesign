@@ -77,7 +77,7 @@ export default function NewCommunity() {
       <main className="mx-auto max-w-[560px] px-4 pb-28 pt-3 md:pb-12">
         {/* Live preview: the tile they are about to make. */}
         <div className={`flex items-center gap-3.5 rounded-xl border-2 border-ink p-4 ${TONE_BG[tone]} ${tone === "purple" ? "text-on-purple" : "text-ink"}`}>
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-[16px] border-2 border-ink bg-paper-pure text-ink">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-ink">
             {ActiveIcon && <ActiveIcon size={28} />}
           </span>
           <div className="min-w-0">
@@ -128,7 +128,7 @@ export default function NewCommunity() {
                   onClick={() => setIcon(key)}
                   aria-label={key}
                   aria-pressed={icon === key}
-                  className={`ds-press grid h-12 w-12 place-items-center rounded-[14px] border-2 ${
+                  className={`ds-press grid h-12 w-12 place-items-center rounded-[8px] border-2 ${
                     icon === key ? "border-purple bg-purple-soft" : "border-ink bg-paper-pure"
                   }`}
                 >

@@ -226,7 +226,7 @@ export function SellerCard({
     >
       <div className="flex items-start justify-between">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={profile.picture} alt="" className="h-14 w-14 rounded-[15px] border-2 border-ink object-cover" />
+        <img src={profile.picture} alt="" className="h-14 w-14 rounded-[8px] border-2 border-ink object-cover" />
         <span className="inline-flex items-center gap-1 rounded-pill bg-ink px-2.5 py-1.5 font-mono text-[0.74rem] font-bold text-white tabular-nums">
           <Star weight="fill" size={13} aria-hidden />
           {avg.toFixed(1)}

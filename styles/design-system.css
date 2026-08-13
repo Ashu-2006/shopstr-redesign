@@ -123,12 +123,15 @@
   --ds-space-24: 6rem;
 
   /* -------------------------------------------------------------- RADIUS --
-     The chunky-squircle + pill language. Big radii are the brand. */
-  --ds-radius-sm: 0.5rem;
-  --ds-radius-md: 0.875rem;
-  --ds-radius-lg: 1.25rem;
-  --ds-radius-xl: 1.75rem;
-  --ds-radius-2xl: 2.25rem;
+     Squircles and pills are still the language, but restrained: the scale was
+     pulled in ~25-30% because oversized radii on large surfaces (cards, panels,
+     sheets) read soft/toy rather than premium. Ratios between steps are kept so
+     concentric radius (inner = outer - padding) still lands. */
+  --ds-radius-sm: 0.375rem;
+  --ds-radius-md: 0.625rem;
+  --ds-radius-lg: 0.875rem;
+  --ds-radius-xl: 1.25rem;
+  --ds-radius-2xl: 1.625rem;
   --ds-radius-pill: 999px;
   --ds-radius-circle: 50%;
 

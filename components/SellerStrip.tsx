@@ -21,11 +21,11 @@ export function SellerStrip({
         <img
           src={profile.picture}
           alt=""
-          className="h-11 w-11 shrink-0 rounded-[11px] object-cover"
+          className="h-11 w-11 shrink-0 rounded-[8px] object-cover"
           style={{ outline: "1px solid rgba(255,255,255,0.1)", outlineOffset: "-1px" }}
         />
       ) : (
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[11px] bg-yellow text-ink ds-display">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] bg-yellow text-ink ds-display">
           {initial}
         </span>
       )}

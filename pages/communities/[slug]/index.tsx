@@ -90,7 +90,7 @@ export default function CommunityDetail() {
         <div className="border-b-2 border-ink bg-paper-pure">
           <div className="mx-auto max-w-[1100px] px-4 py-4">
             <div className="flex items-center gap-3.5">
-              <Skeleton shape="rect" w={56} h={56} className="!rounded-[16px]" />
+              <Skeleton shape="rect" w={56} h={56} className="!rounded-[6px]" />
               <div className="flex-1">
                 <Skeleton shape="line" w="45%" h="1.5rem" />
                 <Skeleton shape="line" w={190} className="mt-2" />
@@ -139,7 +139,7 @@ export default function CommunityDetail() {
             >
               <CaretLeft size={17} weight="bold" />
             </button>
-            <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-[16px] border-2 border-ink ${TONE[comm.tone]}`}>
+            <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-[6px] border-2 border-ink ${TONE[comm.tone]}`}>
               {CommIcon && <CommIcon size={28} />}
             </div>
             <div className="min-w-0 flex-1">

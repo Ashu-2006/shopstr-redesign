@@ -50,10 +50,10 @@ function QuotedCard({ pid, onDark }: { pid: string; onDark: boolean }) {
   return (
     <Link
       href={`/listing/${product.id}`}
-      className={`mb-2 flex items-center gap-2.5 rounded-[10px] p-2 ${onDark ? "bg-black/15" : "bg-paper-2"}`}
+      className={`mb-2 flex items-center gap-2.5 rounded-[8px] p-2 ${onDark ? "bg-black/15" : "bg-paper-2"}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={product.images[0]} alt="" className="h-10 w-10 rounded-[7px] border-2 border-ink object-cover" />
+      <img src={product.images[0]} alt="" className="h-10 w-10 rounded-[6px] border-2 border-ink object-cover" />
       <div className="min-w-0">
         <div className="truncate text-[0.8rem] font-bold">{product.title}</div>
         <div className="font-mono text-[0.72rem] tabular-nums">{groupInt(product.price)} sats</div>
@@ -310,7 +310,7 @@ export default function Thread() {
                 {showReviewPrompt && (
                   <div className={`mt-4 flex flex-col gap-2.5 self-center w-full max-w-[440px] rounded-xl border-2 border-ink bg-paper-pure p-3.5 ${snoozed ? "opacity-50" : ""}`}>
                     <div className="flex items-center gap-2 font-bold">
-                      <span className="grid h-7 w-7 place-items-center rounded-[9px] border-2 border-ink bg-yellow"><Star weight="fill" size={16} /></span>
+                      <span className="grid h-7 w-7 place-items-center rounded-[6px] border-2 border-ink bg-yellow"><Star weight="fill" size={16} /></span>
                       Did your order arrive?
                     </div>
                     <p className="text-[0.84rem] text-text-muted">

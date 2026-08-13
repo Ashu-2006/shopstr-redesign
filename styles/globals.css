@@ -413,22 +413,25 @@ select:focus-visible {
    - Drop decorative image outlines and ink "hairline" gap fills.
    ========================================================================== */
 body.soft-sep {
-  /* deeper grey page so paper-pure (#fff) surfaces pop by contrast. Same
-     true-neutral axis as the default ramp, just two steps heavier. */
-  --ds-paper: #dedede;
-  /* paper-2/-3 sit deeper still so empty media wells separate from BOTH the
-     white cards above them and the page behind them (the listing gallery reads
-     as a real surface even before its image loads) */
-  --ds-paper-2: #cacaca;
-  --ds-paper-3: #b8b8b8;
+  /* THIS IS THE SHIPPING PALETTE: _document.tsx sets .soft-sep on <body>, so
+     these values (not the :root defaults) are what the app renders.
+     A restrained grey page, only one step off white, so paper-pure (#fff)
+     surfaces still separate by fill weight without the page reading heavy or
+     dingy. Same true-neutral axis: R=G=B, zero chroma. */
+  --ds-paper: #ececec;
+  /* paper-2/-3 sit deeper so wells and empty media separate from BOTH the white
+     cards above them and the page behind them (the listing gallery reads as a
+     real surface even before its image loads). Steps stay ~0.08 rel-lum apart. */
+  --ds-paper-2: #e1e1e1;
+  --ds-paper-3: #d6d6d6;
   background: var(--ds-paper);
 }
 /* The html canvas must match, or pages shorter than the viewport show a seam
-   where the body's deepened paper ends and the default paper shows through. */
+   where the body's paper ends and the default paper shows through. */
 html:has(body.soft-sep) {
-  --ds-paper: #dedede;
-  --ds-paper-2: #cacaca;
-  --ds-paper-3: #b8b8b8;
+  --ds-paper: #ececec;
+  --ds-paper-2: #e1e1e1;
+  --ds-paper-3: #d6d6d6;
   background: var(--ds-paper);
 }
 .soft-sep *,

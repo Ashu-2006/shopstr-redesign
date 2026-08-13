@@ -45,7 +45,7 @@ export default function ReviewComposer() {
           <Skeleton shape="line" w={160} />
           <Skeleton shape="rect" w="60%" h="1.8rem" className="mt-3" />
           <div className="mt-4 flex items-center gap-2.5">
-            <Skeleton shape="rect" w={48} h={48} className="!rounded-[10px]" />
+            <Skeleton shape="rect" w={48} h={48} className="!rounded-[8px]" />
             <Skeleton shape="line" w="45%" h="0.9rem" />
           </div>
           <Skeleton shape="rect" w="100%" h={110} className="mt-4" />
@@ -63,7 +63,7 @@ export default function ReviewComposer() {
 
         <div className="mt-4 flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={product.images[0]} alt="" className="h-12 w-12 rounded-[10px] border-2 border-ink object-cover" />
+          <img src={product.images[0]} alt="" className="h-12 w-12 rounded-[8px] border-2 border-ink object-cover" />
           <div className="text-[0.9rem] font-bold">{product.title}</div>
         </div>
 

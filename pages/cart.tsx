@@ -81,9 +81,9 @@ export default function Cart() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => decWithNotice(c.product.id, c.quantity)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[9px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
+                    <button onClick={() => decWithNotice(c.product.id, c.quantity)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
                     <span className="min-w-5 text-center font-mono font-bold tabular-nums">{c.quantity}</span>
-                    <button onClick={() => inc(c.product.id)} aria-label="Increase" className="ds-press grid h-8 w-8 place-items-center rounded-[9px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">+</button>
+                    <button onClick={() => inc(c.product.id)} aria-label="Increase" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">+</button>
                   </div>
                 </motion.li>
               ))}
