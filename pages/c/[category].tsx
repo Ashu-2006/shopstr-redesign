@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ListingRowSkeleton } from "@/components/skeletons";
-import { CategoryFeature } from "@/components/cards";
 import { ListingCard } from "@/components/ListingCard";
+import { FeatureCard } from "@/components/FeatureCard";
 import Link from "next/link";
 
 export default function CategoryScreen() {
@@ -79,12 +79,10 @@ export default function CategoryScreen() {
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-4 md:pb-12">
         {spotlight && (
-          <CategoryFeature
+          <FeatureCard
             product={spotlight}
-            title={spotlight.title}
+            format="spotlight"
             kicker={`Spotlight · ${category}`}
-            href={`/listing/${spotlight.id}`}
-            cta="View item"
           />
         )}
 

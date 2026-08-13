@@ -8,8 +8,9 @@ import { SectionTitle } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Carousel } from "@/components/Carousel";
-import { HeroCard, BreakCard, SolidTile, SellerCard } from "@/components/cards";
+import { SolidTile, SellerCard } from "@/components/cards";
 import { ListingCard } from "@/components/ListingCard";
+import { FeatureCard } from "@/components/FeatureCard";
 import {
   HeroSkeleton,
   ListingRowSkeleton,
@@ -64,7 +65,7 @@ export default function Marketplace() {
         ) : featured.length > 0 ? (
           <Carousel auto fullBleed>
             {featured.map((p, i) => (
-              <HeroCard key={p.id} product={p} n={i + 1} />
+              <FeatureCard key={p.id} product={p} format="hero" n={i + 1} />
             ))}
           </Carousel>
         ) : null}
@@ -92,7 +93,7 @@ export default function Marketplace() {
               {feedA.map(card)}
               {breakItem && (
                 <div className="lg:col-span-2">
-                  <BreakCard product={breakItem} kicker="Editor's pick" />
+                  <FeatureCard product={breakItem} format="break" kicker="Editor's pick" />
                 </div>
               )}
               {feedB.map(card)}

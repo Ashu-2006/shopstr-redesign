@@ -4,12 +4,13 @@ import { primaryCategory, priceLabel, toneBg, type Tone } from "@/lib/catalog";
 import { Sticker } from "@/components/ui/Sticker";
 
 /* The editorial slot. One job: carry an argument, break the browse rhythm.
-   Two formats, both rare by design (a break card in every viewport stops
+   Three formats, all rare by design (a break card in every viewport stops
    breaking anything):
-   - "hero":  overlay-bottom + numeral, for the featured carousel (H1).
-   - "break": full-bleed accent with an inset framed photo, one per feed (H4).
-   Replaces HeroCard and BreakCard; CategoryFeature and FeaturedTile are
-   retired (dead code, same job). */
+   - "hero":      overlay-bottom + numeral, for the featured carousel (H1).
+   - "break":     full-bleed accent with an inset framed photo, one per feed (H4).
+   - "spotlight": split on purple with a CTA, the category feature (H2).
+   Replaces HeroCard, BreakCard and CategoryFeature; FeaturedTile is retired
+   (dead code, same job). */
 
 export function FeatureCard({
   product,
@@ -17,21 +18,29 @@ export function FeatureCard({
   n = 1,
   kicker = "Featured",
   tone = "green",
+  title,
+  href,
+  cta = "View item",
 }: {
   product: ProductData;
-  format: "hero" | "break";
+  format: "hero" | "break" | "spotlight";
   /** hero only: carousel position, rendered as the big numeral. */
   n?: number;
-  /** break only: the editorial claim ("Editor's pick", "Trending in zines"). */
+  /** break/spotlight: the editorial claim ("Editor's pick", "Spotlight · Ceramics"). */
   kicker?: string;
   /** break only: accent background. Text stays ink on every accent. */
   tone?: Tone;
+  /** spotlight only: headline override (defaults to the product title). */
+  title?: string;
+  /** spotlight only: destination override (defaults to the listing). */
+  href?: string;
+  /** spotlight only: CTA label on the white pill. */
+  cta?: string;
 }) {
-  return format === "hero" ? (
-    <HeroFormat product={product} n={n} />
-  ) : (
-    <BreakFormat product={product} kicker={kicker} tone={tone} />
-  );
+  if (format === "hero") return <HeroFormat product={product} n={n} />;
+  if (format === "spotlight")
+    return <SpotlightFormat product={product} kicker={kicker} title={title} href={href} cta={cta} />;
+  return <BreakFormat product={product} kicker={kicker} tone={tone} />;
 }
 
 /* ---- format="hero" --------------------------------------------------------- */
@@ -61,6 +70,47 @@ function HeroFormat({ product, n }: { product: ProductData; n: number }) {
           <span className="font-mono text-xl font-bold tabular-nums lg:text-2xl">{priceLabel(product)}</span>
           <span className="font-mono text-[0.78rem] opacity-85">{product.location}</span>
         </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ---- format="spotlight" -----------------------------------------------------
+   Split composition, text on purple (the one accent that takes white text),
+   white pill CTA. The category spotlight slot. */
+function SpotlightFormat({
+  product,
+  kicker,
+  title,
+  href,
+  cta,
+}: {
+  product: ProductData;
+  kicker: string;
+  title?: string;
+  href?: string;
+  cta: string;
+}) {
+  return (
+    <Link
+      href={href ?? `/listing/${product.id}`}
+      className="group lift grid h-[220px] grid-cols-[1fr_1.05fr] overflow-hidden rounded-xl border-2 border-ink bg-purple text-on-purple"
+    >
+      <div className="h-full overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.images[0]}
+          alt=""
+          className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]"
+        />
+      </div>
+      <div className="flex flex-col justify-between p-[18px]">
+        <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em] text-on-purple-muted">{kicker}</span>
+        <h3 className="ds-display mt-auto text-2xl leading-[0.92]">{title ?? product.title}</h3>
+        <span className="mt-2 font-mono text-[1.05rem] font-bold tabular-nums">from {priceLabel(product)}</span>
+        <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-pill bg-white px-4 py-2 text-sm font-bold text-purple">
+          {cta} →
+        </span>
       </div>
     </Link>
   );

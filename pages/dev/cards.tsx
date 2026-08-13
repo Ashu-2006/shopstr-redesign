@@ -168,12 +168,25 @@ export default function CardsPlayground() {
               <Decision>
                 The H4 mid-feed break. Accent background is now a tone prop (green default) so the
                 break can rotate color without a new component. Text stays ink on every accent.
-                CategoryFeature and FeaturedTile are retired: dead code doing this same job.
+                FeaturedTile is retired: dead code doing this same job.
               </Decision>
               <div className="grid gap-4">
                 <FeatureCard product={p[5]} format="break" kicker="Editor's pick" />
                 <FeatureCard product={p[6] ?? p[0]} format="break" kicker="Trending in zines" tone="yellow" />
               </div>
+            </Section>
+
+            {/* ---------------------------------------------------------------- */}
+            <Section
+              title="FeatureCard · format=&quot;spotlight&quot;"
+              note="same component · category spotlight (H2)"
+            >
+              <Decision>
+                The H2 split on purple, absorbed from CategoryFeature: same editorial job, so it is
+                a format, not a component. Purple is fixed (the one accent that takes white text);
+                headline and destination default to the product, the CTA rides the white pill.
+              </Decision>
+              <FeatureCard product={p[7] ?? p[1]} format="spotlight" kicker="Spotlight · Ceramics" />
             </Section>
 
             {/* ---------------------------------------------------------------- */}
@@ -256,8 +269,8 @@ export default function CardsPlayground() {
               <p className="max-w-[68ch] text-[0.82rem] leading-snug text-text-muted">
                 SolidTile (category nav, no product, no price) and SellerCard (a seller entity, not
                 a listing) are different objects answering different questions. They keep their own
-                components; CategoryTile in BentoTile.tsx retires since SolidTile already does that
-                job.
+                components in cards.tsx; BentoTile.tsx (FeaturedTile + CategoryTile) is deleted,
+                SolidTile already did that job.
               </p>
             </Section>
           </>

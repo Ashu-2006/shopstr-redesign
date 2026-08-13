@@ -1,109 +1,14 @@
 import Link from "next/link";
-import type { ProductData, Profile } from "@/data/types";
+import type { Profile } from "@/data/types";
 import { compactSats } from "@/lib/format";
-import {
-  toneBg,
-  primaryCategory,
-  priceLabel,
-  type Tone,
-} from "@/lib/catalog";
+import { toneBg, type Tone } from "@/lib/catalog";
 import { Sticker, type StickerName } from "@/components/ui/Sticker";
 import { Star, SealCheck, ArrowUpRight } from "@phosphor-icons/react";
 
-/* The chosen card system, ported from the prototype. All pure presentation:
-   props in, JSX out. Each links into the app via next/link. */
-
-/* ---- H1: featured carousel item (overlay-bottom + numeral) ---------------- */
-export function HeroCard({ product, n }: { product: ProductData; n: number }) {
-  return (
-    <Link
-      href={`/listing/${product.id}`}
-      className="group relative block h-[360px] w-full shrink-0 basis-full snap-center overflow-hidden text-white md:h-[440px]"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={product.images[0]} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.05]" />
-      <div className="absolute inset-0 bg-[linear-gradient(transparent_38%,rgba(0,0,0,0.85))]" />
-      <span className="ds-display absolute left-5 top-4 z-10 text-5xl mix-blend-difference lg:left-8 lg:text-6xl">
-        {String(n).padStart(2, "0")}
-      </span>
-      <span className="absolute right-5 top-5 z-10 inline-flex rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">
-        {primaryCategory(product)}
-      </span>
-      <Sticker name="badge-bff-star" className="absolute right-5 top-[60px] z-10 h-12 w-12" />
-      <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[1240px] p-5 md:p-8">
-        <h3 className="ds-display text-[1.9rem] leading-[0.92] md:text-4xl lg:text-5xl">{product.title}</h3>
-        <div className="mt-2.5 flex items-baseline justify-between">
-          <span className="font-mono text-xl font-bold tabular-nums lg:text-2xl">{priceLabel(product)}</span>
-          <span className="font-mono text-[0.78rem] opacity-85">{product.location}</span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-/* ---- H2: split, text on purple (category / listing spotlight) ------------- */
-export function CategoryFeature({
-  product,
-  title,
-  kicker,
-  href,
-  cta,
-}: {
-  product: ProductData;
-  title: string;
-  kicker: string;
-  href: string;
-  cta: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group lift grid h-[220px] grid-cols-[1fr_1.05fr] overflow-hidden rounded-xl border-2 border-ink bg-purple text-on-purple"
-    >
-      <div className="h-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
-      </div>
-      <div className="flex flex-col justify-between p-[18px]">
-        <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em] text-on-purple-muted">{kicker}</span>
-        <h3 className="ds-display mt-auto text-2xl leading-[0.92]">{title}</h3>
-        <span className="mt-2 font-mono text-[1.05rem] font-bold tabular-nums">from {priceLabel(product)}</span>
-        <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-pill bg-white px-4 py-2 text-sm font-bold text-purple">
-          {cta} →
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-/* ---- H4: full-bleed accent, inset photo (mid-feed break card) -------------
-   Mobile: stacked (kicker / photo / title / price). Desktop spans two feed
-   columns, so the photo letterboxes badly if it stays full-width; at lg the
-   card becomes a split composition: text left, taller inset photo right. */
-export function BreakCard({ product, kicker }: { product: ProductData; kicker: string }) {
-  return (
-    <Link
-      href={`/listing/${product.id}`}
-      className="group lift flex flex-col rounded-xl border-2 border-ink bg-green p-4 text-ink lg:grid lg:grid-cols-2 lg:gap-x-7 lg:p-6"
-    >
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[0.64rem] uppercase tracking-[0.1em]">{kicker}</span>
-        <span className="inline-flex rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white lg:hidden">
-          {primaryCategory(product)}
-        </span>
-      </div>
-      <div className="my-3.5 h-[190px] overflow-hidden rounded-lg border-2 border-ink lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:my-0 lg:h-[240px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.images[0]} alt="" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
-      </div>
-      <h3 className="ds-display text-[1.4rem] leading-[0.92] lg:row-start-2 lg:self-center lg:text-3xl">{product.title}</h3>
-      <div className="mt-1.5 flex items-baseline justify-between lg:row-start-3 lg:mt-0 lg:self-end">
-        <span className="font-mono text-[1.1rem] font-bold tabular-nums lg:text-[1.3rem]">{priceLabel(product)}</span>
-        <span className="font-mono text-[0.74rem]">{product.location}</span>
-      </div>
-    </Link>
-  );
-}
+/* Non-listing cards. Listing cards live in ListingCard.tsx (browse) and
+   FeatureCard.tsx (editorial); confirmation rows in LineItem.tsx. These two
+   answer different questions: SolidTile is category nav (no product, no
+   price), SellerCard is a seller entity. Pure presentation. */
 
 /* ---- Solid compact: category tile ---------------------------------------- */
 export function SolidTile({
