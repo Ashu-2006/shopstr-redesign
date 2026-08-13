@@ -11,6 +11,7 @@
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "agentation": "^3.0.2",
+    "animejs": "^4.5.0",
     "dialkit": "^0.1.0",
     "framer-motion": "^12.0.0",
     "gsap": "^3.13.0",
