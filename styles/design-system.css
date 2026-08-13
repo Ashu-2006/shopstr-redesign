@@ -21,29 +21,30 @@
      Purple is the accent for secondary actions and structural emphasis. */
 
   /* Neutrals (the workhorses)
-     A light-GREY ramp on a faintly cool hue (~220deg, chroma near zero), not a
-     warm//yellow paper. The hint of blue keeps purple and the six accents
-     reading punchy; a dead-neutral grey makes them look dingy next to it.
-     Steps are spaced by LIGHTNESS, so depth comes from weight, never warmth. */
+     A TRUE-NEUTRAL grey ramp: R=G=B, zero chroma. No warmth, no blue cast. The
+     six accents and purple carry all the color in the app; the surfaces stay
+     achromatic so nothing competes with them.
+     Steps are spaced evenly by LIGHTNESS (~0.10 rel-lum apart), so depth comes
+     from the weight of the grey, never from hue or a shadow. */
   --ds-ink: #121212;          /* near-black: text, primary buttons, strokes */
   --ds-ink-soft: #3a3a3a;
-  --ds-paper: #f4f5f7;        /* app background (lightest grey step) */
+  --ds-paper: #f0f0f0;        /* app background (lightest grey step) */
   --ds-paper-pure: #ffffff;   /* card / sheet surfaces */
-  --ds-paper-2: #e8eaee;      /* subtle sunken surface: wells, skeletons, hover */
-  --ds-paper-3: #dcdfe5;      /* deeper well: empty media, soft separators */
+  --ds-paper-2: #e2e2e2;      /* subtle sunken surface: wells, skeletons, hover */
+  --ds-paper-3: #d4d4d4;      /* deeper well: empty media, soft separators */
   --ds-line: #121212;         /* stroke color = ink (used at low width) */
   --ds-line-soft: rgba(18, 18, 18, 0.12);
 
-  /* Text: neutral greys on the same cool hue as the paper ramp, so body copy
-     never reads olive against the background. */
+  /* Text: true-neutral greys on the same achromatic axis as the paper ramp, so
+     copy never reads olive or blue against the background. */
   --ds-text: #121212;         /* mostly black */
-  --ds-text-muted: #5b5f66;
-  /* Darkened one notch vs the old warm value so it clears WCAG AA-large (3:1)
-     on ALL THREE paper steps, not just the lightest. Small mono captions inherit
-     it inside paper-2 wells (checkout summary), where the old value failed. */
-  --ds-text-subtle: #767c86;
-  --ds-text-on-dark: #f4f5f7; /* over ink + over purple, text is white-ish */
-  --ds-text-on-dark-muted: #b6bbc4; /* secondary labels over ink / purple */
+  --ds-text-muted: #5e5e5e;
+  /* Kept dark enough to clear WCAG AA-large (3:1) on ALL THREE paper steps, not
+     just the lightest. Small mono captions inherit it inside paper-2 wells
+     (checkout summary), where a lighter value failed. */
+  --ds-text-subtle: #767676;
+  --ds-text-on-dark: #f0f0f0; /* over ink + over purple, text is white-ish */
+  --ds-text-on-dark-muted: #b8b8b8; /* secondary labels over ink / purple */
 
   /* Primary accent — purple */
   --ds-purple: #5a51e5;

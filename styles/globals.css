@@ -413,22 +413,22 @@ select:focus-visible {
    - Drop decorative image outlines and ink "hairline" gap fills.
    ========================================================================== */
 body.soft-sep {
-  /* deeper grey page so paper-pure (#fff) surfaces pop by contrast. Same cool
-     neutral hue as the default ramp, just two steps heavier. */
-  --ds-paper: #e4e7ec;
+  /* deeper grey page so paper-pure (#fff) surfaces pop by contrast. Same
+     true-neutral axis as the default ramp, just two steps heavier. */
+  --ds-paper: #dedede;
   /* paper-2/-3 sit deeper still so empty media wells separate from BOTH the
      white cards above them and the page behind them (the listing gallery reads
      as a real surface even before its image loads) */
-  --ds-paper-2: #ced3db;
-  --ds-paper-3: #bcc3cd;
+  --ds-paper-2: #cacaca;
+  --ds-paper-3: #b8b8b8;
   background: var(--ds-paper);
 }
 /* The html canvas must match, or pages shorter than the viewport show a seam
    where the body's deepened paper ends and the default paper shows through. */
 html:has(body.soft-sep) {
-  --ds-paper: #e4e7ec;
-  --ds-paper-2: #ced3db;
-  --ds-paper-3: #bcc3cd;
+  --ds-paper: #dedede;
+  --ds-paper-2: #cacaca;
+  --ds-paper-3: #b8b8b8;
   background: var(--ds-paper);
 }
 .soft-sep *,

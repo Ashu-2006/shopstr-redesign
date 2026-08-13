@@ -11,9 +11,9 @@
 /* ============================ TOKENS (mirror of styles/design-system.css) === */
 :root{
   --ink:#121212; --ink-soft:#3a3a3a;
-  --paper:#f4f5f7; --paper-pure:#ffffff; --paper-2:#e8eaee; --paper-3:#dcdfe5;
-  --text:#121212; --text-muted:#5b5f66; --text-subtle:#878d97; --on-dark:#f4f5f7;
-  --on-dark-muted:#b6bbc4;
+  --paper:#f0f0f0; --paper-pure:#ffffff; --paper-2:#e2e2e2; --paper-3:#d4d4d4;
+  --text:#121212; --text-muted:#5e5e5e; --text-subtle:#767676; --on-dark:#f0f0f0;
+  --on-dark-muted:#b8b8b8;
   --purple:#5a51e5; --purple-press:#4a42c9; --purple-soft:#e7e5fb; --on-purple:#fff;
   --on-purple-muted:#cfcbff;
   --orange:#ff8336; --yellow:#ffc313; --red:#ff4040; --green:#25c26e;
@@ -127,7 +127,7 @@ h2.sec{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-
 .seller{background:var(--ink);color:var(--on-dark);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:12px}
 .seller .av{width:44px;height:44px;border-radius:12px;background:var(--yellow);color:var(--ink);font-family:var(--font-display);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
 .seller .h{font-weight:700}
-.seller .meta{font-family:var(--font-mono);font-size:.74rem;color:#bdbcb4}
+.seller .meta{font-family:var(--font-mono);font-size:.74rem;color:var(--on-dark-muted)}
 .seller .view{margin-left:auto;background:var(--paper-pure);color:var(--ink);border:none;border-radius:var(--r-pill);padding:9px 16px;font-weight:700;font-family:var(--font-body);cursor:pointer}
 
 /* ============================ NAV ========================================= */
@@ -156,7 +156,7 @@ h2.sec{font-family:var(--font-display);text-transform:uppercase;letter-spacing:-
 .mode.buy .md{color:#e7e5fb}
 .mode.alert{background:var(--pink)}
 .mode.dark{background:var(--ink);color:var(--on-dark)}
-.mode.dark .md{color:#bdbcb4}
+.mode.dark .md{color:var(--on-dark-muted)}
 
 .usage{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.8rem}
 .rule{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:var(--r-md);background:var(--paper-pure);border:var(--stroke) solid var(--ink)}
@@ -225,10 +225,10 @@ footer{padding:40px 0;color:var(--text-muted);font-family:var(--font-mono);font-
         <div class="kicker" style="margin-bottom:14px">Neutrals · structural</div>
         <div class="swatches">
           <div class="sw"><div class="fill" style="background:#121212"><span class="tag">text · btn</span></div><div class="meta"><div class="name">Ink</div><div class="hex">#121212</div></div></div>
-          <div class="sw"><div class="fill" style="background:#f4f5f7"></div><div class="meta"><div class="name">Paper</div><div class="hex">#F4F5F7</div></div></div>
+          <div class="sw"><div class="fill" style="background:#f0f0f0"></div><div class="meta"><div class="name">Paper</div><div class="hex">#F0F0F0</div></div></div>
           <div class="sw"><div class="fill" style="background:#ffffff"></div><div class="meta"><div class="name">Paper pure</div><div class="hex">#FFFFFF</div></div></div>
-          <div class="sw"><div class="fill" style="background:#e8eaee"></div><div class="meta"><div class="name">Paper sunken</div><div class="hex">#E8EAEE</div></div></div>
-          <div class="sw"><div class="fill" style="background:#dcdfe5"></div><div class="meta"><div class="name">Paper deep</div><div class="hex">#DCDFE5</div></div></div>
+          <div class="sw"><div class="fill" style="background:#e2e2e2"></div><div class="meta"><div class="name">Paper sunken</div><div class="hex">#E2E2E2</div></div></div>
+          <div class="sw"><div class="fill" style="background:#d4d4d4"></div><div class="meta"><div class="name">Paper deep</div><div class="hex">#D4D4D4</div></div></div>
         </div>
       </div>
       <div>
@@ -352,7 +352,7 @@ footer{padding:40px 0;color:var(--text-muted);font-family:var(--font-mono);font-
         <button class="btn btn-ghost press">Ghost</button>
         <button class="btn btn-y press">Yellow</button>
         <button class="btn btn-icon btn-primary press">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#f4f3ef" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#f0f0f0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
 
