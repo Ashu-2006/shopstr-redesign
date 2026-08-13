@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Sticker } from "@/components/ui/Sticker";
-import { ProductCard } from "@/components/ProductCard";
+import { ListingCard } from "@/components/ListingCard";
 import { Stars } from "@/components/ui/Stars";
 import { X, Gear, Star, ArrowUpRight, Lightning, ThumbsUp, ThumbsDown } from "@phosphor-icons/react";
 import {
@@ -124,8 +124,9 @@ export default function Profile() {
                 </Link>
               </div>
               <div className="grid grid-cols-3 gap-3">
+                {/* Own listings: no save heart on your own stock */}
                 {myListings.slice(0, 3).map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ListingCard key={p.id} product={p} density="tile" />
                 ))}
               </div>
             </section>

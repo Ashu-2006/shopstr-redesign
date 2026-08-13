@@ -1,25 +1,19 @@
 import Head from "next/head";
 import Link from "next/link";
 import type { ProductData } from "@/data/types";
-import { useListings, useTopSellers, useCartStore, ratingForPubkey } from "@/data/hooks";
+import { useListings, useTopSellers, useCartStore, useSession, ratingForPubkey } from "@/data/hooks";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Carousel } from "@/components/Carousel";
-import {
-  HeroCard,
-  ListCard,
-  BreakCard,
-  NearCard,
-  SolidTile,
-  SellerCard,
-} from "@/components/cards";
+import { HeroCard, BreakCard, SolidTile, SellerCard } from "@/components/cards";
+import { ListingCard } from "@/components/ListingCard";
 import {
   HeroSkeleton,
-  ListCardSkeleton,
-  NearCardSkeleton,
+  ListingRowSkeleton,
+  ListingTileSkeleton,
   SellerCardSkeleton,
 } from "@/components/skeletons";
 
@@ -29,6 +23,7 @@ export default function Marketplace() {
   const { data: listings, isLoading } = useListings();
   const { data: topSellers, isLoading: sellersLoading } = useTopSellers(4);
   const { count } = useCartStore();
+  const { favs, toggleFav } = useSession();
 
   // Editorial picks by id, but never non-null asserted: a missing id degrades
   // to "fewer cards", not a crash on an empty/late dataset.
@@ -42,7 +37,13 @@ export default function Marketplace() {
   const feedB = pick(["lst_011", "lst_013", "lst_009", "lst_002"]);
 
   const card = (p: ProductData) => (
-    <ListCard key={p.id} product={p} rating={ratingForPubkey(p.pubkey)} />
+    <ListingCard
+      key={p.id}
+      product={p}
+      rating={ratingForPubkey(p.pubkey)}
+      fav={favs.has(p.id)}
+      onToggleFav={toggleFav}
+    />
   );
 
   return (
@@ -83,7 +84,7 @@ export default function Marketplace() {
           {isLoading ? (
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {Array.from({ length: 4 }, (_, i) => (
-                <ListCardSkeleton key={i} />
+                <ListingRowSkeleton key={i} />
               ))}
             </div>
           ) : feedA.length + feedB.length > 0 ? (
@@ -152,8 +153,19 @@ export default function Marketplace() {
               <SectionTitle note="Berlin · 5km">Near you</SectionTitle>
               <Carousel snap={false}>
                 {isLoading
-                  ? Array.from({ length: 5 }, (_, i) => <NearCardSkeleton key={i} />)
-                  : near.map((p) => <NearCard key={p.id} product={p} />)}
+                  ? Array.from({ length: 5 }, (_, i) => (
+                      <ListingTileSkeleton key={i} className="w-[200px] shrink-0 snap-start" />
+                    ))
+                  : near.map((p) => (
+                      <ListingCard
+                        key={p.id}
+                        product={p}
+                        density="tile"
+                        fav={favs.has(p.id)}
+                        onToggleFav={toggleFav}
+                        className="w-[200px] shrink-0 snap-start"
+                      />
+                    ))}
               </Carousel>
             </>
           )}

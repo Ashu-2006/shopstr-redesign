@@ -4,9 +4,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import {
   HeroSkeleton,
-  ListCardSkeleton,
-  ProductCardSkeleton,
-  NearCardSkeleton,
+  ListingRowSkeleton,
+  ListingTileSkeleton,
   SellerCardSkeleton,
   RowSkeleton,
   ListingDetailSkeleton,
@@ -69,23 +68,23 @@ export default function StatesPlayground() {
           <HeroSkeleton />
         </Section>
 
-        <Section title="List card (H5, the default)" note="ListCardSkeleton · feeds, category, marketplace For-you">
+        <Section title="Listing row (the default)" note="ListingRowSkeleton · feeds, category, marketplace For-you, search">
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-            <ListCardSkeleton />
-            <ListCardSkeleton />
+            <ListingRowSkeleton />
+            <ListingRowSkeleton />
           </div>
         </Section>
 
-        <Section title="Grid card" note="ProductCardSkeleton · shop items, sell/mine, more-from-seller">
+        <Section title="Listing tile" note="ListingTileSkeleton · shop items, sell/mine, more-from-seller, search, rails">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {Array.from({ length: 4 }, (_, i) => <ProductCardSkeleton key={i} />)}
+            {Array.from({ length: 4 }, (_, i) => <ListingTileSkeleton key={i} />)}
           </div>
         </Section>
 
-        <Section title="Rails" note="NearCardSkeleton + SellerCardSkeleton · horizontal scroll rails">
+        <Section title="Rails" note="ListingTileSkeleton (fixed width) + SellerCardSkeleton · horizontal scroll rails">
           <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2">
-            <NearCardSkeleton />
-            <NearCardSkeleton />
+            <ListingTileSkeleton className="w-[200px] shrink-0" />
+            <ListingTileSkeleton className="w-[200px] shrink-0" />
             <SellerCardSkeleton />
             <SellerCardSkeleton />
           </div>

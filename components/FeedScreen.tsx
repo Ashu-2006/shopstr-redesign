@@ -1,11 +1,11 @@
 import Head from "next/head";
 import type { ProductData } from "@/data/types";
-import { useCartStore, ratingForPubkey } from "@/data/hooks";
+import { useCartStore, useSession, ratingForPubkey } from "@/data/hooks";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { DiscoveryChips } from "@/components/DiscoveryChips";
-import { ListCard } from "@/components/cards";
+import { ListingCard } from "@/components/ListingCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FeedSkeleton } from "@/components/skeletons";
 import type { ReactNode } from "react";
@@ -28,6 +28,7 @@ export function FeedScreen({
   empty?: ReactNode;
 }) {
   const { count } = useCartStore();
+  const { favs, toggleFav } = useSession();
   return (
     <>
       <Head>
@@ -51,7 +52,12 @@ export function FeedScreen({
           <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {listings.map((p, i) => (
               <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
-                <ListCard product={p} rating={ratingForPubkey(p.pubkey)} />
+                <ListingCard
+                  product={p}
+                  rating={ratingForPubkey(p.pubkey)}
+                  fav={favs.has(p.id)}
+                  onToggleFav={toggleFav}
+                />
               </div>
             ))}
           </div>

@@ -4,7 +4,7 @@ import { useListings } from "@/data/hooks";
 import { ListingCard } from "@/components/ListingCard";
 import { FeatureCard } from "@/components/FeatureCard";
 import { LineItem } from "@/components/LineItem";
-import { ListCardSkeleton } from "@/components/skeletons";
+import { ListingRowSkeleton } from "@/components/skeletons";
 import { Minus, Plus } from "@phosphor-icons/react";
 
 /* Dev-only gallery of the consolidated card system, so every variant is
@@ -76,7 +76,7 @@ export default function CardsPlayground() {
         {isLoading || p.length < 6 ? (
           <div className="grid gap-3.5 lg:grid-cols-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <ListCardSkeleton key={i} />
+              <ListingRowSkeleton key={i} />
             ))}
           </div>
         ) : (

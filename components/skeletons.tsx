@@ -16,8 +16,8 @@ export function HeroSkeleton() {
   );
 }
 
-/* ---- H5: wide editorial list card (the DEFAULT) ---------------------------- */
-export function ListCardSkeleton() {
+/* ---- ListingCard density="row" (H5, the DEFAULT) --------------------------- */
+export function ListingRowSkeleton() {
   return (
     <div className="grid min-h-[158px] grid-cols-[42%_1fr] overflow-hidden rounded-lg border-2 border-ink bg-paper-pure">
       <div className="border-r-2 border-ink">
@@ -40,32 +40,20 @@ export function ListCardSkeleton() {
   );
 }
 
-/* ---- Grid card (shop items, sell/mine, more-from-seller) ------------------- */
-export function ProductCardSkeleton() {
+/* ---- ListingCard density="tile" (grids + rails) -----------------------------
+   Framed square image, open body: same frame the real tile paints. Rails pass
+   the same fixed-width className the real tile gets. */
+export function ListingTileSkeleton({ className = "" }: { className?: string }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border-2 border-ink bg-paper-pure">
-      <Skeleton shape="rect" className="aspect-square !rounded-none" w="100%" />
-      <div className="flex flex-1 flex-col gap-1 p-3.5">
-        <Skeleton shape="line" w="85%" h="0.95rem" />
-        <div className="mt-auto flex items-baseline justify-between pt-2">
-          <Skeleton shape="line" w={72} h="0.95rem" />
-          <Skeleton shape="line" w={44} h="0.68rem" />
-        </div>
+    <div className={`flex flex-col ${className}`}>
+      <div className="overflow-hidden rounded-lg border-2 border-ink">
+        <Skeleton shape="rect" className="aspect-square !rounded-none" w="100%" />
       </div>
-    </div>
-  );
-}
-
-/* ---- P1: near-you rail card ------------------------------------------------ */
-export function NearCardSkeleton() {
-  return (
-    <div className="w-[200px] shrink-0 snap-start overflow-hidden rounded-lg border-2 border-ink bg-paper-pure">
-      <Skeleton shape="rect" h={150} w="100%" className="!rounded-none" />
-      <div className="p-3.5">
-        <Skeleton shape="line" w="90%" h="0.92rem" />
-        <div className="mt-2.5 flex items-center justify-between">
-          <Skeleton shape="rect" w={84} h={30} className="!rounded-pill" />
-          <Skeleton shape="line" w={40} h="0.64rem" />
+      <div className="mt-2">
+        <Skeleton shape="line" w="85%" h="0.92rem" />
+        <div className="mt-2 flex items-baseline justify-between">
+          <Skeleton shape="line" w={72} h="0.95rem" />
+          <Skeleton shape="line" w={44} h="0.66rem" />
         </div>
       </div>
     </div>
@@ -138,7 +126,7 @@ export function FeedSkeleton({
   return (
     <div className={className} aria-hidden="true">
       {Array.from({ length: n }, (_, i) => (
-        <ListCardSkeleton key={i} />
+        <ListingRowSkeleton key={i} />
       ))}
     </div>
   );

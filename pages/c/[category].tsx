@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import {
   useCategoryListings,
   useCartStore,
+  useSession,
   ratingForPubkey,
 } from "@/data/hooks";
 import { CaretLeft, MagnifyingGlass } from "@phosphor-icons/react";
@@ -13,8 +14,9 @@ import { Sticker } from "@/components/ui/Sticker";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { ListCardSkeleton } from "@/components/skeletons";
-import { ListCard, CategoryFeature } from "@/components/cards";
+import { ListingRowSkeleton } from "@/components/skeletons";
+import { CategoryFeature } from "@/components/cards";
+import { ListingCard } from "@/components/ListingCard";
 import Link from "next/link";
 
 export default function CategoryScreen() {
@@ -23,6 +25,7 @@ export default function CategoryScreen() {
   const category = typeof raw === "string" ? decodeURIComponent(raw) : "";
   const { data: listings, isLoading } = useCategoryListings(category);
   const { count } = useCartStore();
+  const { favs, toggleFav } = useSession();
 
   if (!category) return null;
 
@@ -91,7 +94,7 @@ export default function CategoryScreen() {
         {isLoading ? (
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
             {Array.from({ length: 6 }, (_, i) => (
-              <ListCardSkeleton key={i} />
+              <ListingRowSkeleton key={i} />
             ))}
           </div>
         ) : listings.length === 0 ? (
@@ -109,7 +112,12 @@ export default function CategoryScreen() {
           <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {listings.map((p, i) => (
               <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
-                <ListCard product={p} rating={ratingForPubkey(p.pubkey)} />
+                <ListingCard
+                  product={p}
+                  rating={ratingForPubkey(p.pubkey)}
+                  fav={favs.has(p.id)}
+                  onToggleFav={toggleFav}
+                />
               </div>
             ))}
           </div>

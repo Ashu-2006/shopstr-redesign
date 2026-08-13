@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
 import { dur, ease, tEnter, tFast } from "@/lib/motion";
-import { MagnifyingGlass, X, Faders, Heart, CaretDown, Check } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, Faders, CaretDown, Check } from "@phosphor-icons/react";
 import { useListings, useSession } from "@/data/hooks";
-import { primaryType, tintFor, priceLabel } from "@/lib/catalog";
 import type { ProductData } from "@/data/types";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ListingCard } from "@/components/ListingCard";
+import { ListingTileSkeleton } from "@/components/skeletons";
 
 type Sort = "featured" | "newest" | "high" | "low";
 const SORTS: { key: Sort; label: string }[] = [
@@ -24,6 +25,7 @@ const SIZES = ["S", "M", "L", "XL"];
 export default function Search() {
   const router = useRouter();
   const { data: listings, isLoading } = useListings();
+  const { favs, toggleFav } = useSession();
 
   // Math.min of an empty array is Infinity; guard so the price filter can't be
   // poisoned while the listings family loads (or if it's genuinely empty).
@@ -224,7 +226,7 @@ export default function Search() {
             {isLoading ? (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
                 {Array.from({ length: 8 }, (_, i) => (
-                  <ResultCardSkeleton key={i} />
+                  <ListingTileSkeleton key={i} />
                 ))}
               </div>
             ) : results.length === 0 ? (
@@ -254,7 +256,7 @@ export default function Search() {
                 <AnimatePresence mode="popLayout" initial={false}>
                   {results.map((p) => (
                     <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={tFast}>
-                      <ResultCard p={p} />
+                      <ListingCard product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -358,48 +360,6 @@ function Suggestion({ term, query }: { term: string; query: string }) {
       {term.slice(i, i + query.length)}
       <span className="text-text-muted">{term.slice(i + query.length)}</span>
     </span>
-  );
-}
-
-/* Shape-match of ResultCard: bordered image well, unframed text below. */
-function ResultCardSkeleton() {
-  return (
-    <div className="flex flex-col">
-      <div className="overflow-hidden rounded-lg border-2 border-ink">
-        <Skeleton shape="rect" className="aspect-square !rounded-none" w="100%" />
-      </div>
-      <div className="mt-2">
-        <Skeleton shape="line" w="80%" h="0.95rem" />
-        <Skeleton shape="line" w={72} h="0.92rem" className="mt-1.5" />
-      </div>
-    </div>
-  );
-}
-
-/* Search result card: image well + fav heart + type tag + title + price. */
-function ResultCard({ p }: { p: ProductData }) {
-  const { favs, toggleFav } = useSession();
-  const fav = favs.has(p.id);
-  const type = primaryType(p);
-  return (
-    <div className="group flex flex-col">
-      <div className={`relative aspect-square overflow-hidden rounded-lg border-2 border-ink ${tintFor(p)}`}>
-        <Link href={`/listing/${p.id}`} className="absolute inset-0 block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={p.images[0]} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-(--ds-dur-slow) ease-smooth motion-safe:group-hover:scale-[1.06]" />
-        </Link>
-        {type && <span className="absolute left-2.5 top-2.5 rounded-pill border-2 border-ink bg-ink px-2.5 py-1 text-xs font-semibold text-white">{type}</span>}
-        <button onClick={() => toggleFav(p.id)} aria-label="Save" aria-pressed={fav}
-          className={`ds-press absolute right-2.5 top-2.5 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-ink ${fav ? "bg-pink" : "bg-paper-pure"}`}>
-          <Heart size={16} weight={fav ? "fill" : "duotone"} className="text-ink" />
-        </button>
-      </div>
-      <Link href={`/listing/${p.id}`} className="mt-2 block">
-        {p.condition === "New" && <div className="font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-red">Just in</div>}
-        <h3 className="mt-0.5 line-clamp-2 font-bold leading-tight">{p.title}</h3>
-        <div className="mt-1 font-mono text-[0.92rem] font-bold tabular-nums">{priceLabel(p)}</div>
-      </Link>
-    </div>
   );
 }
 

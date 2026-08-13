@@ -7,11 +7,11 @@ import { profileByHandle, profileByPubkey, useSellerListings, useReviews, averag
 import { timeAgo, groupInt } from "@/lib/format";
 import Link from "next/link";
 import { BottomNav } from "@/components/ui/BottomNav";
-import { ProductCard } from "@/components/ProductCard";
+import { ListingCard } from "@/components/ListingCard";
 import { Stars } from "@/components/ui/Stars";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ProductCardSkeleton } from "@/components/skeletons";
+import { ListingTileSkeleton } from "@/components/skeletons";
 import { ReviewCard } from "@/components/ReviewCard";
 import { CaretLeft, Check, Plus, Star, UsersThree } from "@phosphor-icons/react";
 
@@ -23,7 +23,7 @@ export default function Shop() {
   const profile = profileByHandle(handle);
   const { data: items, isLoading: itemsLoading } = useSellerListings(profile?.pubkey ?? "");
   const { data: reviews } = useReviews(profile?.pubkey ?? "");
-  const { follows, toggleFollow } = useSession();
+  const { follows, toggleFollow, favs, toggleFav } = useSession();
   const ownedCommunity = communityForCurator(handle);
   const [tab, setTab] = useState<"items" | "reviews" | "policies">("items");
 
@@ -139,7 +139,7 @@ export default function Shop() {
           (itemsLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
               {Array.from({ length: 8 }, (_, i) => (
-                <ProductCardSkeleton key={i} />
+                <ListingTileSkeleton key={i} />
               ))}
             </div>
           ) : items.length === 0 ? (
@@ -155,7 +155,9 @@ export default function Shop() {
             />
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {items.map((p) => <ProductCard key={p.id} product={p} />)}
+              {items.map((p) => (
+                <ListingCard key={p.id} product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
+              ))}
             </div>
           ))}
         {tab === "reviews" && (

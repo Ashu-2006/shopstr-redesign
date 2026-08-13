@@ -7,8 +7,8 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { Pill } from "@/components/ui/Pill";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ProductCard } from "@/components/ProductCard";
-import { ProductCardSkeleton } from "@/components/skeletons";
+import { ListingCard } from "@/components/ListingCard";
+import { ListingTileSkeleton } from "@/components/skeletons";
 
 // Honest lane empties: Sold and Drafts have no mock data, so they say so
 // instead of silently re-showing the Active grid (a fake-empty).
@@ -52,7 +52,7 @@ export default function MyListings() {
         ) : isLoading ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
             {Array.from({ length: 4 }, (_, i) => (
-              <ProductCardSkeleton key={i} />
+              <ListingTileSkeleton key={i} />
             ))}
           </div>
         ) : mine.length === 0 ? (
@@ -68,7 +68,8 @@ export default function MyListings() {
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {mine.map((p) => <ProductCard key={p.id} product={p} />)}
+            {/* Own stock: no save heart */}
+            {mine.map((p) => <ListingCard key={p.id} product={p} density="tile" />)}
           </div>
         )}
       </main>
