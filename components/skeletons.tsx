@@ -51,7 +51,7 @@ export function ListingTileSkeleton({ className = "" }: { className?: string }) 
       </div>
       <div className="mt-2">
         <Skeleton shape="line" w="85%" h="0.92rem" />
-        <div className="mt-2 flex items-baseline justify-between">
+        <div className="mt-1.5 flex items-baseline justify-between">
           <Skeleton shape="line" w={72} h="0.95rem" />
           <Skeleton shape="line" w={44} h="0.66rem" />
         </div>

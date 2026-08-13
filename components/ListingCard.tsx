@@ -187,11 +187,11 @@ function TileCard({
         )}
         {onToggleFav && <FavButton id={product.id} fav={fav} onToggleFav={onToggleFav} />}
       </div>
+      {/* No "Just in" kicker: condition describes wear, not recency, and 79% of
+          the catalog is "New", so the badge fired on 4 of every 5 cards and
+          carried no information. Recency needs a real timestamp. */}
       <Link href={`/listing/${product.id}`} className="mt-2 block">
-        {product.condition === "New" && (
-          <div className="font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-red">Just in</div>
-        )}
-        <h3 className="mt-0.5 line-clamp-2 text-[0.92rem] font-bold leading-tight">{product.title}</h3>
+        <h3 className="line-clamp-2 text-[0.92rem] font-bold leading-tight">{product.title}</h3>
         <div className="mt-1.5">
           <MetaLine product={product} rating={rating} priceClass="text-[0.95rem]" />
         </div>
