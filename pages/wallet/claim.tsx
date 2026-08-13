@@ -1,20 +1,28 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useListings, useClaimable } from "@/data/hooks";
+import { useRouter } from "next/router";
+import { useListings, useClaimable, useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Sticker } from "@/components/ui/Sticker";
 import { SectionTitle } from "@/components/ui/Section";
-import { RecRow } from "@/components/RecRow";
+import { LineItem } from "@/components/LineItem";
 import { RowSkeleton } from "@/components/skeletons";
 import { Gear } from "@phosphor-icons/react";
 
 export default function Claim() {
+  const router = useRouter();
+  const cart = useCartStore();
   const { data: claim } = useClaimable();
   const { data: listings, isLoading } = useListings();
   const amount = claim?.amount ?? 45000;
   const recs = listings.filter((l) => l.price <= amount).slice(0, 3);
+  // One-tap Buy on a recommendation: straight into checkout.
+  const buyNow = (id: string) => {
+    cart.add(id, 1);
+    router.push("/checkout");
+  };
 
   return (
     <>
@@ -37,7 +45,17 @@ export default function Claim() {
             <div className="flex flex-col gap-2.5">
               {isLoading
                 ? Array.from({ length: 3 }, (_, i) => <RowSkeleton key={i} avatarSize={50} />)
-                : recs.map((p) => <RecRow key={p.id} product={p} />)}
+                : recs.map((p) => (
+                    <LineItem
+                      key={p.id}
+                      product={p}
+                      trailing={
+                        <button onClick={() => buyNow(p.id)} className="rounded-pill bg-ink px-3.5 py-2 text-[0.78rem] font-bold text-text-on-dark">
+                          Buy
+                        </button>
+                      }
+                    />
+                  ))}
             </div>
           </>
         )}

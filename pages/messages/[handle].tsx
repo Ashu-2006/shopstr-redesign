@@ -20,6 +20,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Sticker } from "@/components/ui/Sticker";
 import { InboxList } from "@/components/InboxList";
+import { LineItem } from "@/components/LineItem";
 import {
   Star,
   Check,
@@ -44,21 +45,14 @@ function dayLabel(at: number): string {
   return `${d}d ago`;
 }
 
+/* Thin data wrapper: the page owns the fetch, LineItem owns the anatomy. */
 function QuotedCard({ pid, onDark }: { pid: string; onDark: boolean }) {
   const { data: product } = useListing(pid);
   if (!product) return null;
   return (
-    <Link
-      href={`/listing/${product.id}`}
-      className={`mb-2 flex items-center gap-2.5 rounded-[8px] p-2 ${onDark ? "bg-black/15" : "bg-paper-2"}`}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={product.images[0]} alt="" className="h-10 w-10 rounded-[6px] border-2 border-ink object-cover" />
-      <div className="min-w-0">
-        <div className="truncate text-[0.8rem] font-bold">{product.title}</div>
-        <div className="font-mono text-[0.72rem] tabular-nums">{groupInt(product.price)} sats</div>
-      </div>
-    </Link>
+    <div className="mb-2">
+      <LineItem product={product} size="sm" frame="quiet" onDark={onDark} />
+    </div>
   );
 }
 

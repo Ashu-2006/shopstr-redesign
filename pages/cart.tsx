@@ -13,6 +13,7 @@ import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { LineItem } from "@/components/LineItem";
 
 const SHIPPING = 4000;
 
@@ -71,21 +72,22 @@ export default function Cart() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -16, transition: tExit }}
                   transition={tEnter}
-                  className="flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.product.images[0]} alt="" className="h-14 w-14 shrink-0 rounded-md border-2 border-ink object-cover" />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-bold">{c.product.title}</div>
-                    <div className="font-mono text-sm text-text-muted tabular-nums">
-                      {priceLine(c.product)}{c.size ? ` · ${c.size}` : ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => decWithNotice(c.product.id, c.quantity)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
-                    <span className="min-w-5 text-center font-mono font-bold tabular-nums">{c.quantity}</span>
-                    <button onClick={() => inc(c.product.id)} aria-label="Increase" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">+</button>
-                  </div>
+                  <LineItem
+                    product={c.product}
+                    sub={
+                      <div className="font-mono text-sm text-text-muted tabular-nums">
+                        {priceLine(c.product)}{c.size ? ` · ${c.size}` : ""}
+                      </div>
+                    }
+                    trailing={
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => decWithNotice(c.product.id, c.quantity)} aria-label="Decrease" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">−</button>
+                        <span className="min-w-5 text-center font-mono font-bold tabular-nums">{c.quantity}</span>
+                        <button onClick={() => inc(c.product.id)} aria-label="Increase" className="ds-press grid h-8 w-8 place-items-center rounded-[6px] border-2 border-ink bg-paper-pure text-lg font-bold leading-none">+</button>
+                      </div>
+                    }
+                  />
                 </motion.li>
               ))}
               </AnimatePresence>

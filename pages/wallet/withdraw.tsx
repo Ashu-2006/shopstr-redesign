@@ -1,18 +1,24 @@
 import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useListings } from "@/data/hooks";
+import { useListings, useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
-import { RecRow } from "@/components/RecRow";
+import { LineItem } from "@/components/LineItem";
 
 const AMOUNT = 45000;
 
 export default function Withdraw() {
   const router = useRouter();
+  const cart = useCartStore();
   const { data: listings } = useListings();
   const recs = listings.filter((l) => l.price <= AMOUNT).slice(0, 3);
   const [done, setDone] = useState(false);
+  // One-tap Buy on a recommendation: straight into checkout.
+  const buyNow = (id: string) => {
+    cart.add(id, 1);
+    router.push("/checkout");
+  };
 
   if (done) {
     // Completion reward: the same stroke-draw check as the paid screen, so every
@@ -51,7 +57,17 @@ export default function Withdraw() {
           Spending keeps your sats in the circular economy. These are ready to buy right now, or continue the withdrawal.
         </p>
         <div className="mt-4 flex flex-col gap-2.5">
-          {recs.map((p) => <RecRow key={p.id} product={p} />)}
+          {recs.map((p) => (
+            <LineItem
+              key={p.id}
+              product={p}
+              trailing={
+                <button onClick={() => buyNow(p.id)} className="rounded-pill bg-ink px-3.5 py-2 text-[0.78rem] font-bold text-text-on-dark">
+                  Buy
+                </button>
+              }
+            />
+          ))}
         </div>
         <button onClick={() => router.push("/marketplace")} className="ds-press mt-4 w-full rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark">
           Stay &amp; browse

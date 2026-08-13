@@ -8,7 +8,8 @@ import { priceLabel } from "@/lib/catalog";
    only variation: Buy in recommendations, quantity stepper in cart, status
    pill in orders, nothing in a chat quote.
    Replaces RecRow, the cart line, the orders line and QuotedCard. Pure:
-   actions come in through `trailing`, the page owns the behavior. */
+   actions come in through `trailing`, the page owns the behavior. Clicks
+   inside `trailing` never trigger the row link. */
 
 export function LineItem({
   product,
@@ -17,10 +18,11 @@ export function LineItem({
   frame = "card",
   onDark = false,
   meta,
+  sub,
   trailing,
 }: {
   product: ProductData;
-  /** Defaults to the listing detail. */
+  /** Defaults to the listing detail. Orders rows point at the order instead. */
   href?: string;
   /** md: 56px thumb (standalone rows). sm: 40px (embedded, e.g. chat quote). */
   size?: "md" | "sm";
@@ -29,8 +31,11 @@ export function LineItem({
   frame?: "card" | "quiet";
   /** quiet only: set when embedded on an ink or purple surface. */
   onDark?: boolean;
-  /** One short qualifier after the price ("Qty 2", "Size M"). */
+  /** One short qualifier after the default price ("Qty 2", "Size M"). */
   meta?: string;
+  /** Replaces the whole price line (orders meta, cart price breakdown).
+      When provided, `meta` is ignored; the page styles its own content. */
+  sub?: ReactNode;
   trailing?: ReactNode;
 }) {
   const sm = size === "sm";
@@ -53,14 +58,30 @@ export function LineItem({
       />
       <div className="min-w-0 flex-1">
         <div className={`truncate font-bold leading-tight ${sm ? "text-[0.8rem]" : ""}`}>{product.title}</div>
-        <div className={`mt-0.5 font-mono tabular-nums ${sm ? "text-[0.72rem]" : "text-[0.82rem] font-bold"}`}>
-          {priceLabel(product)}
-          {meta && (
-            <span className={`font-normal ${onDark ? "text-text-on-dark-muted" : "text-text-subtle"}`}> · {meta}</span>
-          )}
-        </div>
+        {sub ?? (
+          <div className={`mt-0.5 font-mono tabular-nums ${sm ? "text-[0.72rem]" : "text-[0.82rem] font-bold"}`}>
+            {priceLabel(product)}
+            {meta && (
+              <span className={`font-normal ${onDark ? "text-text-on-dark-muted" : "text-text-subtle"}`}> · {meta}</span>
+            )}
+          </div>
+        )}
       </div>
-      {trailing && <div className="shrink-0">{trailing}</div>}
+      {trailing && (
+        <div
+          className="shrink-0"
+          onClick={(e) => {
+            // Trailing CONTROLS (stepper, Buy) act in place, never navigate;
+            // passive trailing content (a status pill) still follows the row.
+            if ((e.target as HTMLElement).closest("button, a, input")) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+        >
+          {trailing}
+        </div>
+      )}
     </Link>
   );
 }

@@ -9,6 +9,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RowSkeleton } from "@/components/skeletons";
+import { LineItem } from "@/components/LineItem";
 import type { OrderStatus } from "@/data/mock/extras";
 
 /** Chip per status. "pending" is the one that needs attention, so it is yellow. */
@@ -103,22 +104,24 @@ export default function Orders() {
               if (!p) return null;
               const chip = CHIP[o.status];
               return (
-                <Link key={o.id} href={`/orders/${o.id}`} className="ds-press flex items-center gap-3 rounded-lg border-2 border-ink bg-paper-pure p-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.images[0]} alt="" className="h-14 w-14 shrink-0 rounded-md border-2 border-ink object-cover" />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-bold">{p.title}</div>
-                    <div className="font-mono text-[0.66rem] text-text-subtle">
-                      Order #{o.id} · {o.isSale ? `to @${o.buyerHandle}` : `@${o.sellerHandle}`} · {o.placed}
-                    </div>
-                    {o.shipment?.tracking && (
-                      <div className="font-mono text-[0.64rem] text-text-muted">
-                        {o.shipment.carrier} {o.shipment.tracking}
+                <LineItem
+                  key={o.id}
+                  product={p}
+                  href={`/orders/${o.id}`}
+                  sub={
+                    <>
+                      <div className="font-mono text-[0.66rem] text-text-subtle">
+                        Order #{o.id} · {o.isSale ? `to @${o.buyerHandle}` : `@${o.sellerHandle}`} · {o.placed}
                       </div>
-                    )}
-                  </div>
-                  <Pill tone={chip.tone} className="!px-2.5 !py-1 !text-xs">{chip.label}</Pill>
-                </Link>
+                      {o.shipment?.tracking && (
+                        <div className="font-mono text-[0.64rem] text-text-muted">
+                          {o.shipment.carrier} {o.shipment.tracking}
+                        </div>
+                      )}
+                    </>
+                  }
+                  trailing={<Pill tone={chip.tone} className="!px-2.5 !py-1 !text-xs">{chip.label}</Pill>}
+                />
               );
             })}
           </div>
