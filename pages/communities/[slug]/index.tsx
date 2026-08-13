@@ -11,6 +11,7 @@ import {
   profileByHandle,
   moderatorsOf,
   useIsModerator,
+  nextPostId,
   ME,
 } from "@/data/hooks";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
@@ -52,7 +53,10 @@ export default function CommunityDetail() {
 
   const post = (kind: PostKind, text: string) => {
     submitPost({
-      id: `own_${slug}_${text.length}_${kind}`,
+      // Monotonic id. Deriving it from the text (e.g. its length) collides for
+      // two same-length posts, which duplicates React keys and makes the two
+      // impossible to moderate independently.
+      id: `own_${slug}_${nextPostId()}`,
       communitySlug: slug,
       kind,
       text,

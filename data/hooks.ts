@@ -201,6 +201,17 @@ export function useCommunity(slug: string): AsyncResult<Community | null> {
 /** The signed-in user. Single place to change when auth lands. */
 export const ME = "ekko";
 
+/**
+ * Monotonic id source for locally-composed posts. Module-level (not React
+ * state) so ids never repeat within a session even across remounts. Upstream
+ * this is the signed event id.
+ */
+let postSeq = 0;
+export function nextPostId(): string {
+  postSeq += 1;
+  return String(postSeq);
+}
+
 /** Full moderator list for a community: owner first, then named moderators. */
 export function moderatorsOf(c: Community): string[] {
   return [c.curator, ...c.moderators.filter((m) => m !== c.curator)];

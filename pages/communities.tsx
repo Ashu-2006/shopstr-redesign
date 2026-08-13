@@ -57,6 +57,9 @@ export default function Communities() {
           <div className="pt-4">
             <h1 className="ds-display text-[2.1rem] leading-[0.92] lg:text-[2.6rem]">
               Your peo
+              {/* Letter-swap: the sticker stands in for the "p", so the real
+                  glyph stays in the a11y tree (otherwise this reads "peole"). */}
+              <span className="sr-only">p</span>
               <Sticker name="shape-smiley" className="inline-block h-[0.74em] w-auto align-[-0.08em] spin-slow" />
               le
             </h1>
