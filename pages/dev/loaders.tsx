@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { animate, createTimeline, stagger } from "animejs";
 import { Button } from "@/components/ui/Button";
+import { BootScreen } from "@/components/ui/BootScreen";
 import { stickerSrc, type StickerName } from "@/components/ui/Sticker";
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
 
@@ -659,12 +660,23 @@ const CONCEPTS = [
 
 export default function LoadersPlayground() {
   const [keys, setKeys] = useState<Record<string, number>>({});
+  const [showBoot, setShowBoot] = useState(false);
   const replay = (id: string) =>
     setKeys((k) => ({ ...k, [id]: (k[id] ?? 0) + 1 }));
+
+  // The SHIPPED boot screen, held open for review. In the app it releases on
+  // the real load signal (useAppBoot), which is too fast to inspect.
+  // Click again to dismiss; no auto-timer, so it can be inspected as long as
+  // needed (the real gate in _app releases on the load signal instead).
 
   return (
     <>
       <Head><title>Loader concepts · Shopstr dev</title></Head>
+      {showBoot && (
+        <div onClick={() => setShowBoot(false)} className="contents">
+          <BootScreen />
+        </div>
+      )}
       <main className="mx-auto max-w-[1100px] px-4 py-8 pb-24">
         <h1 className="ds-display text-3xl">Full-page loader concepts</h1>
         <p className="mt-2 max-w-[62ch] text-text-muted">
@@ -676,6 +688,25 @@ export default function LoadersPlayground() {
           </Link>
           ).
         </p>
+
+        {/* What actually shipped, reachable for review. */}
+        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border-2 border-ink bg-yellow p-4">
+          <span className="font-mono text-[0.7rem] font-bold uppercase tracking-[0.1em]">
+            Shipped
+          </span>
+          <button
+            onClick={() => setShowBoot(true)}
+            className="ds-press rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 text-sm font-bold"
+          >
+            Play the real boot screen
+          </button>
+          <Link
+            href="/a-page-that-does-not-exist"
+            className="ds-press rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 text-sm font-bold"
+          >
+            Open the real 404 →
+          </Link>
+        </div>
 
         {CONCEPTS.map(({ id, title, blurb, Boot, NotFound, bootNote, nfNote }) => (
           <section key={id} className="mt-10">

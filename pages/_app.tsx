@@ -1,17 +1,45 @@
+import { useEffect, useState } from "react";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { motion, MotionConfig } from "framer-motion";
 import { IconContext } from "@phosphor-icons/react";
 import { Agentation } from "agentation";
 import { AppProviders } from "@/data/store";
+import { useAppBoot } from "@/data/hooks";
 import { LeftSidebar } from "@/components/ui/LeftSidebar";
+import { BootScreen } from "@/components/ui/BootScreen";
 import { dur, ease, tFast } from "@/lib/motion";
 import "@/styles/globals.css";
+
+/**
+ * Boot gate. The splash sits OVER the app (which mounts and loads behind it),
+ * so releasing it reveals real content instead of starting a second load.
+ * It stays mounted through its own fade-out, then unmounts.
+ * The /dev/* playgrounds skip it: they are review surfaces, and a splash in
+ * front of them just costs a second per reload.
+ */
+function BootGate() {
+  const router = useRouter();
+  const { booting } = useAppBoot();
+  const [mounted, setMounted] = useState(true);
+  const skip = router.pathname.startsWith("/dev/");
+
+  useEffect(() => {
+    if (booting) return;
+    // Matches --ds-dur-slow (560ms), the fade on BootScreen.
+    const t = setTimeout(() => setMounted(false), 560);
+    return () => clearTimeout(t);
+  }, [booting]);
+
+  if (skip || !mounted) return null;
+  return <BootScreen leaving={!booting} />;
+}
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   return (
     <AppProviders>
+      <BootGate />
       {/* Every Phosphor icon defaults to the regular weight and inherits the
           current text color + font size (1em). Per-icon size/color/weight
           overrides still win. Regular, not duotone: duotone's second tone
