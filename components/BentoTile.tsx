@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ProductData } from "@/data/types";
 import { formatSats } from "@/lib/format";
+import { priceLine } from "@/lib/money";
 import { Sticker, type StickerName } from "@/components/ui/Sticker";
 
 type Tone = "purple" | "green" | "yellow" | "pink" | "blue" | "orange" | "paper";
@@ -39,7 +40,7 @@ export function FeaturedTile({
       </span>
       <h3 className="ds-display mt-1.5 text-2xl leading-[0.95]">{product.title}</h3>
       <span className="mt-2 font-mono text-sm font-bold tabular-nums">
-        {formatSats(product.price)}
+        {priceLine(product)}
       </span>
     </Link>
   );

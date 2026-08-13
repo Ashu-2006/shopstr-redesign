@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ProductData } from "@/data/types";
 import { formatSats } from "@/lib/format";
+import { priceLine } from "@/lib/money";
 import { Pill } from "@/components/ui/Pill";
 
 /** Soft tint per primary category, so the grid reads colorful but controlled. */
@@ -59,7 +60,7 @@ export function ProductCard({ product }: { product: ProductData }) {
         </h3>
         <div className="mt-auto flex items-baseline justify-between pt-2">
           <span className="font-mono text-[0.95rem] font-bold tabular-nums">
-            {formatSats(product.price)}
+            {priceLine(product)}
           </span>
           <span className="font-mono text-[0.68rem] text-text-subtle">
             {product.location}

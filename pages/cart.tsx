@@ -8,6 +8,7 @@ import { Toast } from "@/components/ui/Toast";
 import { Lightning } from "@phosphor-icons/react";
 import { useCartStore } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
+import { priceLine } from "@/lib/money";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Button } from "@/components/ui/Button";
@@ -77,7 +78,7 @@ export default function Cart() {
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-bold">{c.product.title}</div>
                     <div className="font-mono text-sm text-text-muted tabular-nums">
-                      {groupInt(c.product.price)} sats{c.size ? ` · ${c.size}` : ""}
+                      {priceLine(c.product)}{c.size ? ` · ${c.size}` : ""}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

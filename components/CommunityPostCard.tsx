@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CommunityPost, PostKind } from "@/data/mock/extras";
 import type { ProductData, Profile } from "@/data/types";
 import { groupInt, timeAgo } from "@/lib/format";
+import { priceLine } from "@/lib/money";
 import { Sticker } from "@/components/ui/Sticker";
 import {
   Camera,
@@ -100,7 +101,7 @@ export function CommunityPostCard({
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-bold">{product.title}</div>
-            <div className="font-mono text-xs tabular-nums">{groupInt(product.price)} sats</div>
+            <div className="font-mono text-xs tabular-nums">{priceLine(product)}</div>
           </div>
           <span className="shrink-0 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-purple">
             View →

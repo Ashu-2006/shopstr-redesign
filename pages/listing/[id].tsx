@@ -18,13 +18,14 @@ import {
 import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree, MapPin } from "@phosphor-icons/react";
 import { formatSats, groupInt, timeAgo } from "@/lib/format";
 import { shippingLabel, fulfilmentOptions } from "@/lib/fulfilment";
+import { quotedPrice, satsFor } from "@/lib/money";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
 import { Stars } from "@/components/ui/Stars";
 import { Sticker } from "@/components/ui/Sticker";
 import { SellerStrip } from "@/components/SellerStrip";
 import { ReviewCard } from "@/components/ReviewCard";
-import { ProductCard } from "@/components/ProductCard";
+import { ListingCard } from "@/components/ListingCard";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { Toast } from "@/components/ui/Toast";
@@ -108,8 +109,9 @@ export default function ListingDetail() {
   // options decide whether pickup/shipping may even be offered.
   const shippingLine = shippingLabel(product, formatSats);
   const { canShip, canPickup } = fulfilmentOptions(product.shippingType);
+  const quoted = quotedPrice(product);
   const isFav = favs.has(product.id);
-  const walletCovers = product.price <= walletBalance;
+  const walletCovers = (satsFor(product) ?? Infinity) <= walletBalance;
 
   const buyNow = () => {
     cart.add(product.id, 1, size ?? undefined);
@@ -140,7 +142,7 @@ export default function ListingDetail() {
           <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-text-on-dark-muted">
             {walletCovers ? "From wallet" : "Price"}
           </span>
-          <span className="font-mono text-lg font-bold leading-none tabular-nums">{groupInt(product.price)}</span>
+          <span className="font-mono text-lg font-bold leading-none tabular-nums">{groupInt(satsFor(product) ?? 0)}</span>
         </div>
         <Button variant="secondary" full className="flex-1" onClick={buyNow}>
           {walletCovers ? "Buy with sats" : "Buy now"}
@@ -251,10 +253,21 @@ export default function ListingDetail() {
         <div className="mt-5 flex flex-col gap-5 md:mt-0">
           <div>
             <h1 className="ds-display text-3xl leading-[0.95] md:text-4xl">{product.title}</h1>
+            {/* A fiat-quoted listing leads with the seller's number, because that
+                is what they committed to; sats follow as the settlement amount. */}
             <div className="mt-3 flex items-end gap-3">
-              <span className="font-mono text-4xl font-bold leading-none tabular-nums">{groupInt(product.price)}</span>
-              <span className="pb-1 font-mono text-sm text-text-muted">sats</span>
+              <span className="font-mono text-4xl font-bold leading-none tabular-nums">
+                {quoted.quoted}
+              </span>
+              {!quoted.converted && <span className="pb-1 font-mono text-sm text-text-muted">sats</span>}
             </div>
+            {quoted.converted && (
+              <p className="mt-1.5 font-mono text-xs font-bold text-purple">
+                {quoted.sats === null
+                  ? "Sats amount unavailable right now"
+                  : `≈ ${groupInt(quoted.sats)} sats · locked at checkout`}
+              </p>
+            )}
             <p className="mt-1.5 font-mono text-xs text-text-subtle">{formatSats(product.totalCost)} total with shipping</p>
           </div>
 
@@ -381,7 +394,7 @@ export default function ListingDetail() {
             <h2 className="ds-display mb-3 text-xl">More from @{seller?.handle}</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               {others.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ListingCard key={p.id} product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
               ))}
             </div>
           </section>

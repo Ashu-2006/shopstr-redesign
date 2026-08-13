@@ -3,6 +3,7 @@
 
 import type { ProductData } from "@/data/types";
 import { groupInt } from "@/lib/format";
+import { priceLine } from "@/lib/money";
 import type { StickerName } from "@/components/ui/Sticker";
 
 /** The six marketplace "type" tags (distinct from real categories). */
@@ -76,5 +77,8 @@ export function tintFor(p: ProductData): string {
 
 /** PDF Issue 3: one price style. "Free" for zero, never "0 sats". */
 export function priceLabel(p: ProductData): string {
-  return p.price > 0 ? `${groupInt(p.price)} sats` : "Free";
+  if (p.price <= 0) return "Free";
+  // Goes through priceLine so a fiat-quoted listing shows the seller's own
+  // number, not its sats amount dressed up as the asking price.
+  return priceLine(p);
 }

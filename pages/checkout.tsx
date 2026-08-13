@@ -6,7 +6,9 @@ import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { shake, tEnter, tExit } from "@/lib/motion";
 import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
+import type { CartItem } from "@/data/types";
 import { cartFulfilmentOptions, effectiveShippingCost } from "@/lib/fulfilment";
+import { satsFor } from "@/lib/money";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
 import { CheckoutSummary } from "@/components/CheckoutSummary";
@@ -332,7 +334,7 @@ export default function Checkout() {
                       {i.size ? ` · ${i.size}` : ""}
                     </div>
                   </div>
-                  <span className="shrink-0 font-mono text-[0.82rem] tabular-nums">{groupInt(i.product.price * i.quantity)}</span>
+                  <span className="shrink-0 font-mono text-[0.82rem] tabular-nums">{groupInt((satsFor(i.product) ?? 0) * i.quantity)}</span>
                 </li>
               ))}
             </ul>
@@ -373,6 +375,7 @@ export default function Checkout() {
           idx={idx}
           closeTo={prevHref.pay}
           total={total}
+          items={cart.items}
           pay={draft.pay}
           onPay={(p) => set("pay", p)}
           onPaid={() => router.push("/paid")}
@@ -475,6 +478,7 @@ function PayStep({
   idx,
   closeTo,
   total,
+  items,
   pay,
   onPay,
   onPaid,
@@ -483,6 +487,7 @@ function PayStep({
   idx: number;
   closeTo: string;
   total: number;
+  items: CartItem[];
   pay: "lightning" | "cashu";
   onPay: (p: "lightning" | "cashu") => void;
   onPaid: () => void;
@@ -513,6 +518,10 @@ function PayStep({
   const pay_ = () => { setConfirming(true); window.setTimeout(onPaid, 1100); };
   const mm = Math.floor(secs / 60);
   const ss = String(secs % 60).padStart(2, "0");
+
+  // Items the seller quoted in a currency other than sats.
+  const quotedItems = items.filter((i) => (i.product.currency || "sats") !== "sats");
+  const rateUnavailable = quotedItems.some((i) => satsFor(i.product) === null);
 
   if (confirming) {
     return (
@@ -559,6 +568,25 @@ function PayStep({
       <div className="mt-3 text-center font-mono text-2xl font-bold tabular-nums">
         {groupInt(total)} <span className="text-sm font-normal text-text-muted">sats</span>
       </div>
+
+      {/* Fiat-quoted items settle in sats at a rate that does not hold forever.
+          The countdown is therefore a RATE LOCK, not just an invoice timer, and
+          a failed lookup has to be sayable mid-checkout. */}
+      {quotedItems.length > 0 && (
+        <div className={`mt-2.5 rounded-md border-2 p-2.5 text-center font-mono text-[0.68rem] leading-snug ${
+          rateUnavailable ? "border-red bg-pink-soft" : "border-purple bg-purple-soft text-purple-press"
+        }`}>
+          {rateUnavailable ? (
+            <>Could not look up the {quotedItems[0].product.currency} → sats rate. The seller&apos;s price stands; try again in a moment.</>
+          ) : (
+            <>
+              {quotedItems.map((i) => `${i.product.currency} ${i.product.price}`).join(" + ")}
+              {" converted at today's rate · locked for "}
+              {mm}:{ss}
+            </>
+          )}
+        </div>
+      )}
 
       {pay === "lightning" ? (
         <div className="mt-3">

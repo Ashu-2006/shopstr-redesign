@@ -20,6 +20,7 @@ import {
 } from "react";
 import type { CartItem } from "@/data/types";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
+import { satsFor } from "@/lib/money";
 
 /* ------------------------------------------------------------------ CART -- */
 
@@ -82,7 +83,9 @@ function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartApi>(() => {
     const count = items.reduce((n, c) => n + c.quantity, 0);
-    const subtotal = items.reduce((n, c) => n + c.product.price * c.quantity, 0);
+    // satsFor() converts a fiat-quoted listing; using product.price directly
+    // would add a $85 listing to the cart as 85 sats.
+    const subtotal = items.reduce((n, c) => n + (satsFor(c.product) ?? 0) * c.quantity, 0);
     return { items, count, subtotal, add, inc, dec, remove, clear };
   }, [items, add, inc, dec, remove, clear]);
 

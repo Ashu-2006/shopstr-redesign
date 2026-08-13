@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CaretDown } from "@phosphor-icons/react";
 import type { CartItem } from "@/data/types";
 import { groupInt } from "@/lib/format";
+import { satsFor } from "@/lib/money";
 
 /**
  * Order context for the checkout panel: what you're buying, who from, what it
@@ -21,7 +22,7 @@ export function CheckoutSummary({
   fulfilment: "ship" | "pickup";
 }) {
   const [open, setOpen] = useState(false);
-  const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + (satsFor(i.product) ?? 0) * i.quantity, 0);
   const total = subtotal + shipping;
   const count = items.reduce((n, i) => n + i.quantity, 0);
   const sellers = [...new Set(items.map((i) => i.product.pubkey.replace("pk_", "")))];
@@ -88,7 +89,7 @@ export function CheckoutSummary({
                     {i.size ? ` · ${i.size}` : ""}
                   </div>
                 </div>
-                <span className="shrink-0 font-mono text-[0.78rem] tabular-nums">{groupInt(i.product.price * i.quantity)}</span>
+                <span className="shrink-0 font-mono text-[0.78rem] tabular-nums">{groupInt((satsFor(i.product) ?? 0) * i.quantity)}</span>
               </li>
             ))}
           </ul>
