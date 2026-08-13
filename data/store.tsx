@@ -102,6 +102,10 @@ export function useCartStore(): CartApi {
  * the user moderates the community — a moderator's own post is self-approved
  * (upstream: they can publish the kind-4550 approval themselves).
  */
+/** Mirrors OrderStatus in data/mock/extras. Kept local so the client-state
+    layer never imports from mock/ (the data boundary owns that direction). */
+type OrderStatusValue = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+
 export interface OwnPost {
   id: string;
   communitySlug: string;
@@ -129,6 +133,9 @@ interface SessionApi {
   /** Posts the user submitted this session (they land pending). */
   ownPosts: OwnPost[];
   submitPost: (post: OwnPost) => void;
+  /** Order-status changes made this session, by order id. */
+  orderStatus: Map<string, OrderStatusValue>;
+  setOrderStatus: (id: string, status: OrderStatusValue) => void;
   /** Where a seller's sats land after a sale. Inverted default = stay in Shopstr. */
   payout: "shopstr" | "lightning";
   setPayout: (v: "shopstr" | "lightning") => void;
@@ -151,6 +158,9 @@ function SessionProvider({ children }: { children: ReactNode }) {
     () => new Map()
   );
   const [ownPosts, setOwnPosts] = useState<OwnPost[]>([]);
+  const [orderStatus, setOrderStatusMap] = useState<Map<string, OrderStatusValue>>(
+    () => new Map()
+  );
 
   const toggleFav = useCallback((id: string) => {
     setFavs((prev) => {
@@ -184,6 +194,10 @@ function SessionProvider({ children }: { children: ReactNode }) {
     setOwnPosts((prev) => [...prev, post]);
   }, []);
 
+  const setOrderStatus = useCallback((id: string, status: OrderStatusValue) => {
+    setOrderStatusMap((prev) => new Map(prev).set(id, status));
+  }, []);
+
   const value = useMemo<SessionApi>(
     () => ({
       signedIn,
@@ -198,6 +212,8 @@ function SessionProvider({ children }: { children: ReactNode }) {
       moderatePost,
       ownPosts,
       submitPost,
+      orderStatus,
+      setOrderStatus,
       payout,
       setPayout,
       walletBalance: 182400,
@@ -205,7 +221,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
     [
       signedIn, favs, toggleFav, follows, toggleFollow,
       joinedCommunities, toggleJoin, moderated, moderatePost,
-      ownPosts, submitPost, payout,
+      ownPosts, submitPost, orderStatus, setOrderStatus, payout,
     ]
   );
 

@@ -40,6 +40,7 @@ import {
   type Community,
   type CommunityPost,
   type Order,
+  type OrderStatus,
   type WalletTx,
 } from "@/data/mock/extras";
 import { useCartStore, useSession, type OwnPost } from "@/data/store";
@@ -435,12 +436,66 @@ export function communityForListing(productId: string): Community | null {
 /** The current user's orders. */
 export function useOrders(): AsyncResult<Order[]> {
   const isLoading = useSimulatedLoad("orders");
-  return { data: isLoading ? [] : MOCK_ORDERS, isLoading };
+  const { orderStatus } = useSession();
+  const data = useMemo(
+    () =>
+      MOCK_ORDERS.map((o) =>
+        orderStatus.has(o.id) ? { ...o, status: orderStatus.get(o.id)! } : o
+      ),
+    [orderStatus]
+  );
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/* --------------------------------------------------------- ORDER TRANSITIONS --
+   Who may move an order where. Ported from upstream's order-status-auth: the
+   SELLER owns confirmed/shipped/delivered, the BUYER may only cancel. Anything
+   else is not merely hidden in the UI, it is unauthorized.
+   -------------------------------------------------------------------------- */
+
+const SELLER_STATUSES: OrderStatus[] = ["confirmed", "shipped", "delivered"];
+const BUYER_STATUSES: OrderStatus[] = ["cancelled"];
+
+/** Terminal states: nothing moves after these. */
+const TERMINAL: OrderStatus[] = ["delivered", "cancelled"];
+
+export function canUpdateStatus(order: Order, next: OrderStatus): boolean {
+  if (TERMINAL.includes(order.status)) return false;
+  // Cancelling is only meaningful before the seller has shipped.
+  if (next === "cancelled" && order.status === "shipped") return false;
+  return order.isSale
+    ? SELLER_STATUSES.includes(next)
+    : BUYER_STATUSES.includes(next);
+}
+
+/** The single action offered on an order, or null when there is nothing to do. */
+export function nextAction(
+  order: Order
+): { status: OrderStatus; label: string; tone: "ink" | "red" } | null {
+  if (TERMINAL.includes(order.status)) return null;
+  if (order.isSale) {
+    if (order.status === "pending") return { status: "confirmed", label: "Confirm order", tone: "ink" };
+    if (order.status === "confirmed") return { status: "shipped", label: "Mark shipped", tone: "ink" };
+    if (order.status === "shipped") return { status: "delivered", label: "Mark delivered", tone: "ink" };
+    return null;
+  }
+  // Buyer: the only lever is cancelling, and only before it ships.
+  if (order.status === "pending" || order.status === "confirmed") {
+    return { status: "cancelled", label: "Cancel order", tone: "red" };
+  }
+  return null;
 }
 
 export function useOrder(id: string): AsyncResult<Order | null> {
   const isLoading = useSimulatedLoad("orders");
-  const data = useMemo(() => MOCK_ORDERS.find((o) => o.id === id) ?? null, [id]);
+  const { orderStatus } = useSession();
+  const data = useMemo(() => {
+    const found = MOCK_ORDERS.find((o) => o.id === id) ?? null;
+    if (!found) return null;
+    return orderStatus.has(found.id)
+      ? { ...found, status: orderStatus.get(found.id)! }
+      : found;
+  }, [id, orderStatus]);
   return { data: isLoading ? null : data, isLoading };
 }
 

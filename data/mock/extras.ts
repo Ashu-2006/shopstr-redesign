@@ -263,22 +263,82 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
   },
 ];
 
-export type OrderStatus = "paid" | "shipped" | "delivered";
+/**
+ * Order lifecycle, matching upstream exactly (orders-dashboard + the MCP
+ * order-status enum). "pending" is paid-but-not-yet-acknowledged: the state a
+ * buyer is most anxious in and the one a seller must act on. There is no
+ * "paid" status upstream.
+ */
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
+/** Shipment details, only meaningful once a seller marks an order shipped. */
+export interface Shipment {
+  tracking?: string;
+  carrier?: string;
+  /** Human ETA, e.g. "Tue 11 Jun". */
+  eta?: string;
+}
 
 export interface Order {
   id: string;
   productId: string;
   sellerHandle: string;
+  /** The other side of the deal, when the current user is the seller. */
+  buyerHandle?: string;
   status: OrderStatus;
+  /**
+   * True when the CURRENT USER is the seller on this order. Drives which
+   * status transitions are permitted (see canUpdateStatus in data/hooks.ts).
+   */
+  isSale?: boolean;
   /** human "2d ago" etc. */
   placed: string;
   network: "Lightning" | "Cashu";
+  shipment?: Shipment;
 }
 
 export const MOCK_ORDERS: Order[] = [
-  { id: "A1F2", productId: "lst_007", sellerHandle: "ekko", status: "shipped", placed: "2d ago", network: "Lightning" },
+  // Purchases (the current user is the buyer).
+  {
+    id: "A1F2",
+    productId: "lst_007",
+    sellerHandle: "ekko",
+    status: "shipped",
+    placed: "2d ago",
+    network: "Lightning",
+    shipment: { tracking: "NL8472913746", carrier: "PostNL", eta: "Tue 11 Jun" },
+  },
   { id: "9C3D", productId: "lst_001", sellerHandle: "alice", status: "delivered", placed: "1wk ago", network: "Cashu" },
-  { id: "77B0", productId: "lst_005", sellerHandle: "daveshoots", status: "paid", placed: "3wk ago", network: "Lightning" },
+  // Pending: paid, waiting on the seller to confirm. The buyer can still cancel.
+  { id: "77B0", productId: "lst_005", sellerHandle: "daveshoots", status: "pending", placed: "3wk ago", network: "Lightning" },
+  { id: "5E1A", productId: "lst_003", sellerHandle: "carol.makes", status: "confirmed", placed: "4d ago", network: "Cashu" },
+  { id: "2B9F", productId: "lst_020", sellerHandle: "bobbuilds", status: "cancelled", placed: "5wk ago", network: "Lightning" },
+  // Sales (the current user is the seller, so the seller actions apply).
+  {
+    id: "C4D8",
+    productId: "lst_012",
+    sellerHandle: "ekko",
+    buyerHandle: "mara.knits",
+    status: "pending",
+    isSale: true,
+    placed: "6h ago",
+    network: "Lightning",
+  },
+  {
+    id: "E7A3",
+    productId: "lst_018",
+    sellerHandle: "ekko",
+    buyerHandle: "nuno",
+    status: "confirmed",
+    isSale: true,
+    placed: "1d ago",
+    network: "Cashu",
+  },
 ];
 
 /** A just-arrived sale the seller can claim — drives the seller-to-buyer bridge. */
