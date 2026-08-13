@@ -12,6 +12,7 @@ import {
   useCartStore,
   useSession,
   useCommunitiesForListing,
+  profileByPubkey,
   averageRating,
 } from "@/data/hooks";
 import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree, MapPin } from "@phosphor-icons/react";
@@ -22,6 +23,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Stars } from "@/components/ui/Stars";
 import { Sticker } from "@/components/ui/Sticker";
 import { SellerStrip } from "@/components/SellerStrip";
+import { ReviewCard } from "@/components/ReviewCard";
 import { ProductCard } from "@/components/ProductCard";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -96,7 +98,7 @@ export default function ListingDetail() {
     );
   }
 
-  const avg = averageRating(reviews.scores);
+  const avg = averageRating(reviews.reviews);
   const type = product.categories.find((c) =>
     ["Digital", "Service", "Resale", "Exchange", "Swap"].includes(c)
   );
@@ -315,7 +317,7 @@ export default function ListingDetail() {
             ))}
           </dl>
 
-          {seller && <SellerStrip profile={seller} avg={avg} count={reviews.scores.length} />}
+          {seller && <SellerStrip profile={seller} avg={avg} count={reviews.reviews.length} />}
 
           {/* Ask before you buy: if members discussed this item in a moderated
               community, that is the strongest pre-purchase trust signal we have. */}
@@ -345,20 +347,19 @@ export default function ListingDetail() {
           <section>
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="ds-display text-xl">Reviews</h2>
-              {reviews.scores.length > 0 && (
-                <Stars avg={avg} count={reviews.scores.length} className="text-sm" />
+              {reviews.reviews.length > 0 && (
+                <Stars avg={avg} count={reviews.reviews.length} className="text-sm" />
               )}
             </div>
-            {reviews.comments && reviews.comments.length > 0 ? (
+            {reviews.reviews.length > 0 ? (
               <ul className="flex flex-col gap-2.5">
-                {reviews.comments.map((c) => (
-                  <li key={c.id} className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1 font-mono text-sm font-bold tabular-nums"><Star weight="fill" size={14} /> {c.score.toFixed(1)}</span>
-                      <span className="font-mono text-[0.7rem] text-text-subtle">{timeAgo(c.createdAt, 1717372800000)}</span>
-                    </div>
-                    <p className="mt-1.5 text-sm text-text-muted">{c.text}</p>
-                  </li>
+                {reviews.reviews.slice(0, 4).map((r) => (
+                  <ReviewCard
+                    key={r.id}
+                    review={r}
+                    now={1717372800000}
+                    authorHandle={profileByPubkey(r.authorPubkey)?.handle}
+                  />
                 ))}
               </ul>
             ) : (

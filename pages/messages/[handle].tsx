@@ -89,7 +89,7 @@ export default function Thread() {
   const { data: orderProduct } = useListing(order?.productId ?? "");
 
   const selling = thread?.kind === "selling";
-  const avg = averageRating(reviews.scores);
+  const avg = averageRating(reviews.reviews);
 
   const [sent, setSent] = useState<SentMsg[]>([]);
   const [draft, setDraft] = useState("");
@@ -203,11 +203,11 @@ export default function Thread() {
                   @{handle}
                   {seller?.nip05 && <SealCheck size={15} weight="fill" className="text-green" />}
                 </div>
-                {reviews.scores.length > 0 && (
+                {reviews.reviews.length > 0 && (
                   <div className="flex items-center gap-1 font-mono text-[0.68rem] text-text-muted">
                     <Star weight="fill" size={11} />
                     <span className="tabular-nums font-bold">{formatRating(avg)}</span>
-                    <span>· {reviews.scores.length} reviews</span>
+                    <span>· {reviews.reviews.length} reviews</span>
                   </div>
                 )}
               </div>

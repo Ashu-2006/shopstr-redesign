@@ -58,23 +58,44 @@ export interface Profile {
 }
 
 /**
- * Reviews for a seller. A seller's rating = average of `scores`; the review
- * count = `scores.length`. Kept as raw scores so the average is derived, never
- * stored.
+ * The named rating dimensions upstream collects alongside the thumb
+ * (components/messages/chat-panel.tsx). Each is a boolean, not a star count.
  */
-export interface SellerReviews {
-  pubkey: string;
-  scores: number[];
-  comments?: ReviewComment[];
-}
+export type ReviewDimension = "value" | "quality" | "delivery" | "communication";
 
-export interface ReviewComment {
+export const REVIEW_DIMENSIONS: ReviewDimension[] = [
+  "value",
+  "quality",
+  "delivery",
+  "communication",
+];
+
+/**
+ * One review (upstream kind 31555). Reviews are keyed to a PRODUCT address and
+ * roll up to the merchant, so productId is required.
+ *
+ * The score is NOT a star rating. Upstream weights the mandatory binary thumb
+ * at 50% of the total and splits the remaining 50% equally across whichever
+ * named dimensions the reviewer supplied. weightedScore() in data/hooks.ts is
+ * the only place that math lives.
+ */
+export interface Review {
   id: string;
   authorPubkey: string;
-  score: number;
-  text: string;
+  /** The listing this review is about. */
+  productId: string;
+  /** Mandatory, binary: would you deal with this seller again. */
+  thumb: boolean;
+  /** Optional named dimensions; absent means "not rated", not "bad". */
+  dimensions: Partial<Record<ReviewDimension, boolean>>;
+  text?: string;
   /** Unix seconds. */
   createdAt: number;
+}
+
+export interface SellerReviews {
+  pubkey: string;
+  reviews: Review[];
 }
 
 /** A line item in the cart. */

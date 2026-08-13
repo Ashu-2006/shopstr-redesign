@@ -16,11 +16,14 @@ import type {
   ProductData,
   Profile,
   SellerReviews,
+  Review,
+  ReviewDimension,
   CartItem,
   ChatThread,
   ChatMessage,
   AsyncResult,
 } from "@/data/types";
+import { REVIEW_DIMENSIONS } from "@/data/types";
 import { MOCK_LISTINGS } from "@/data/mock/listings";
 import {
   MOCK_PROFILES,
@@ -84,6 +87,57 @@ function useSimulatedLoad(key: string): boolean {
   return state.loading && !loadedFamilies.has(key);
 }
 
+/* ------------------------------------------------------------------- BOOT --
+   The app-boot gate. Distinct from per-surface loading: this covers the one
+   moment before ANY data exists, where there is no card geometry to skeleton.
+   It resolves on a real signal (the first data family landing), never a fixed
+   timer, with a floor so the animation cannot flash, and a ceiling so a stalled
+   family can never trap the user on the splash.
+   Once booted it stays booted for the session, so client navigation never
+   replays it (same rule as useSimulatedLoad). */
+
+const BOOT_FLOOR_MS = 900; // one full sticker orbit; below this it flashes
+const BOOT_CEILING_MS = 8000; // hard release: a wedged load can't trap the user
+
+let hasBooted = false;
+
+export function useAppBoot(): { booting: boolean } {
+  const [booting, setBooting] = useState(!hasBooted);
+
+  useEffect(() => {
+    if (hasBooted) return;
+    const started = Date.now();
+    let done = false;
+    const release = () => {
+      if (done) return;
+      done = true;
+      hasBooted = true;
+      setBooting(false);
+    };
+    // Hold until the first data family has actually landed AND the floor has
+    // passed, so the splash tracks the real load instead of a guess. The
+    // ceiling is a safety net for a wedged family, not the normal path: on a
+    // healthy load the poll always wins (families land in 500-900ms).
+    const poll = setInterval(() => {
+      const elapsed = Date.now() - started;
+      if (loadedFamilies.size > 0 && elapsed >= BOOT_FLOOR_MS) {
+        clearInterval(poll);
+        release();
+      }
+    }, 80);
+    const ceiling = setTimeout(() => {
+      clearInterval(poll);
+      release();
+    }, BOOT_CEILING_MS);
+    return () => {
+      clearInterval(poll);
+      clearTimeout(ceiling);
+    };
+  }, []);
+
+  return { booting };
+}
+
 /** All active listings. */
 export function useListings(): AsyncResult<ProductData[]> {
   const isLoading = useSimulatedLoad("listings");
@@ -102,16 +156,14 @@ export function useListing(id: string): AsyncResult<ProductData | null> {
 }
 
 /**
- * A seller's reviews. Consumers derive rating = avg(scores) and
- * count = scores.length; we never pre-store the average.
+ * A seller's reviews. The average is always DERIVED, never pre-stored.
+ * See weightedScore() for the thumb-weighted composition upstream uses.
  */
 export function useReviews(pubkey: string): AsyncResult<SellerReviews> {
   const isLoading = useSimulatedLoad(`reviews:${pubkey}`);
-  const data = useMemo(
-    () => MOCK_REVIEWS[pubkey] ?? { pubkey, scores: [] },
-    [pubkey]
-  );
-  return { data: isLoading ? { pubkey, scores: [] } : data, isLoading };
+  const empty = useMemo(() => ({ pubkey, reviews: [] }), [pubkey]);
+  const data = useMemo(() => MOCK_REVIEWS[pubkey] ?? { pubkey, reviews: [] }, [pubkey]);
+  return { data: isLoading ? empty : data, isLoading };
 }
 
 /** A profile by pubkey (null if unknown). */
@@ -419,8 +471,12 @@ export function useTopSellers(limit = 4): AsyncResult<TopSeller[]> {
       .sort((a, b) => (b.totalSales ?? 0) - (a.totalSales ?? 0))
       .slice(0, limit)
       .map((profile) => {
-        const scores = MOCK_REVIEWS[profile.pubkey]?.scores ?? [];
-        return { profile, avg: averageRating(scores), count: scores.length };
+        const sellerReviews = MOCK_REVIEWS[profile.pubkey]?.reviews ?? [];
+        return {
+          profile,
+          avg: averageRating(sellerReviews),
+          count: sellerReviews.length,
+        };
       });
   }, [limit]);
   return { data: isLoading ? [] : data, isLoading };
@@ -428,13 +484,64 @@ export function useTopSellers(limit = 4): AsyncResult<TopSeller[]> {
 
 /* ---- Small derivations consumers commonly need (pure, not hooks) ---- */
 
-/** Average rating from a scores array, or 0 when there are none. */
-export function averageRating(scores: number[]): number {
-  if (scores.length === 0) return 0;
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
+/* ------------------------------------------------------- REVIEW SCORING --
+   Ported 1:1 from upstream (utils/parsers/review-parser-functions.ts). A review
+   is NOT a star rating: the mandatory binary thumb is worth 50% of the score,
+   and whatever named dimensions the reviewer supplied split the other 50%
+   equally. A thumbs-down therefore caps at 50% no matter how good the rest is.
+   -------------------------------------------------------------------------- */
+
+/** One review's weighted score, in 0..1. */
+export function weightedScore(review: Review): number {
+  const thumbScore = (review.thumb ? 1 : 0) * 0.5;
+  const dims = Object.values(review.dimensions);
+  if (dims.length === 0) return thumbScore;
+  const each = 0.5 / dims.length;
+  return thumbScore + dims.reduce((t, ok) => t + (ok ? each : 0), 0);
+}
+
+/** Mean weighted score across reviews, in 0..1. 0 when there are none. */
+export function averageWeighted(reviews: Review[]): number {
+  if (reviews.length === 0) return 0;
+  return reviews.reduce((t, r) => t + weightedScore(r), 0) / reviews.length;
+}
+
+/**
+ * The 0..5 number the UI shows. The weighted 0..1 score is the source of truth;
+ * this is purely a display projection so the existing Stars component and every
+ * card keep working. Never store or compare this.
+ */
+export function averageRating(reviews: Review[]): number {
+  return averageWeighted(reviews) * 5;
+}
+
+/** Per-dimension approval rate, for the seller page breakdown. */
+export function dimensionBreakdown(
+  reviews: Review[]
+): { dimension: ReviewDimension; pct: number; count: number }[] {
+  return REVIEW_DIMENSIONS.map((dimension) => {
+    const rated = reviews.filter((r) => r.dimensions[dimension] !== undefined);
+    const good = rated.filter((r) => r.dimensions[dimension]).length;
+    return {
+      dimension,
+      pct: rated.length === 0 ? 0 : Math.round((good / rated.length) * 100),
+      count: rated.length,
+    };
+  }).filter((d) => d.count > 0);
+}
+
+/** Share of reviews that were a thumbs-up, as a percentage. */
+export function thumbRate(reviews: Review[]): number {
+  if (reviews.length === 0) return 0;
+  return Math.round((reviews.filter((r) => r.thumb).length / reviews.length) * 100);
 }
 
 /** Look up a profile by handle (slug used in routes). */
+/** Look up a profile by pubkey (synchronous; for rendering review authors). */
+export function profileByPubkey(pubkey: string): Profile | null {
+  return MOCK_PROFILES[pubkey] ?? null;
+}
+
 export function profileByHandle(handle: string): Profile | null {
   return (
     Object.values(MOCK_PROFILES).find((p) => p.handle === handle) ?? null
@@ -443,6 +550,6 @@ export function profileByHandle(handle: string): Profile | null {
 
 /** Derived rating for a seller (pure helper for cards that take rating as a prop). */
 export function ratingForPubkey(pubkey: string): { avg: number; count: number } {
-  const scores = MOCK_REVIEWS[pubkey]?.scores ?? [];
-  return { avg: averageRating(scores), count: scores.length };
+  const reviews = MOCK_REVIEWS[pubkey]?.reviews ?? [];
+  return { avg: averageRating(reviews), count: reviews.length };
 }

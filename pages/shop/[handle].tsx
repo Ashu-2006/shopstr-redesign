@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { tLayout } from "@/lib/motion";
-import { profileByHandle, useSellerListings, useReviews, averageRating, useSession, communityForCurator } from "@/data/hooks";
+import { profileByHandle, profileByPubkey, useSellerListings, useReviews, averageRating, thumbRate, dimensionBreakdown, useSession, communityForCurator } from "@/data/hooks";
 import { timeAgo, groupInt } from "@/lib/format";
 import Link from "next/link";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -12,6 +12,7 @@ import { Stars } from "@/components/ui/Stars";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductCardSkeleton } from "@/components/skeletons";
+import { ReviewCard } from "@/components/ReviewCard";
 import { CaretLeft, Check, Plus, Star, UsersThree } from "@phosphor-icons/react";
 
 const NOW = 1717372800000;
@@ -50,7 +51,7 @@ export default function Shop() {
     );
   }
   if (!profile) return null;
-  const avg = averageRating(reviews.scores);
+  const avg = averageRating(reviews.reviews);
   const following = follows.has(handle);
 
   return (
@@ -90,7 +91,7 @@ export default function Shop() {
             </button>
           </div>
           <div className="mt-1 font-mono text-[0.7rem] text-text-subtle">
-            <Stars avg={avg} count={reviews.scores.length} /> · {items[0]?.location ?? "-"}{profile.nip05 ? ` · ${profile.nip05}` : ""}
+            <Stars avg={avg} count={reviews.reviews.length} /> · {items[0]?.location ?? "-"}{profile.nip05 ? ` · ${profile.nip05}` : ""}
           </div>
           {profile.about && <p className="mt-2.5 text-text-muted">{profile.about}</p>}
           <div className="mt-3.5 flex gap-2 border-b-2 border-ink">
@@ -158,29 +159,65 @@ export default function Shop() {
             </div>
           ))}
         {tab === "reviews" && (
-          <div className="flex flex-col gap-2.5">
-            {reviews.scores.length === 0 && (reviews.comments ?? []).length === 0 && (
+          <div className="flex flex-col gap-4">
+            {reviews.reviews.length === 0 ? (
               <EmptyState
                 variant="inline"
                 headline="No reviews yet"
                 body="Reviews land here after a sale closes."
                 className="!py-8"
               />
-            )}
-            {(reviews.comments ?? []).length === 0 && reviews.scores.length > 0 && (
-              <p className="inline-flex items-center gap-1 text-text-muted"><Star weight="fill" size={16} /> {avg.toFixed(1)} from {reviews.scores.length} reviews.</p>
-            )}
-            {(reviews.comments ?? []).map((c) => (
-              <div key={c.id} className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
-                <div className="flex justify-between">
-                  <span className="inline-flex items-center gap-1 font-mono text-sm font-bold tabular-nums"><Star weight="fill" size={15} /> {c.score.toFixed(1)}</span>
-                  <span className="font-mono text-[0.7rem] text-text-subtle">{timeAgo(c.createdAt, NOW)}</span>
+            ) : (
+              <>
+                {/* The headline number, then WHY it is that number. A single
+                    average hides which part of the deal was weak. */}
+                <div className="rounded-xl border-2 border-ink bg-paper-pure p-4">
+                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    <span className="inline-flex items-baseline gap-1.5">
+                      <span className="font-mono text-3xl font-bold tabular-nums">{thumbRate(reviews.reviews)}%</span>
+                      <span className="font-mono text-[0.68rem] uppercase tracking-[0.1em] text-text-muted">
+                        would deal again
+                      </span>
+                    </span>
+                    <span className="font-mono text-[0.72rem] text-text-subtle tabular-nums">
+                      {reviews.reviews.length} reviews
+                    </span>
+                  </div>
+                  <ul className="mt-3.5 flex flex-col gap-2">
+                    {dimensionBreakdown(reviews.reviews).map((d) => (
+                      <li key={d.dimension} className="flex items-center gap-2.5">
+                        <span className="w-24 shrink-0 font-mono text-[0.66rem] uppercase tracking-[0.06em] text-text-muted">
+                          {d.dimension}
+                        </span>
+                        <span className="h-2.5 flex-1 overflow-hidden rounded-pill border-2 border-ink bg-paper-2">
+                          <span
+                            className="block h-full rounded-pill bg-green"
+                            style={{ width: `${d.pct}%` }}
+                          />
+                        </span>
+                        <span className="w-10 shrink-0 text-right font-mono text-[0.7rem] font-bold tabular-nums">
+                          {d.pct}%
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <p className="mt-1.5 text-sm text-text-muted">{c.text}</p>
-              </div>
-            ))}
+
+                <ul className="flex flex-col gap-2.5">
+                  {reviews.reviews.map((r) => (
+                    <ReviewCard
+                      key={r.id}
+                      review={r}
+                      now={NOW}
+                      authorHandle={profileByPubkey(r.authorPubkey)?.handle}
+                    />
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         )}
+
         {tab === "policies" && (
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
             {[["Ships from", items[0]?.location ?? "-"], ["Delivery", "3-5 days"], ["Returns", "14 days"], ["Payment", "Lightning · Cashu"]].map(([k, v]) => (

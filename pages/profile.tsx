@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { Sticker } from "@/components/ui/Sticker";
 import { ProductCard } from "@/components/ProductCard";
 import { Stars } from "@/components/ui/Stars";
-import { X, Gear, Star, ArrowUpRight, Lightning } from "@phosphor-icons/react";
+import { X, Gear, Star, ArrowUpRight, Lightning, ThumbsUp, ThumbsDown } from "@phosphor-icons/react";
 import {
   useProfile,
   useReviews,
@@ -29,8 +29,9 @@ export default function Profile() {
   const { data: myListings } = useSellerListings("pk_ekko");
   const { walletBalance } = useSession();
 
-  const avg = averageRating(reviews.scores);
-  const latest = reviews.comments?.[0];
+  const avg = averageRating(reviews.reviews);
+  // Newest review that actually carries a written note.
+  const latest = reviews.reviews.find((r) => r.text);
 
   return (
     <>
@@ -82,7 +83,7 @@ export default function Profile() {
                   <p className="mt-1 font-mono text-xs text-text-muted">{me?.nip05}</p>
                 </div>
               </div>
-              <Stars avg={avg} count={reviews.scores.length} className="mt-4 text-sm" />
+              <Stars avg={avg} count={reviews.reviews.length} className="mt-4 text-sm" />
               {me?.about && <p className="mt-2 text-sm leading-relaxed text-text-muted">{me.about}</p>}
             </div>
 
@@ -141,8 +142,9 @@ export default function Profile() {
               {latest && (
                 <div className="flex min-h-[132px] flex-col justify-between rounded-xl border-2 border-ink bg-paper-pure p-4">
                   <p className="line-clamp-3 text-sm text-text-muted">&ldquo;{latest.text}&rdquo;</p>
-                  <span className="mt-2 inline-flex items-center gap-1 font-mono text-sm font-bold tabular-nums">
-                    <Star weight="fill" size={14} /> {latest.score.toFixed(1)} · latest review
+                  <span className="mt-2 inline-flex items-center gap-1.5 font-mono text-xs font-bold">
+                    {latest.thumb ? <ThumbsUp size={14} weight="fill" /> : <ThumbsDown size={14} weight="fill" />}
+                    latest review
                   </span>
                 </div>
               )}
