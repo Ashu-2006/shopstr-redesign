@@ -14,8 +14,9 @@ import {
   useCommunitiesForListing,
   averageRating,
 } from "@/data/hooks";
-import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree } from "@phosphor-icons/react";
+import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree, MapPin } from "@phosphor-icons/react";
 import { formatSats, groupInt, timeAgo } from "@/lib/format";
+import { shippingLabel, fulfilmentOptions } from "@/lib/fulfilment";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
 import { Stars } from "@/components/ui/Stars";
@@ -100,10 +101,11 @@ export default function ListingDetail() {
     ["Digital", "Service", "Resale", "Exchange", "Swap"].includes(c)
   );
   const others = allListings.filter((l) => l.pubkey === product.pubkey && l.id !== product.id).slice(0, 4);
-  const shippingLine =
-    product.shippingCost === 0
-      ? `${product.shippingType ?? "Shipping"} · free`
-      : `${product.shippingType ?? "Shipping"} · ${formatSats(product.shippingCost ?? 0)}`;
+  // The shipping TYPE is a protocol enum ("Added Cost"), never user-facing copy.
+  // shippingLabel turns it into the truth for this listing, and the fulfilment
+  // options decide whether pickup/shipping may even be offered.
+  const shippingLine = shippingLabel(product, formatSats);
+  const { canShip, canPickup } = fulfilmentOptions(product.shippingType);
   const isFav = favs.has(product.id);
   const walletCovers = product.price <= walletBalance;
 
@@ -278,10 +280,31 @@ export default function ListingDetail() {
           {/* Desktop buy box: the CTA lives with the product, not in a viewport-wide bar. */}
           <div className="hidden lg:block">{buyControls}</div>
 
+          {/* Pickup-only is a hard constraint, not a footnote: it decides
+              whether this item can reach the buyer at all. */}
+          {canPickup && (
+            <div className={`flex items-start gap-2.5 rounded-xl border-2 border-ink p-3 ${canShip ? "bg-blue-soft" : "bg-yellow"}`}>
+              <MapPin size={18} weight="bold" className="mt-0.5 shrink-0" />
+              <div className="text-sm leading-snug">
+                <b>{canShip ? "Ship or collect in person" : "Collection only"}</b>
+                {product.pickupLocations?.length ? (
+                  <span className="block font-mono text-[0.7rem] text-text-muted">
+                    {product.pickupLocations.join(" · ")}
+                  </span>
+                ) : null}
+                {!canShip && (
+                  <span className="block font-mono text-[0.7rem] text-text-muted">
+                    This seller does not post this item.
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
             {[
               ["Shipping", shippingLine],
-              ["Ships from", product.location],
+              [canShip ? "Ships from" : "Collect from", product.location],
               ["Category", product.categories.filter((c) => !["Digital", "Service", "Resale", "Exchange", "Swap", "Physical"].includes(c)).join(", ") || "-"],
               ["Quantity", product.quantity != null ? `${groupInt(product.quantity)} available` : "-"],
             ].map(([k, v]) => (

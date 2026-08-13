@@ -226,6 +226,14 @@ export interface CheckoutDraft {
   address: string;
   city: string;
   zip: string;
+  /** Upstream requires state/province AND country on a shipping address. */
+  state: string;
+  country: string;
+  /** Pickup only: which of the seller's declared collection points. */
+  pickupLocation: string;
+  /** Pickup only: how the seller reaches the buyer (upstream ContactFormData). */
+  contact: string;
+  contactType: "nostr" | "phone" | "signal";
   note: string;
   pay: "lightning" | "cashu";
 }
@@ -242,6 +250,11 @@ const INITIAL_DRAFT: CheckoutDraft = {
   address: "Skalitzer Str. 12",
   city: "Berlin",
   zip: "10997",
+  state: "Berlin",
+  country: "Germany",
+  pickupLocation: "",
+  contact: "",
+  contactType: "nostr",
   note: "",
   pay: "lightning",
 };

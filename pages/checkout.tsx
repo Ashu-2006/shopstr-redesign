@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { shake, tEnter, tExit } from "@/lib/motion";
 import { Package, MapPin, Lock, Lightning, Key, Sparkle, ArrowsClockwise } from "@phosphor-icons/react";
 import { useCartStore, useCheckout } from "@/data/hooks";
+import { cartFulfilmentOptions, effectiveShippingCost } from "@/lib/fulfilment";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
 import { CheckoutSummary } from "@/components/CheckoutSummary";
@@ -59,7 +60,7 @@ function FootNote({ icon, children }: { icon: ReactNode; children: ReactNode }) 
 function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; onClick: () => void; icon: ReactNode; title: string; sub: string }) {
   return (
     <button onClick={onClick} className={`ds-press flex items-center gap-3 rounded-lg border-2 border-ink p-3.5 text-left ${selected ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] border-2 border-current">{icon}</span>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] border-2 border-current">{icon}</span>
       <span className="leading-tight">
         <span className="font-bold">{title}</span>
         <br />
@@ -101,13 +102,29 @@ export default function Checkout() {
   const cart = useCartStore();
   const { draft, set } = useCheckout();
 
-  // Real money math: per-line shipping from the listings themselves (combined
-  // per item, not per unit), zeroed for local pickup.
+  // What this cart is actually allowed to do: only the options EVERY item
+  // supports. A "Pickup" listing can never be shipped, so offering the choice
+  // would be a lie the seller can't honour.
+  const options = cartFulfilmentOptions(cart.items.map((i) => i.product));
+  // Keep the draft honest if the cart changed under it.
+  const fulfilment: "ship" | "pickup" =
+    !options.canShip ? "pickup" : !options.canPickup ? "ship" : draft.fulfilment;
+
+  // Real money math: per-line shipping from the listings themselves, through
+  // the same zero-cost rules upstream enforces (only "Added Cost" ever charges).
   const shipping =
-    draft.fulfilment === "pickup"
+    fulfilment === "pickup"
       ? 0
-      : cart.items.reduce((s, i) => s + (i.product.shippingCost ?? 0), 0);
+      : cart.items.reduce(
+          (s, i) => s + (effectiveShippingCost(i.product.shippingType, i.product.shippingCost) ?? 0),
+          0
+        );
   const total = cart.subtotal + shipping;
+
+  // Collection points the seller actually declared, deduped across the cart.
+  const pickupChoices = Array.from(
+    new Set(cart.items.flatMap((i) => i.product.pickupLocations ?? []))
+  );
 
   const idx = INDEX[step] ?? 0;
 
@@ -155,12 +172,25 @@ export default function Checkout() {
         <FlowLead>Step 1 of 5 · fulfilment</FlowLead>
         <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">Ship it or<br />pick it up?</h3>
         <div className="mt-4 flex flex-col gap-2.5">
-          <OptCard selected={draft.fulfilment === "ship"} onClick={() => set("fulfilment", "ship")} icon={<Box />} title="Ship to me" sub="Enter an address · tracked delivery" />
-          <OptCard selected={draft.fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Local pickup" sub="Arrange a spot over DM · no shipping cost" />
+          {options.canShip && (
+            <OptCard selected={fulfilment === "ship"} onClick={() => set("fulfilment", "ship")} icon={<Box />} title="Ship to me" sub="Enter an address · tracked delivery" />
+          )}
+          {options.canPickup && (
+            <OptCard selected={fulfilment === "pickup"} onClick={() => set("fulfilment", "pickup")} icon={<Pin />} title="Collect in person" sub="Arrange a spot over DM · no shipping cost" />
+          )}
         </div>
+        {/* When the cart leaves no choice, say why instead of showing one lonely
+            option with no explanation. */}
+        {(!options.canShip || !options.canPickup) && (
+          <p className="mt-3 font-mono text-[0.7rem] leading-snug text-text-muted">
+            {!options.canShip
+              ? "Everything in your basket is collection only, so there is nothing to post."
+              : "These items are posted by the seller and cannot be collected."}
+          </p>
+        )}
       </>
     );
-    footer = <WideBtn onClick={() => goStep(router, draft.fulfilment === "pickup" ? "pickup" : "ship")}>Continue →</WideBtn>;
+    footer = <WideBtn onClick={() => goStep(router, fulfilment === "pickup" ? "pickup" : "ship")}>Continue →</WideBtn>;
   }
 
   if (step === "ship") {
@@ -182,8 +212,51 @@ export default function Checkout() {
         <FlowLead>Step 2 of 5 · pickup details</FlowLead>
         <h3 className="ds-display mt-2 text-2xl leading-[0.95] lg:text-3xl">How to<br />reach you</h3>
         <div className="mt-4 flex flex-col gap-3">
-          <Field label="Display name"><input className={`${inputBase} border-ink focus:border-purple`} value={draft.name} onChange={(e) => set("name", e.target.value)} /></Field>
-          <Field label="Note to seller (optional)"><textarea rows={3} className={`${inputBase} border-ink focus:border-purple`} value={draft.note} onChange={(e) => set("note", e.target.value)} placeholder="Can pick up evenings near Görlitzer Park." /></Field>
+          {/* The seller declares where collection happens; the buyer picks one.
+              Upstream requires this whenever the type allows pickup. */}
+          {pickupChoices.length > 0 && (
+            <Field label="Collection point">
+              <div className="flex flex-col gap-2">
+                {pickupChoices.map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => set("pickupLocation", loc)}
+                    aria-pressed={draft.pickupLocation === loc}
+                    className={`ds-press flex items-center gap-2.5 rounded-md border-2 px-3 py-2.5 text-left text-[0.9rem] font-semibold ${
+                      draft.pickupLocation === loc ? "border-purple bg-purple-soft" : "border-ink bg-paper-pure"
+                    }`}
+                  >
+                    <Pin /> {loc}
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
+          <Field label="Contact name"><input className={`${inputBase} border-ink focus:border-purple`} value={draft.name} onChange={(e) => set("name", e.target.value)} /></Field>
+          <Field label="How should they reach you?">
+            {/* min-w-0 on the flex child: without it the input's intrinsic width
+                pushes past the panel and clips. */}
+            <div className="flex gap-2">
+              <select
+                aria-label="Contact type"
+                className={`${inputBase} !w-[7.5rem] shrink-0 border-ink focus:border-purple`}
+                value={draft.contactType}
+                onChange={(e) => set("contactType", e.target.value as typeof draft.contactType)}
+              >
+                <option value="nostr">Nostr DM</option>
+                <option value="phone">Phone</option>
+                <option value="signal">Signal</option>
+              </select>
+              <input
+                aria-label="Contact"
+                className={`${inputBase} !w-auto min-w-0 flex-1 border-ink focus:border-purple`}
+                value={draft.contact}
+                onChange={(e) => set("contact", e.target.value)}
+                placeholder={draft.contactType === "nostr" ? "npub1… or leave blank" : "+351 …"}
+              />
+            </div>
+          </Field>
+          <Field label="Instructions for the seller"><textarea rows={3} className={`${inputBase} border-ink focus:border-purple`} value={draft.note} onChange={(e) => set("note", e.target.value)} placeholder="Evenings work best, I can come by after 6pm." /></Field>
           <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem] leading-snug"><span className="mt-0.5"><Spark /></span><span>You&apos;ll agree a time and place with the seller in an encrypted DM after payment.</span></div>
         </div>
       </>
@@ -350,6 +423,10 @@ function ShipStep({ idx, closeTo, summary }: { idx: number; closeTo: string; sum
     if (!draft.address.trim()) e.address = true;
     if (!draft.city.trim()) e.city = true;
     if (!draft.zip.trim()) e.zip = true;
+    // Upstream requires both of these on a shipping address; a parcel without
+    // a state/province or country is not deliverable.
+    if (!draft.state.trim()) e.state = true;
+    if (!draft.country.trim()) e.country = true;
     if (Object.keys(e).length) {
       setErrs(e);
       controls.start(shake);
@@ -378,6 +455,10 @@ function ShipStep({ idx, closeTo, summary }: { idx: number; closeTo: string; sum
           <div className="flex gap-2.5">
             <div className="flex-1"><Field label="City" invalid={errs.city}><input className={fieldCls("city")} value={draft.city} onChange={(e) => { set("city", e.target.value); setErrs((p) => ({ ...p, city: false })); }} /></Field></div>
             <div className="w-28"><Field label="Postcode" invalid={errs.zip}><input className={fieldCls("zip")} value={draft.zip} onChange={(e) => { set("zip", e.target.value); setErrs((p) => ({ ...p, zip: false })); }} /></Field></div>
+          </div>
+          <div className="flex gap-2.5">
+            <div className="flex-1"><Field label="State / province" invalid={errs.state}><input className={fieldCls("state")} value={draft.state} onChange={(e) => { set("state", e.target.value); setErrs((p) => ({ ...p, state: false })); }} /></Field></div>
+            <div className="flex-1"><Field label="Country" invalid={errs.country}><input className={fieldCls("country")} value={draft.country} onChange={(e) => { set("country", e.target.value); setErrs((p) => ({ ...p, country: false })); }} /></Field></div>
           </div>
           <div className="flex items-start gap-2.5 rounded-md border-2 border-ink bg-yellow-soft p-2.5 text-[0.8rem] leading-snug"><span className="mt-0.5"><LockIcon /></span><span>Your address is end-to-end encrypted and sent to the seller as a one-time DM. Shopstr never stores it.</span></div>
         </div>

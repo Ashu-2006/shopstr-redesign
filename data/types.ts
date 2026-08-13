@@ -5,6 +5,20 @@
    integer sats. Identity is npub/pubkey based — never email/phone/password.
    ========================================================================== */
 
+/**
+ * How a listing can be fulfilled. This is a CLOSED allowlist that mirrors
+ * upstream exactly (utils/STATIC-VARIABLES.ts) — upstream drops the whole
+ * shipping tag when the value is not one of these. The enum is the fulfilment
+ * model, not a label:
+ *   "N/A"          no shipping concept (digital / service)
+ *   "Free"         seller ships, no charge
+ *   "Pickup"       pickup ONLY — shipping is impossible
+ *   "Free/Pickup"  buyer chooses ship or pickup, per order
+ *   "Added Cost"   seller ships and charges shippingCost
+ * Only "Added Cost" ever charges; the rest are forced to zero.
+ */
+export type ShippingType = "N/A" | "Free" | "Pickup" | "Free/Pickup" | "Added Cost";
+
 /** A marketplace listing. */
 export interface ProductData {
   id: string;
@@ -19,9 +33,11 @@ export interface ProductData {
   totalCost: number;
   location: string;
   categories: string[];
-  shippingType?: string;
-  /** Integer sats. */
+  shippingType?: ShippingType;
+  /** Integer sats. Only meaningful when shippingType is "Added Cost". */
   shippingCost?: number;
+  /** Required when shippingType allows pickup; the buyer picks one. */
+  pickupLocations?: string[];
   condition?: string;
   quantity?: number;
   sizes?: string[];
