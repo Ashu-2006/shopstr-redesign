@@ -30,6 +30,7 @@ Visual references: `design/style-guide.html` (the system) and `design/screens.ht
 - **LIGHT THEME IS PRIMARY.** Background is neutral paper (`--ds-paper`), text is mostly black (`--ds-text`).
 - **Neutral is the primary color**: primary buttons and primary backgrounds are neutral (ink `#121212` / paper).
 - **The neutral ramp is TRUE-NEUTRAL GREY: R=G=B, zero chroma.** Never warm, never blue. The accents carry all the color; surfaces stay achromatic. Three steps, evenly spaced by lightness: `--ds-paper` (page), then `--ds-paper-2` (sunken: wells, skeletons, hover), then `--ds-paper-3` (deep well: empty media, soft separators). Depth comes from the **weight** of the grey, never from hue or a shadow. There is no `paper-warm`. Text greys (`--ds-text-muted`, `--ds-text-subtle`) sit on the same achromatic axis so copy never reads olive or cool. A muted label on ink or purple uses `text-on-dark-muted` / `on-purple-muted`, never a raw hex. **If you add a neutral, its three channels must be equal.**
+- **`_document.tsx` puts `.soft-sep` on `<body>`, so the `body.soft-sep` block in `globals.css` is the palette the app actually renders** (`paper #ececec` / `paper-2 #e1e1e1` / `paper-3 #d6d6d6`), NOT the `:root` defaults. Change both, or the change won't show up.
 - **Purple `#5A51E5` is the primary accent** — secondary buttons, structural emphasis, links.
 - **Playful accents — the ONLY six**: orange `#FF8336`, yellow `#FFC313`, red `#FF4040`, green `#25C26E`, blue `#00AEFF` (bright sky blue), pink `#FF3DAC`. No others — no violet, no indigo-blue. Used **extensively and creatively** — chips, shapes, category coding, decorative assets. Take every reasonable chance to use them.
 - Some modes use an accent color as a **full-bleed background** (e.g. the pink product screen). Will be specified per-mode.
@@ -66,8 +67,8 @@ Named `shape-*` (sparkle, starburst, daisy, sun-rays, heart-circle, smiley, hand
 - The React app imports from the root `Assets/` via the `@/` alias.
 
 ### Radius
-- Chunky squircles and pills are the brand. Prefer large radii (`--ds-radius-lg`+, `--ds-radius-pill`).
-- Respect **concentric radius**: inner radius = outer − padding.
+- Squircles and pills are the brand, but **restrained**. The scale was pulled in ~25-30% (sm .375 / md .625 / lg .875 / xl 1.25 / 2xl 1.625rem) because oversized radii on large surfaces read soft and toy rather than premium. Use the tokens; don't reintroduce bigger values.
+- Respect **concentric radius**: inner radius = outer minus padding.
 
 ### Motion (make-interfaces principles)
 - Scale-on-press `0.96` (`.ds-press`). Spring transitions use `bounce: 0`.
