@@ -51,7 +51,7 @@ export function FeedScreen({
         ) : (
           <div className="stagger grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
             {listings.map((p, i) => (
-              <div key={p.id} style={{ animationDelay: `${i * 55}ms` }}>
+              <div key={p.id} className="self-start" style={{ animationDelay: `${i * 55}ms` }}>
                 <ListingCard
                   product={p}
                   rating={ratingForPubkey(p.pubkey)}

@@ -111,10 +111,14 @@ function RowCard({
   className: string;
 }) {
   const type = primaryType(product);
+  /* Fixed height + self-start: the row is a bounded object. Left to itself as a
+     grid child it stretches to the tallest cell in its track, and its height
+     otherwise floats with each photo's aspect ratio, so a feed of rows never
+     lines up. One height, every row, every surface. */
   return (
     <Link
       href={`/listing/${product.id}`}
-      className={`group lift grid min-h-[158px] grid-cols-[42%_1fr] overflow-hidden rounded-lg border-2 border-ink bg-paper-pure ${className}`}
+      className={`group lift grid h-[176px] grid-cols-[42%_1fr] self-start overflow-hidden rounded-lg border-2 border-ink bg-paper-pure ${className}`}
     >
       <div className={`relative overflow-hidden border-r-2 border-ink ${tintFor(product)}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}

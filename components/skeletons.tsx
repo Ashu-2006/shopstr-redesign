@@ -19,7 +19,7 @@ export function HeroSkeleton() {
 /* ---- ListingCard density="row" (H5, the DEFAULT) --------------------------- */
 export function ListingRowSkeleton() {
   return (
-    <div className="grid min-h-[158px] grid-cols-[42%_1fr] overflow-hidden rounded-lg border-2 border-ink bg-paper-pure">
+    <div className="grid h-[176px] grid-cols-[42%_1fr] self-start overflow-hidden rounded-lg border-2 border-ink bg-paper-pure">
       <div className="border-r-2 border-ink">
         <Skeleton shape="rect" className="!rounded-none" h="100%" w="100%" />
       </div>
