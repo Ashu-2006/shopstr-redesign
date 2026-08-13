@@ -3,8 +3,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { tLayout } from "@/lib/motion";
-import { profileByHandle, useSellerListings, useReviews, averageRating, useSession } from "@/data/hooks";
-import { timeAgo } from "@/lib/format";
+import { profileByHandle, useSellerListings, useReviews, averageRating, useSession, communityForCurator } from "@/data/hooks";
+import { timeAgo, groupInt } from "@/lib/format";
 import Link from "next/link";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
@@ -12,7 +12,7 @@ import { Stars } from "@/components/ui/Stars";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductCardSkeleton } from "@/components/skeletons";
-import { CaretLeft, Check, Plus, Star } from "@phosphor-icons/react";
+import { CaretLeft, Check, Plus, Star, UsersThree } from "@phosphor-icons/react";
 
 const NOW = 1717372800000;
 
@@ -23,6 +23,7 @@ export default function Shop() {
   const { data: items, isLoading: itemsLoading } = useSellerListings(profile?.pubkey ?? "");
   const { data: reviews } = useReviews(profile?.pubkey ?? "");
   const { follows, toggleFollow } = useSession();
+  const ownedCommunity = communityForCurator(handle);
   const [tab, setTab] = useState<"items" | "reviews" | "policies">("items");
 
   // profileByHandle is synchronous, so a missing profile with a real handle is
@@ -114,6 +115,25 @@ export default function Shop() {
       </div>
 
       <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12">
+        {/* A community belongs to a merchant pubkey upstream, so a seller who
+            runs one gets it surfaced on their shopfront. */}
+        {tab === "items" && ownedCommunity && (
+          <Link
+            href={`/communities/${ownedCommunity.slug}`}
+            className="ds-press mb-4 flex items-center gap-3 rounded-xl border-2 border-ink bg-purple p-4 text-on-purple"
+          >
+            <UsersThree size={22} weight="bold" className="shrink-0" />
+            <span className="min-w-0 flex-1 leading-snug">
+              <b>@{handle}</b> runs <b>{ownedCommunity.name}</b>
+              <span className="block font-mono text-[0.68rem] opacity-80 tabular-nums">
+                {groupInt(ownedCommunity.memberCount)} members · moderated
+              </span>
+            </span>
+            <span className="shrink-0 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em]">
+              Visit →
+            </span>
+          </Link>
+        )}
         {tab === "items" &&
           (itemsLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">

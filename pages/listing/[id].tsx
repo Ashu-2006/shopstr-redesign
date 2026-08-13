@@ -11,9 +11,10 @@ import {
   useReviews,
   useCartStore,
   useSession,
+  useCommunitiesForListing,
   averageRating,
 } from "@/data/hooks";
-import { Heart, Lightning, ShoppingBag, ChatCircle, Star } from "@phosphor-icons/react";
+import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree } from "@phosphor-icons/react";
 import { formatSats, groupInt, timeAgo } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
@@ -54,6 +55,10 @@ export default function ListingDetail() {
     },
     []
   );
+
+  // Communities where members discussed this exact listing. Read before the
+  // early returns below: hooks must run in the same order on every render.
+  const discussedIn = useCommunitiesForListing(product?.id ?? "");
 
   // Only declare a listing genuinely missing once the router is ready with a
   // real id. During a route change the id momentarily empties; showing
@@ -288,6 +293,31 @@ export default function ListingDetail() {
           </dl>
 
           {seller && <SellerStrip profile={seller} avg={avg} count={reviews.scores.length} />}
+
+          {/* Ask before you buy: if members discussed this item in a moderated
+              community, that is the strongest pre-purchase trust signal we have. */}
+          {discussedIn.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {discussedIn.map(({ community, postCount }) => (
+                <Link
+                  key={community.slug}
+                  href={`/communities/${community.slug}`}
+                  className="ds-press flex items-center gap-3 rounded-xl border-2 border-ink bg-blue-soft p-3"
+                >
+                  <UsersThree size={20} weight="bold" className="shrink-0" />
+                  <span className="min-w-0 flex-1 text-sm leading-snug">
+                    Discussed in <b>{community.name}</b>
+                    <span className="font-mono text-[0.68rem] text-text-muted tabular-nums">
+                      {" "}· {postCount} post{postCount === 1 ? "" : "s"}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-purple">
+                    Read →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
 
           <section>
             <div className="mb-3 flex items-baseline justify-between">

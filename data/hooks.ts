@@ -30,14 +30,16 @@ import {
 import { MOCK_THREAD_MESSAGES } from "@/data/mock/messages";
 import {
   MOCK_COMMUNITIES,
+  MOCK_COMMUNITY_POSTS,
   MOCK_ORDERS,
   MOCK_TXNS,
   CLAIMABLE,
   type Community,
+  type CommunityPost,
   type Order,
   type WalletTx,
 } from "@/data/mock/extras";
-import { useCartStore } from "@/data/store";
+import { useCartStore, useSession, type OwnPost } from "@/data/store";
 
 /* Re-export the mutable client-state hooks so the whole app imports state and
    data from this one module (the data boundary), never from store/ or mock/. */
@@ -187,6 +189,184 @@ export function useCommunity(slug: string): AsyncResult<Community | null> {
     [slug]
   );
   return { data: isLoading ? null : data, isLoading };
+}
+
+/* ------------------------------------------------------- COMMUNITY: NIP-72 --
+   The mechanism, not decoration. A post is a REQUEST until a moderator
+   approves it (upstream: kind 1111 gated by kind 4550). These hooks derive
+   every community surface from that one rule, and fold in the session's local
+   moderation verdicts + own submissions so the flow is reviewable end to end.
+   -------------------------------------------------------------------------- */
+
+/** The signed-in user. Single place to change when auth lands. */
+export const ME = "ekko";
+
+/** Full moderator list for a community: owner first, then named moderators. */
+export function moderatorsOf(c: Community): string[] {
+  return [c.curator, ...c.moderators.filter((m) => m !== c.curator)];
+}
+
+/** Does the current user moderate this community? */
+export function useIsModerator(slug: string): boolean {
+  const comm = MOCK_COMMUNITIES.find((c) => c.slug === slug);
+  return !!comm && moderatorsOf(comm).includes(ME);
+}
+
+/**
+ * All posts for a community, with session state folded in: locally declined
+ * posts disappear, locally approved ones flip to approved, and the user's own
+ * submissions from this session are appended as pending.
+ */
+function resolvePosts(
+  slug: string,
+  moderated: Map<string, "approved" | "declined">,
+  ownPosts: OwnPost[]
+): CommunityPost[] {
+  const own: CommunityPost[] = ownPosts
+    .filter((p) => p.communitySlug === slug)
+    .map((p) => ({
+      id: p.id,
+      communitySlug: p.communitySlug,
+      authorHandle: ME,
+      kind: p.kind,
+      text: p.text,
+      at: p.at,
+      // A moderator publishes their own approval, so their post is live at once.
+      status: p.selfApproved ? ("approved" as const) : ("pending" as const),
+      approvedBy: p.selfApproved ? ME : undefined,
+      productId: p.productId,
+      replyCount: 0,
+    }));
+
+  return [...MOCK_COMMUNITY_POSTS.filter((p) => p.communitySlug === slug), ...own]
+    .filter((p) => moderated.get(p.id) !== "declined")
+    .map((p) =>
+      moderated.get(p.id) === "approved"
+        ? { ...p, status: "approved" as const, approvedBy: ME }
+        : p
+    )
+    .sort((a, b) => b.at - a.at);
+}
+
+/** Approved posts only — what a member sees in the feed. */
+export function useCommunityPosts(slug: string): AsyncResult<CommunityPost[]> {
+  const isLoading = useSimulatedLoad("communities");
+  const { moderated, ownPosts } = useSession();
+  const data = useMemo(
+    () => resolvePosts(slug, moderated, ownPosts).filter((p) => p.status === "approved"),
+    [slug, moderated, ownPosts]
+  );
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/**
+ * The moderator queue: other people's posts awaiting a verdict. Your own
+ * requests are excluded — they surface to you as "waiting on approval" instead,
+ * so a moderator never sees their own post twice or approves themselves.
+ */
+export function usePendingPosts(slug: string): AsyncResult<CommunityPost[]> {
+  const isLoading = useSimulatedLoad("communities");
+  const { moderated, ownPosts } = useSession();
+  const data = useMemo(
+    () =>
+      resolvePosts(slug, moderated, ownPosts).filter(
+        (p) => p.status === "pending" && p.authorHandle !== ME
+      ),
+    [slug, moderated, ownPosts]
+  );
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/** The current user's own posts still awaiting approval, in one community. */
+export function useMyPendingPosts(slug: string): CommunityPost[] {
+  const { moderated, ownPosts } = useSession();
+  return useMemo(
+    () =>
+      resolvePosts(slug, moderated, ownPosts).filter(
+        (p) => p.status === "pending" && p.authorHandle === ME
+      ),
+    [slug, moderated, ownPosts]
+  );
+}
+
+export interface CommunityDigestEntry {
+  community: Community;
+  /** Approved posts, newest first. */
+  posts: CommunityPost[];
+  /** Pending posts awaiting THIS user's verdict (moderators only). */
+  queueCount: number;
+  /** The user's own posts awaiting approval here. */
+  myPendingCount: number;
+}
+
+/**
+ * The /communities landing: what's new across the communities you joined,
+ * plus your queue if you moderate. This is the reason to return, so it is
+ * derived rather than hand-authored.
+ */
+export function useCommunityDigest(): AsyncResult<CommunityDigestEntry[]> {
+  const isLoading = useSimulatedLoad("communities");
+  const { joinedCommunities, moderated, ownPosts } = useSession();
+
+  const data = useMemo(
+    () =>
+      MOCK_COMMUNITIES.filter((c) => joinedCommunities.has(c.slug)).map((community) => {
+        const all = resolvePosts(community.slug, moderated, ownPosts);
+        const isMod = moderatorsOf(community).includes(ME);
+        return {
+          community,
+          posts: all.filter((p) => p.status === "approved"),
+          queueCount: isMod ? all.filter((p) => p.status === "pending").length : 0,
+          myPendingCount: all.filter(
+            (p) => p.status === "pending" && p.authorHandle === ME
+          ).length,
+        };
+      }),
+    [joinedCommunities, moderated, ownPosts]
+  );
+
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/**
+ * Communities where an approved post quotes this listing. Powers the
+ * "Discussed in ..." entry point on the listing page (the ask-before-you-buy
+ * path, and the only place a community proves its value pre-purchase).
+ */
+export function useCommunitiesForListing(
+  productId: string
+): { community: Community; postCount: number }[] {
+  const { moderated, ownPosts } = useSession();
+  return useMemo(() => {
+    if (!productId) return [];
+    return MOCK_COMMUNITIES.map((community) => {
+      const postCount = resolvePosts(community.slug, moderated, ownPosts).filter(
+        (p) => p.status === "approved" && p.productId === productId
+      ).length;
+      return { community, postCount };
+    }).filter((e) => e.postCount > 0);
+  }, [productId, moderated, ownPosts]);
+}
+
+/** The community a merchant owns, for the shop page tab (upstream parity). */
+export function communityForCurator(handle: string): Community | null {
+  return MOCK_COMMUNITIES.find((c) => c.curator === handle) ?? null;
+}
+
+/**
+ * The community best matched to a listing's category, for the post-purchase
+ * "show it off" prompt. Topic match only: a community never owns a listing.
+ */
+export function communityForListing(productId: string): Community | null {
+  const product = MOCK_LISTINGS.find((l) => l.id === productId);
+  if (!product) return null;
+  return (
+    MOCK_COMMUNITIES.find((c) =>
+      c.topics.some((t) =>
+        product.categories.some((cat) => cat.toLowerCase() === t.toLowerCase())
+      )
+    ) ?? null
+  );
 }
 
 /** The current user's orders. */

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { Lightning, Key, Star } from "@phosphor-icons/react";
-import { useCartStore, useCheckout } from "@/data/hooks";
+import { Lightning, Key, Star, UsersThree } from "@phosphor-icons/react";
+import { useCartStore, useCheckout, communityForListing } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { Sticker } from "@/components/ui/Sticker";
 
@@ -19,6 +19,8 @@ export default function Paid() {
     seller: cart.items[0]?.product.pubkey.replace("pk_", "") ?? "ekko",
     firstId: cart.items[0]?.product.id ?? "lst_007",
   }));
+
+  const showOffIn = communityForListing(snapshot.firstId);
 
   useEffect(() => {
     cart.clear();
@@ -62,6 +64,16 @@ export default function Paid() {
         </p>
 
         <div className="z-10 flex w-full max-w-[420px] flex-col gap-2.5">
+          {/* Closes the circular-economy loop: a buyer who shows the thing off
+              becomes a participant, not just a transaction. */}
+          {showOffIn && (
+            <Link
+              href={`/communities/${showOffIn.slug}`}
+              className="ds-press inline-flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-purple py-3.5 font-bold text-on-purple"
+            >
+              <UsersThree size={18} weight="bold" /> Show it off in {showOffIn.name}
+            </Link>
+          )}
           <Link href={`/review/${snapshot.firstId}`} className="ds-press inline-flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-ink py-3.5 font-bold text-text-on-dark">
             <Star weight="fill" size={18} /> Leave a review
           </Link>

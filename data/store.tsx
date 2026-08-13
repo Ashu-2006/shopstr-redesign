@@ -97,6 +97,22 @@ export function useCartStore(): CartApi {
 
 /* --------------------------------------------------------------- SESSION -- */
 
+/**
+ * A post the user submitted this session. Lands pending like upstream, unless
+ * the user moderates the community — a moderator's own post is self-approved
+ * (upstream: they can publish the kind-4550 approval themselves).
+ */
+export interface OwnPost {
+  id: string;
+  communitySlug: string;
+  kind: "show" | "ask" | "sale";
+  text: string;
+  at: number;
+  productId?: string;
+  /** Set when the author moderates this community. */
+  selfApproved?: boolean;
+}
+
 interface SessionApi {
   signedIn: boolean;
   signIn: () => void;
@@ -104,6 +120,15 @@ interface SessionApi {
   toggleFav: (id: string) => void;
   follows: Set<string>;
   toggleFollow: (handle: string) => void;
+  /** Community slugs the user has joined. Real state: gates posting. */
+  joinedCommunities: Set<string>;
+  toggleJoin: (slug: string) => void;
+  /** Locally approved / declined post ids, so moderation is reviewable. */
+  moderated: Map<string, "approved" | "declined">;
+  moderatePost: (id: string, verdict: "approved" | "declined") => void;
+  /** Posts the user submitted this session (they land pending). */
+  ownPosts: OwnPost[];
+  submitPost: (post: OwnPost) => void;
   /** Where a seller's sats land after a sale. Inverted default = stay in Shopstr. */
   payout: "shopstr" | "lightning";
   setPayout: (v: "shopstr" | "lightning") => void;
@@ -118,6 +143,14 @@ function SessionProvider({ children }: { children: ReactNode }) {
   const [favs, setFavs] = useState<Set<string>>(new Set());
   const [follows, setFollows] = useState<Set<string>>(new Set());
   const [payout, setPayout] = useState<"shopstr" | "lightning">("shopstr");
+  // Seeded so the signed-in user has somewhere to return to on first run.
+  const [joinedCommunities, setJoined] = useState<Set<string>>(
+    () => new Set(["riso", "film", "ceramics"])
+  );
+  const [moderated, setModerated] = useState<Map<string, "approved" | "declined">>(
+    () => new Map()
+  );
+  const [ownPosts, setOwnPosts] = useState<OwnPost[]>([]);
 
   const toggleFav = useCallback((id: string) => {
     setFavs((prev) => {
@@ -135,6 +168,22 @@ function SessionProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const toggleJoin = useCallback((slug: string) => {
+    setJoined((prev) => {
+      const next = new Set(prev);
+      next.has(slug) ? next.delete(slug) : next.add(slug);
+      return next;
+    });
+  }, []);
+
+  const moderatePost = useCallback((id: string, verdict: "approved" | "declined") => {
+    setModerated((prev) => new Map(prev).set(id, verdict));
+  }, []);
+
+  const submitPost = useCallback((post: OwnPost) => {
+    setOwnPosts((prev) => [...prev, post]);
+  }, []);
+
   const value = useMemo<SessionApi>(
     () => ({
       signedIn,
@@ -143,11 +192,21 @@ function SessionProvider({ children }: { children: ReactNode }) {
       toggleFav,
       follows,
       toggleFollow,
+      joinedCommunities,
+      toggleJoin,
+      moderated,
+      moderatePost,
+      ownPosts,
+      submitPost,
       payout,
       setPayout,
       walletBalance: 182400,
     }),
-    [signedIn, favs, toggleFav, follows, toggleFollow, payout]
+    [
+      signedIn, favs, toggleFav, follows, toggleFollow,
+      joinedCommunities, toggleJoin, moderated, moderatePost,
+      ownPosts, submitPost, payout,
+    ]
   );
 
   return <SessionCtx.Provider value={value}>{children}</SessionCtx.Provider>;
