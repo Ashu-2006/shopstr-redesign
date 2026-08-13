@@ -40,7 +40,10 @@ export function EmptyState({
         "text-center",
         isPage
           ? "px-6 pb-10 pt-16"
-          : "rounded-xl border-2 border-dashed border-ink/30 px-6 py-14",
+          : // Inline needs to read as a bounded well. The dashed stroke carries
+            // that in the default theme; body.soft-sep zeroes every border, so a
+            // paper-2 fill backs it up and the container survives either mode.
+            "rounded-xl border-2 border-dashed border-ink/30 bg-paper-2/60 px-6 py-14",
         className,
       ].join(" ")}
     >

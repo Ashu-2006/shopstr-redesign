@@ -35,9 +35,13 @@ export default function StatesPlayground() {
       <main className="mx-auto max-w-[1100px] px-4 py-8 pb-24">
         <h1 className="ds-display text-3xl">Loading + empty states</h1>
         <p className="mt-2 max-w-[60ch] text-text-muted">
-          The full vocabulary. One sweep (`.ds-skeleton`, 1.6s, paper tokens), no spinners
-          anywhere. Card skeletons keep the live ink frame and mirror real geometry so
-          nothing reflows when data lands.
+          The full vocabulary. One sweep (<span className="font-mono text-[0.85em]">.ds-skeleton</span>,
+          1.6s, true-neutral paper tokens), no spinners anywhere. Card skeletons mirror real card
+          geometry exactly, so nothing reflows when data lands.
+        </p>
+        <p className="mt-2 max-w-[60ch] font-mono text-[0.72rem] text-text-subtle">
+          Note: with body.soft-sep active, separation comes from fill weight rather than
+          strokes, so the card frames below read as white surfaces, not outlines.
         </p>
 
         <div className="my-8 h-0.5 bg-ink/15" />
