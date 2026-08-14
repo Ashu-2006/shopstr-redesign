@@ -37,6 +37,8 @@ function BootGate() {
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
+  // /dev/* are standalone surfaces (playgrounds, the landing page): no app nav.
+  const standalone = router.pathname.startsWith("/dev/");
   return (
     <AppProviders>
       <BootGate />
@@ -53,8 +55,10 @@ export default function App({ Component, pageProps }: AppProps) {
             the route-fade below so it never re-fades on navigation. It's
             position:fixed, so the md:pl-20 inset on the content wrapper (not a
             transform) is what keeps page content clear of the collapsed rail. */}
-        <LeftSidebar />
-        <div className="md:pl-20">
+        {/* /dev/* routes are standalone surfaces (playgrounds, the landing
+            page): no app nav rail, and therefore no inset for it either. */}
+        {!standalone && <LeftSidebar />}
+        <div className={standalone ? "" : "md:pl-20"}>
         {/* Route transition is a fade-IN keyed on the route. We deliberately do
             NOT wrap this in <AnimatePresence mode="wait">: a "wait" exit keeps the
             outgoing page mounted while it animates out, and dynamic pages
