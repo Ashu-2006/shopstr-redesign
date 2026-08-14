@@ -68,9 +68,9 @@ export default function Cart() {
                 <motion.li
                   key={c.product.id + (c.size ?? "")}
                   layout
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -16, transition: tExit }}
+                  initial={{ opacity: 0, transform: "translateY(8px)" }}
+                  animate={{ opacity: 1, transform: "translateY(0px)" }}
+                  exit={{ opacity: 0, transform: "translateX(-16px)", transition: tExit }}
                   transition={tEnter}
                 >
                   <LineItem

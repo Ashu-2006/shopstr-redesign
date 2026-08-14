@@ -159,7 +159,7 @@ export default function ListingDetail() {
               <motion.span
                 key={addedPop}
                 aria-hidden
-                initial={{ opacity: 0, scale: 0.4, rotate: -20, y: 0 }}
+                initial={{ opacity: 0, scale: 0.9, rotate: -20, y: 0 }}
                 animate={{
                   opacity: 1,
                   scale: 1,

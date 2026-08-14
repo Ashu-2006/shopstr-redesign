@@ -147,16 +147,25 @@
      lib/motion.ts mirrors these values for Framer Motion; keep them in sync. */
   --ds-dur-instant: 70ms; /* micro-feedback: icon opacity, row hover, press */
   --ds-dur-fast: 140ms; /* THE WORKHORSE: hover, focus, color, most things */
-  --ds-dur-moderate: 300ms; /* entrances: menus, popovers, accordions */
-  --ds-dur-slow: 560ms; /* large travel: drawers, page-level, image zoom */
+  --ds-dur-moderate: 240ms; /* entrances: menus, popovers, accordions (<300ms) */
+  /* Reserved for genuinely large travel (drawers, page-level) and decorative
+     reveals. UI interactions must stay under 300ms: a 180ms dropdown reads as
+     more responsive than a 400ms one. */
+  --ds-dur-slow: 420ms;
   --ds-dur-base: var(--ds-dur-moderate); /* deprecated alias */
   /* Ambient loop duration (skeleton sweep). Deliberately OUTSIDE the four-step
      interaction scale above: it paces a background loop, not an interaction. */
   --ds-dur-loop: 1.6s;
 
-  --ds-ease-smooth: cubic-bezier(0.45, 0.05, 0.55, 0.95); /* neutral default */
-  --ds-ease-swing: cubic-bezier(0, 0.55, 0.45, 1); /* max velocity at t=0; slides */
-  --ds-ease-exit: cubic-bezier(0.65, 0.05, 0.36, 1); /* hesitates, then commits */
+  /* Strong curves. The browser built-ins (and gentle symmetric curves) are too
+     weak to read as intentional: what makes motion feel premium is covering most
+     of the distance early, then settling. At 30% elapsed `smooth` below has
+     travelled 84% of the way, vs 19% for a symmetric ease-in-out.
+     NEVER use ease-in on UI: it delays the exact moment the user is watching. */
+  --ds-ease-smooth: cubic-bezier(0.23, 1, 0.32, 1); /* strong ease-out; the default */
+  --ds-ease-swing: cubic-bezier(0.32, 0.72, 0, 1); /* iOS-like; panels, drawers, slides */
+  --ds-ease-move: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement / morphing */
+  --ds-ease-exit: cubic-bezier(0.23, 1, 0.32, 1); /* exits: same strong ease-out, shorter */
   --ds-ease-jumpy: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* overshoots both ends; sticker pops only */
   --ds-ease-out: var(--ds-ease-swing); /* deprecated alias */
   --ds-ease-fluid: var(--ds-ease-smooth); /* deprecated alias */

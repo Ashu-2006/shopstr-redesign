@@ -98,7 +98,10 @@ export function OneWayFrame({
       >
         {/* The panel PERSISTS across steps. `layout` smart-animates its height as
             the inner content swaps, so steps don't pop in as fresh cards. In
-            dialog mode the height is fixed, so only the inner region moves. */}
+            dialog mode the height is fixed, so only the inner region moves.
+            Keeps the `y` shorthand deliberately: `layout` drives this element's
+            transform via layout projection, and a hardcoded transform string
+            would fight it. A one-off mount is not an under-load hot path. */}
         <motion.div
           layout
           initial={{ opacity: 0, y: 10 }}

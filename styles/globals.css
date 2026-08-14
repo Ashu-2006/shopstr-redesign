@@ -78,12 +78,27 @@
      bare transition utility run 140ms smooth unless overridden. */
   --ease-smooth: var(--ds-ease-smooth);
   --ease-swing: var(--ds-ease-swing);
+  --ease-move: var(--ds-ease-move);
   --ease-exit: var(--ds-ease-exit);
   --ease-jumpy: var(--ds-ease-jumpy);
   --ease-out: var(--ds-ease-out);
   --ease-fluid: var(--ds-ease-fluid);
   --default-transition-duration: var(--ds-dur-fast);
   --default-transition-timing-function: var(--ds-ease-smooth);
+}
+
+/* Redefine Tailwind's `hover:` so it only applies on devices with a real
+   pointer. Tailwind v4 ships `hover:` ungated, so on a touchscreen a tap
+   latches the hover state (a tapped product card stays zoomed until you tap
+   elsewhere). Overriding the variant fixes every `hover:` call site at once
+   instead of editing each one. Color-only hovers were harmless either way;
+   transform hovers (`hover:scale-*`, `hover:rotate-*`) were the real bug. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
 }
 
 /* ------------------------------------------------------------------ BASE -- */
@@ -224,7 +239,10 @@ select:focus-visible {
 
 /* Sticker / reveal pop. Starts at scale(1) and bulges 5%: bulging reads
    physical, growing from small reads cheap. Opacity is solid by 40% so the
-   content is readable before the motion ends. */
+   content is readable before the motion ends.
+   A keyframe is correct here (unlike the toast below): every call site is
+   keyed/remounted per reward, so it is a one-shot that never needs to be
+   interrupted and retargeted mid-flight. */
 @keyframes ds-popdown {
   0% {
     opacity: 0;
@@ -247,24 +265,23 @@ select:focus-visible {
   animation: ds-popdown var(--ds-dur-moderate) var(--ds-ease-smooth) both;
 }
 
-/* Toast / notice: enters from the edge it lives on with a 1% overshoot.
-   Stagger simultaneous toasts by 40-60ms. */
-@keyframes ds-toast-in {
-  0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.96);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(0) scale(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
+/* Toast / notice: enters from the edge it lives on.
+   A TRANSITION, not a keyframe: toasts can be re-triggered rapidly, and a
+   keyframe restarts from zero on every retrigger (a second toast arriving
+   mid-animation visibly snaps back). A transition can be interrupted and
+   retargeted from wherever it currently is. The mounted flag flips one frame
+   after mount, so the browser has a "from" state to transition out of.
+   Named properties only, never `all`. */
 .toast-in {
-  animation: ds-toast-in var(--ds-dur-moderate) var(--ds-ease-swing) both;
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+  transition:
+    opacity var(--ds-dur-moderate) var(--ds-ease-smooth),
+    transform var(--ds-dur-moderate) var(--ds-ease-swing);
+}
+.toast-in[data-mounted="true"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* Slow spin for decorative stickers. */

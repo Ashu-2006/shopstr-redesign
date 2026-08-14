@@ -12,21 +12,23 @@ export const dur = {
   instant: 0.07,
   /** 140ms: THE WORKHORSE (hover, focus, color, most transitions). */
   fast: 0.14,
-  /** 300ms: entrances (menus, popovers, step changes, list items). */
-  moderate: 0.3,
-  /** 560ms: large travel (drawers, page-level moves, image zoom). */
-  slow: 0.56,
+  /** 240ms: entrances (menus, popovers, step changes, list items). */
+  moderate: 0.24,
+  /** 420ms: large travel (drawers, page-level moves) and decorative reveals. */
+  slow: 0.42,
 } as const;
 
-/** Easing curves as cubic-bezier tuples. */
+/** Easing curves as cubic-bezier tuples. Strong on purpose: most of the
+    distance is covered early, then it settles. Never ease-in on UI. */
 export const ease = {
-  /** Symmetric, neutral. Default when nothing should call attention. */
-  smooth: [0.45, 0.05, 0.55, 0.95],
-  /** Max velocity at t=0, decelerates into place. Panels, slides, anything
-      that should read as responsive rather than animated. */
-  swing: [0, 0.55, 0.45, 1],
-  /** Hesitates, then commits. Exits and dismissals. */
-  exit: [0.65, 0.05, 0.36, 1],
+  /** Strong ease-out. The default for entering and exiting. */
+  smooth: [0.23, 1, 0.32, 1],
+  /** iOS-like drawer curve. Panels, sheets, anything sliding. */
+  swing: [0.32, 0.72, 0, 1],
+  /** Strong ease-in-out, for something moving/morphing on screen. */
+  move: [0.77, 0, 0.175, 1],
+  /** Exits: same strong ease-out, just given less time than the enter. */
+  exit: [0.23, 1, 0.32, 1],
   /** Overshoots both ends. Sticker pops only, one per screen, sparingly. */
   jumpy: [0.68, -0.55, 0.27, 1.55],
 } as const;

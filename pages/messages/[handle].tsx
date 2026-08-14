@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { tEnter, tExit } from "@/lib/motion";
 import {
   useListing,
   useChats,
@@ -367,13 +368,16 @@ export default function Thread() {
                   <PaperPlaneTilt size={18} />
                 </button>
                 <AnimatePresence>
+                  {/* Never enter from scale(0): nothing appears from nothing.
+                      0.9 + opacity reads as a real object arriving. Exit fades
+                      rather than collapsing to zero. */}
                   {spark > 0 && !reduceMotion && (
                     <motion.span
                       key={spark}
-                      initial={{ scale: 0, rotate: -30, opacity: 1 }}
+                      initial={{ scale: 0.9, rotate: -30, opacity: 0 }}
                       animate={{ scale: 1.15, rotate: 10, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+                      exit={{ scale: 0.9, opacity: 0, transition: tExit }}
+                      transition={tEnter}
                       onAnimationComplete={() => setTimeout(() => setSpark(0), 450)}
                       className="pointer-events-none absolute -top-8 right-1"
                     >

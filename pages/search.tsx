@@ -271,10 +271,14 @@ export default function Search() {
         {sheet && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSheet(false)} className="fixed inset-0 z-40 bg-ink/50" />
+            {/* Full transform string, not the `y` shorthand: shorthands run on
+                the main thread via rAF and drop frames under load, while a
+                transform string is composited. Percentages are relative to the
+                sheet's own height, so it works at any size. */}
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%", transition: { duration: dur.moderate, ease: ease.exit } }}
+              initial={{ transform: "translateY(100%)" }}
+              animate={{ transform: "translateY(0%)" }}
+              exit={{ transform: "translateY(100%)", transition: { duration: dur.moderate, ease: ease.exit } }}
               transition={tEnter}
               className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[88vh] max-w-[560px] flex-col rounded-t-2xl border-2 border-ink bg-paper"
             >
