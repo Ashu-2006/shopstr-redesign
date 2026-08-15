@@ -35,7 +35,7 @@ export function FeedScreen({
         <title>{title} · Shopstr</title>
       </Head>
       <TopBar searchHref="/search" cartCount={count} />
-      <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-4 md:pb-12">
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12">
         <DiscoveryChips />
         <SectionTitle note={loading ? undefined : sub}>{title}</SectionTitle>
         {loading ? (

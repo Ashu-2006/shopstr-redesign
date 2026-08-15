@@ -119,7 +119,7 @@ export default function Search() {
       <header className="sticky top-0 z-30 border-b-2 border-ink bg-paper px-4 py-3">
         {/* Suggestion mode reads as a command palette at lg: the bar narrows to
             the same centered measure as the term list. Results mode goes wide. */}
-        <div className={`mx-auto flex max-w-[1240px] items-center gap-3 ${committed ? "" : "lg:max-w-[680px]"}`}>
+        <div className={`mx-auto flex max-w-(--ds-measure) items-center gap-3 ${committed ? "" : "lg:max-w-[680px]"}`}>
           <div className="relative flex flex-1 items-center gap-2 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2.5">
             <MagnifyingGlass size={18} className="shrink-0 text-text-subtle" />
             <input
@@ -143,7 +143,7 @@ export default function Search() {
 
       {!committed ? (
         /* ---- Suggestions ---- */
-        <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 md:pb-12 lg:max-w-[680px]">
+        <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-5 md:pb-12 lg:max-w-[680px]">
           <div className="mb-3 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-text-subtle">
             {query.trim() ? "Top suggestions" : "Popular"}
           </div>
@@ -172,7 +172,7 @@ export default function Search() {
       ) : (
         /* ---- Results ---- */
         <>
-          <div className="mx-auto max-w-[1240px] px-4">
+          <div className="mx-auto max-w-(--ds-measure) px-4">
             <h1 className="ds-display mt-5 text-3xl">{committed}</h1>
             <div className="mt-3 flex items-center justify-between border-t-2 border-ink py-3">
               {isLoading ? (
@@ -222,7 +222,7 @@ export default function Search() {
             </div>
           </div>
 
-          <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-3 md:pb-12">
+          <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-3 md:pb-12">
             {isLoading ? (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
                 {Array.from({ length: 8 }, (_, i) => (

@@ -46,8 +46,8 @@ export default function DiscoverCommunities() {
   return (
     <>
       <Head><title>Discover communities · Shopstr</title></Head>
-      <SheetHeader title="Discover" backTo="/communities" contentMax="max-w-[1100px]" />
-      <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-3 md:pb-12">
+      <SheetHeader title="Discover" backTo="/communities" contentMax="max-w-(--ds-measure)" />
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-3 md:pb-12">
         <p className="max-w-[52ch] text-text-muted">
           Every community is moderated: a member posts, a moderator approves, then it appears.
           That gate is why these rooms are worth reading.

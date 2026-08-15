@@ -40,7 +40,7 @@ export default function CategoryScreen() {
 
       {/* Colored hero: takes the category's accent (smart-opens into this color) */}
       <header className={`cat-pop relative overflow-hidden border-b-2 border-ink ${toneBg(meta.tone)}`}>
-        <div className="mx-auto max-w-[1240px] px-4 pb-6 pt-4">
+        <div className="mx-auto max-w-(--ds-measure) px-4 pb-6 pt-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => router.back()}
@@ -77,7 +77,7 @@ export default function CategoryScreen() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-4 md:pb-12">
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12">
         {spotlight && (
           <FeatureCard
             product={spotlight}

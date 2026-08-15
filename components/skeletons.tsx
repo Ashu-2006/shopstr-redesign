@@ -135,7 +135,7 @@ export function FeedSkeleton({
 /* ---- Listing detail: gallery + info columns --------------------------------- */
 export function ListingDetailSkeleton() {
   return (
-    <main className="mx-auto max-w-[1100px] px-4 pb-44 pt-4 md:grid md:grid-cols-2 md:gap-10 lg:pb-16">
+    <main className="mx-auto max-w-(--ds-measure) px-4 pb-44 pt-4 md:grid md:grid-cols-2 md:gap-10 lg:pb-16">
       <div>
         <div className="mb-3 flex items-center justify-between">
           <Skeleton shape="rect" w={96} h={38} className="!rounded-pill" />

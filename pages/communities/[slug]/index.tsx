@@ -88,7 +88,7 @@ export default function CommunityDetail() {
       <>
         <Head><title>Community · Shopstr</title></Head>
         <div className="border-b-2 border-ink bg-paper-pure">
-          <div className="mx-auto max-w-[1100px] px-4 py-4">
+          <div className="mx-auto max-w-(--ds-measure) px-4 py-4">
             <div className="flex items-center gap-3.5">
               <Skeleton shape="rect" w={56} h={56} className="!rounded-[6px]" />
               <div className="flex-1">
@@ -98,7 +98,7 @@ export default function CommunityDetail() {
             </div>
           </div>
         </div>
-        <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12" aria-hidden="true">
+        <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12" aria-hidden="true">
           <div className="flex flex-col gap-3">
             {Array.from({ length: 3 }, (_, i) => (
               <div key={i} className="rounded-xl border-2 border-ink bg-paper-pure p-4">
@@ -127,7 +127,7 @@ export default function CommunityDetail() {
 
       {/* ---- Identity bar: compact, factual. No stock banner, no invented stats. ---- */}
       <div className="border-b-2 border-ink bg-paper-pure">
-        <div className="mx-auto max-w-[1100px] px-4 py-3.5">
+        <div className="mx-auto max-w-(--ds-measure) px-4 py-3.5">
           {/* Identity row. On mobile the actions drop to their own row so the
               display name gets the full measure instead of wrapping to four
               lines against a squeezed flex child. */}
@@ -197,7 +197,7 @@ export default function CommunityDetail() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12 lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-8">
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12 lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-8">
         <div>
           <CommunityComposer
             joined={joined}

@@ -199,7 +199,11 @@ export default function ListingDetail() {
 
       <TopBar searchHref="/search" cartCount={cart.count} />
 
-      <main className="mx-auto max-w-[1100px] px-4 pb-44 pt-4 md:grid md:grid-cols-2 md:gap-10 lg:pb-16">
+      {/* Two columns only. "More from" used to live inside this grid as a
+          col-span-2 row, which ended the gallery's sticky containing block one
+          row early and unstuck it before the page finished scrolling. It is now
+          a sibling below, so the image tracks the info column the whole way. */}
+      <main className="mx-auto max-w-(--ds-measure) px-4 pt-4 md:grid md:grid-cols-2 md:gap-10">
         {/* ---- Gallery ---- */}
         <div className="md:sticky md:top-24 md:self-start">
           <div className="mb-3 flex items-center justify-between">
@@ -256,8 +260,11 @@ export default function ListingDetail() {
             {/* A fiat-quoted listing leads with the seller's number, because that
                 is what they committed to; sats follow as the settlement amount. */}
             <div className="mt-3 flex items-end gap-3">
+              {/* A sats listing renders the bare number with the unit as a
+                  separate smaller token; quoted.quoted already carries "sats",
+                  so using it here printed "120,000 sats sats". */}
               <span className="font-mono text-4xl font-bold leading-none tabular-nums">
-                {quoted.quoted}
+                {quoted.converted ? quoted.quoted : groupInt(product.price)}
               </span>
               {!quoted.converted && <span className="pb-1 font-mono text-sm text-text-muted">sats</span>}
             </div>
@@ -386,24 +393,28 @@ export default function ListingDetail() {
           </section>
 
         </div>
-
-        {/* Related items span both columns: an orphaned grid under the buy box reads
-            as part of the purchase decision; full-width it reads as browsing. */}
-        {others.length > 0 && (
-          <section className="mt-8 md:col-span-2 md:mt-2">
-            <h2 className="ds-display mb-3 text-xl">More from @{seller?.handle}</h2>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {others.map((p) => (
-                <ListingCard key={p.id} product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
-              ))}
-            </div>
-          </section>
-        )}
       </main>
+
+      {/* Related items sit OUTSIDE the sticky grid and run the full measure:
+          an orphaned grid under the buy box reads as part of the purchase
+          decision, whereas full-width it reads as browsing. */}
+      {others.length > 0 && (
+        <section className="mx-auto max-w-(--ds-measure) px-4 pb-44 pt-10 lg:pb-16">
+          <h2 className="ds-display mb-3 text-xl">More from @{seller?.handle}</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {others.map((p) => (
+              <ListingCard key={p.id} product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
+            ))}
+          </div>
+        </section>
+      )}
+      {/* No related items: the main grid still needs bottom clearance for the
+          fixed buy bar. */}
+      {others.length === 0 && <div className="pb-44 lg:pb-16" />}
 
       {/* ---- Fixed buy bar: mobile/tablet only. Desktop gets the inline buy box. ---- */}
       <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 md:pb-6 lg:hidden">
-        <div className="mx-auto max-w-[1100px]">{buyControls}</div>
+        <div className="mx-auto max-w-(--ds-measure)">{buyControls}</div>
       </div>
 
       <AnimatePresence>

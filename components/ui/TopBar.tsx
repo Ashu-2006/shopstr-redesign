@@ -36,7 +36,7 @@ export function TopBar({
   );
   return (
     <header className="sticky top-0 z-30 bg-paper border-b-2 border-ink">
-      <div className="mx-auto flex max-w-[1240px] items-center gap-3 px-4 py-3 md:gap-5">
+      <div className="mx-auto flex max-w-(--ds-measure) items-center gap-3 px-4 py-3 md:gap-5">
         <Link href="/marketplace" aria-label="Shopstr home" className="shrink-0">
           <Logo />
         </Link>

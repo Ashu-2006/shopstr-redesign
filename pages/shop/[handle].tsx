@@ -68,7 +68,7 @@ export default function Shop() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={profile.banner ?? "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600"} alt="" className="h-full w-full object-cover" />
         </div>
-        <div className="mx-auto max-w-[1100px] px-4 pb-1">
+        <div className="mx-auto max-w-(--ds-measure) px-4 pb-1">
           <div className="flex items-end gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={profile.picture} alt="" className="-mt-11 h-[74px] w-[74px] rounded-[8px] border-2 border-ink object-cover md:-mt-14 md:h-[92px] md:w-[92px]" />
@@ -115,7 +115,7 @@ export default function Shop() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12">
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12">
         {/* A community belongs to a merchant pubkey upstream, so a seller who
             runs one gets it surfaced on their shopfront. */}
         {tab === "items" && ownedCommunity && (

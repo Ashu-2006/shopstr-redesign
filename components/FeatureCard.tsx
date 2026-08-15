@@ -64,7 +64,7 @@ function HeroFormat({ product, n }: { product: ProductData; n: number }) {
         {primaryCategory(product)}
       </span>
       <Sticker name="badge-bff-star" className="absolute right-5 top-[60px] z-10 h-12 w-12" />
-      <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[1240px] p-5 md:p-8">
+      <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-(--ds-measure) p-5 md:p-8">
         <h3 className="ds-display text-[1.9rem] leading-[0.92] md:text-4xl lg:text-5xl">{product.title}</h3>
         <div className="mt-2.5 flex items-baseline justify-between">
           <span className="font-mono text-xl font-bold tabular-nums lg:text-2xl">{priceLabel(product)}</span>
@@ -94,7 +94,9 @@ function SpotlightFormat({
   return (
     <Link
       href={href ?? `/listing/${product.id}`}
-      className="group lift grid h-[220px] grid-cols-[1fr_1.05fr] overflow-hidden rounded-xl border-2 border-ink bg-purple text-on-purple"
+      // The image takes the extra width as the viewport grows; the copy pane is
+      // capped. A 50/50 split left a huge empty purple field on wide screens.
+      className="group lift grid h-[220px] grid-cols-[1fr_minmax(0,340px)] overflow-hidden rounded-xl border-2 border-ink bg-purple text-on-purple lg:h-[260px] lg:grid-cols-[1fr_minmax(0,420px)]"
     >
       <div className="h-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -135,6 +135,15 @@
   --ds-radius-pill: 999px;
   --ds-radius-circle: 50%;
 
+  /* -------------------------------------------------------------- MEASURE --
+     The content column. ONE value, so every browse surface shares an axis and
+     nothing has to be re-tuned page by page. Editorial layouts read better on a
+     held measure than on a full-bleed stretch: past ~1120px the spotlight's
+     copy pane and the list rows start pulling apart.
+     Two-pane surfaces (messages, profile, the community digest) set their own
+     wider grid deliberately and do not use this. */
+  --ds-measure: 1120px;
+
   /* --------------------------------------------------------------- LINE --
      Stroke widths. Used sparingly; spacing is the default separator. */
   --ds-stroke: 1.5px;

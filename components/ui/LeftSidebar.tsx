@@ -86,7 +86,9 @@ export function LeftSidebar() {
       <Link
         href="/marketplace"
         aria-label="Shopstr home"
-        className="flex h-16 shrink-0 items-center border-b-2 border-ink"
+        // px-3 matches the <nav> below, so the mark sits on the same optical
+        // axis as the item icons. Without it the logo is 12px to their left.
+        className="flex h-16 shrink-0 items-center border-b-2 border-ink px-3"
       >
         <span className="grid w-14 shrink-0 place-items-center">
           <Sticker name="shape-sparkle-4pt" className="h-6 w-6" />

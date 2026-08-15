@@ -42,12 +42,12 @@ export default function Cart() {
   return (
     <>
       <Head><title>Cart · Shopstr</title></Head>
-      <SheetHeader title="Your cart" backTo="/marketplace" contentMax="max-w-[760px] lg:max-w-[1100px]" />
+      <SheetHeader title="Your cart" backTo="/marketplace" contentMax="max-w-[760px] lg:max-w-(--ds-measure)" />
 
       {/* Desktop: line items left, sticky order summary right. */}
       <main
         className={`mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12 ${
-          items.length > 0 ? "lg:grid lg:max-w-[1100px] lg:grid-cols-[1fr_400px] lg:items-start lg:gap-8" : ""
+          items.length > 0 ? "lg:grid lg:max-w-(--ds-measure) lg:grid-cols-[1fr_400px] lg:items-start lg:gap-8" : ""
         }`}
       >
         {items.length === 0 ? (

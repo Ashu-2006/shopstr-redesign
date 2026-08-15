@@ -33,12 +33,21 @@ export function ReviewCard({
   return (
     <li className="rounded-lg border-2 border-ink bg-paper-pure p-3.5">
       <div className="flex items-center justify-between gap-3">
+        {/* A verdict, not an alarm. Full-saturation accents on every row made a
+            wall of reviews shout; the icon carries the signal and the tint just
+            supports it. */}
         <span
-          className={`inline-flex items-center gap-1.5 rounded-pill border-2 border-ink px-2.5 py-1 text-xs font-bold ${
-            review.thumb ? "bg-green" : "bg-pink"
+          className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+            review.thumb ? "text-text" : "text-red"
           }`}
         >
-          {review.thumb ? <ThumbsUp size={13} weight="fill" /> : <ThumbsDown size={13} weight="fill" />}
+          <span
+            className={`grid h-5 w-5 place-items-center rounded-full ${
+              review.thumb ? "bg-green-soft" : "bg-pink-soft"
+            }`}
+          >
+            {review.thumb ? <ThumbsUp size={11} weight="fill" /> : <ThumbsDown size={11} weight="fill" />}
+          </span>
           {review.thumb ? "Would deal again" : "Would not"}
         </span>
         <span className="font-mono text-[0.7rem] text-text-subtle">

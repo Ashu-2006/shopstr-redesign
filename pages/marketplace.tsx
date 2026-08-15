@@ -70,7 +70,7 @@ export default function Marketplace() {
           </Carousel>
         ) : null}
 
-        <div className="mx-auto max-w-[1240px] px-4">
+        <div className="mx-auto max-w-(--ds-measure) px-4">
           {/* Browse categories — static chrome, paints immediately */}
           <SectionTitle>Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

@@ -23,8 +23,8 @@ export default function MyListings() {
   return (
     <>
       <Head><title>My listings · Shopstr</title></Head>
-      <SheetHeader title="My listings" backTo="/profile" contentMax="max-w-[1100px]" />
-      <main className="mx-auto max-w-[1100px] px-4 pb-28 pt-4 md:pb-12">
+      <SheetHeader title="My listings" backTo="/profile" contentMax="max-w-(--ds-measure)" />
+      <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-4 md:pb-12">
         {/* Mobile: full-width thumb CTA. md+: compact button docked in the
             header row beside the lane pills (a stretched pill reads as a
             banner, not an action, at desktop widths). */}
