@@ -63,10 +63,11 @@ function OptCard({ selected, onClick, icon, title, sub }: { selected: boolean; o
   return (
     <button onClick={onClick} className={`ds-press flex items-center gap-3 rounded-lg border-2 border-ink p-3.5 text-left ${selected ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}>
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] border-2 border-current">{icon}</span>
-      <span className="leading-tight">
-        <span className="font-bold">{title}</span>
-        <br />
-        <span className="font-mono text-[0.76rem] opacity-70">{sub}</span>
+      {/* Stacked blocks, not a <br />: a break inherits body leading and opens
+          a gap between the label and its sub. */}
+      <span className="min-w-0 leading-snug">
+        <span className="block font-bold">{title}</span>
+        <span className="mt-0.5 block font-mono text-[0.76rem] leading-snug opacity-70">{sub}</span>
       </span>
     </button>
   );

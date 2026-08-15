@@ -14,13 +14,15 @@ export default function Payout() {
       className={`ds-press flex items-center gap-3 rounded-lg border-2 border-ink p-3.5 text-left ${payout === value ? "bg-ink text-text-on-dark" : "bg-paper-pure"}`}
     >
       <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[8px] text-lg ${value === "shopstr" ? "bg-green text-ink" : "border-2 border-current"}`}><IconGlyph size={20} /></span>
-      <span>
-        <span className="font-bold">
+      {/* Title and sub are stacked blocks, not a <br /> inside an inline span:
+          a <br /> inherits the 1.5 body leading and opens a visible gap
+          between the two lines. leading-snug keeps the pair tight. */}
+      <span className="min-w-0 leading-snug">
+        <span className="block font-bold">
           {title}
           {rec && <span className="ml-2 rounded-pill bg-purple px-2 py-0.5 text-[0.58rem] font-bold text-on-purple align-middle">Recommended</span>}
         </span>
-        <br />
-        <span className="font-mono text-[0.76rem] opacity-70">{sub}</span>
+        <span className="mt-0.5 block font-mono text-[0.76rem] leading-snug opacity-70">{sub}</span>
       </span>
     </button>
   );
