@@ -26,13 +26,34 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# design references — not app code (Pinterest images are third-party; proposal is personal)
+# design references: not app code (Pinterest images are third-party; proposal is personal)
 /Pinterest/
 *.pdf
 
 # local test / tooling artifacts
 .playwright-mcp/
 
-# stray screenshots
-/home.jpeg
-/*.jpeg
+# screenshots and scratch images (verification captures, never app assets).
+# Real app imagery lives in /Assets and /public, both still tracked.
+*.jpeg
+*.jpg
+*.png
+*.gif
+*.webp
+!/Assets/**
+!/public/**
+!/design/assets/**
+
+# agent tooling and local skills: environment, not product
+/.claude/
+/.agents/
+/skills-lock.json
+
+# working notes: plans, specs, audits and drafts written while building.
+# Ignore the CONTENTS, not the directory itself, so the un-ignore below works
+# (git will not descend into an excluded directory to re-include a child).
+/docs/*
+!/docs/app-map.md
+
+# dev playgrounds: internal review surfaces (/dev/*), not shipped product
+/pages/dev/
