@@ -497,6 +497,9 @@ function PayStep({
   const [secs, setSecs] = useState(298);
   const [expired, setExpired] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  // Cashu path: the pasted token is the payment, so it has to be real state.
+  const [token, setToken] = useState("");
+  const [tokenError, setTokenError] = useState<string | null>(null);
 
   useEffect(() => {
     if (pay !== "lightning" || expired || confirming) return;
@@ -516,7 +519,23 @@ function PayStep({
   }, [expired]);
 
   const regen = () => { setSecs(298); setExpired(false); };
-  const pay_ = () => { setConfirming(true); window.setTimeout(onPaid, 1100); };
+  const pay_ = () => {
+    // Paying with a token requires a token: check it before pretending to pay.
+    if (pay === "cashu") {
+      const t = token.trim();
+      if (!t) {
+        setTokenError("Paste the Cashu token you want to pay with.");
+        return;
+      }
+      if (!/^cashu[A-Za-z0-9_-]{20,}$/.test(t)) {
+        setTokenError("That doesn't look like a Cashu token. They start with cashu and are much longer.");
+        return;
+      }
+    }
+    setTokenError(null);
+    setConfirming(true);
+    window.setTimeout(onPaid, 1100);
+  };
   const mm = Math.floor(secs / 60);
   const ss = String(secs % 60).padStart(2, "0");
 
@@ -623,8 +642,21 @@ function PayStep({
         </div>
       ) : (
         <div className="mt-3">
-          <textarea rows={4} placeholder="Paste your Cashu token (cashuA…)" className="w-full resize-none rounded-lg border-2 border-dashed border-ink bg-paper-pure p-3.5 font-mono text-[0.8rem] text-text-muted outline-none" />
-          <p className="mt-2 text-[0.84rem] leading-snug text-text-muted">We&apos;ll redeem the token at the seller&apos;s mint and confirm instantly.</p>
+          <textarea
+            rows={4}
+            value={token}
+            onChange={(e) => { setToken(e.target.value); if (tokenError) setTokenError(null); }}
+            placeholder="Paste your Cashu token (cashuA…)"
+            aria-invalid={tokenError ? true : undefined}
+            className={`w-full resize-none break-all rounded-lg border-2 border-dashed bg-paper-pure p-3.5 font-mono text-[0.8rem] outline-none ${
+              tokenError ? "border-red text-ink" : "border-ink text-ink"
+            }`}
+          />
+          {tokenError ? (
+            <p role="alert" className="mt-2 text-[0.84rem] font-semibold leading-snug text-red">{tokenError}</p>
+          ) : (
+            <p className="mt-2 text-[0.84rem] leading-snug text-text-muted">We&apos;ll redeem the token at the seller&apos;s mint and confirm instantly.</p>
+          )}
         </div>
       )}
     </OneWayFrame>

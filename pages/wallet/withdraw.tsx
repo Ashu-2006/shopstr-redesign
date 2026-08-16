@@ -1,17 +1,25 @@
 import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useListings, useCartStore } from "@/data/hooks";
+import { useListings, useCartStore, useSession } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
 import { LineItem } from "@/components/LineItem";
-
-const AMOUNT = 45000;
 
 export default function Withdraw() {
   const router = useRouter();
   const cart = useCartStore();
   const { data: listings } = useListings();
+  const { txns, walletBalance } = useSession();
+
+  /* The debit already happened in /wallet/send (this is the "before you go"
+     interstitial on the way out), so read the amount off the ledger's most
+     recent melt rather than charging again or hardcoding a figure. */
+  const AMOUNT = (() => {
+    const melt = txns.find((t) => t.kind === "melt");
+    return melt ? Math.abs(melt.amount) : Math.min(45000, walletBalance);
+  })();
+
   const recs = listings.filter((l) => l.price <= AMOUNT).slice(0, 3);
   const [done, setDone] = useState(false);
   // One-tap Buy on a recommendation: straight into checkout.

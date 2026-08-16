@@ -1,12 +1,45 @@
+import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { Lightning, WarningCircle, Check } from "@phosphor-icons/react";
+import { useSession } from "@/data/hooks";
+import { groupInt } from "@/lib/format";
 import { OneWayFrame, FlowLead } from "@/components/ui/OneWayFrame";
-import { Lightning } from "@phosphor-icons/react";
 
-const inputCls = "rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 text-[0.92rem] outline-none focus:border-purple w-full";
+const inputCls =
+  "w-full rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 text-[0.92rem] outline-none focus:border-purple";
 
 export default function Receive() {
   const router = useRouter();
+  const { walletReceive } = useSession();
+
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const amountNum = Number(amount.replace(/[,\s]/g, ""));
+  const hasAmount = amount.trim().length > 0;
+
+  /** Copy is the real action for a zero-amount invoice; with an amount we also
+      credit the ledger, which is how a paid invoice would land. */
+  const submit = () => {
+    if (hasAmount) {
+      if (!Number.isFinite(amountNum) || amountNum <= 0) {
+        setError("Enter an amount in whole sats.");
+        return;
+      }
+      if (!Number.isInteger(amountNum)) {
+        setError("Sats can't be fractional.");
+        return;
+      }
+      walletReceive(amountNum, { kind: "mint", title: "Invoice paid", sub: "Lightning · Cashu mint" });
+      router.push("/wallet");
+      return;
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+
   return (
     <>
       <Head><title>Receive sats · Shopstr</title></Head>
@@ -25,10 +58,32 @@ export default function Receive() {
         </div>
         <label className="mt-4 flex flex-col gap-1.5">
           <span className="font-mono text-[0.66rem] uppercase tracking-[0.08em] text-text-muted">Or request an amount</span>
-          <input className={inputCls} placeholder="Amount in sats" />
+          <input
+            value={amount}
+            onChange={(e) => { setAmount(e.target.value); if (error) setError(null); }}
+            inputMode="numeric"
+            placeholder="Amount in sats"
+            aria-invalid={error ? true : undefined}
+            className={`${inputCls} font-mono tabular-nums ${error ? "border-red" : ""}`}
+          />
+          {error && (
+            <span role="alert" className="inline-flex items-start gap-1.5 text-[0.78rem] font-semibold text-red">
+              <WarningCircle size={15} weight="bold" className="mt-px shrink-0" />
+              {error}
+            </span>
+          )}
         </label>
-        <button onClick={() => router.push("/wallet")} className="ds-press mt-4 w-full rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark">
-          Copy invoice
+        <button
+          onClick={submit}
+          className="ds-press mt-4 inline-flex w-full items-center justify-center gap-2 rounded-pill border-2 border-ink bg-ink px-6 py-3.5 font-bold text-text-on-dark"
+        >
+          {hasAmount ? (
+            `Request ${groupInt(Number.isFinite(amountNum) ? amountNum : 0)} sats`
+          ) : copied ? (
+            <><Check size={18} weight="bold" /> Copied</>
+          ) : (
+            "Copy invoice"
+          )}
         </button>
       </OneWayFrame>
     </>

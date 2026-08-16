@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useListings, useClaimable, useCartStore } from "@/data/hooks";
+import { useListings, useClaimable, useCartStore, useSession, CLAIMABLE_ID } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -16,7 +17,22 @@ export default function Claim() {
   const cart = useCartStore();
   const { data: claim } = useClaimable();
   const { data: listings, isLoading } = useListings();
-  const amount = claim?.amount ?? 45000;
+  const { claim: sweep } = useSession();
+
+  /* Landing here IS the claim, so sweep the payout into the ledger on mount.
+     The amount is snapshotted first: `claim` goes null the moment it's swept
+     (that's what stops it being claimed twice), and the success screen still
+     needs the figure it just credited. */
+  const [amount] = useState(() => claim?.amount ?? 45000);
+  const [fromHandle] = useState(() => claim?.fromHandle ?? "bagelmaker");
+  const swept = useRef(false);
+  useEffect(() => {
+    if (swept.current) return;
+    swept.current = true;
+    sweep(CLAIMABLE_ID, amount, fromHandle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const recs = listings.filter((l) => l.price <= amount).slice(0, 3);
   // One-tap Buy on a recommendation: straight into checkout.
   const buyNow = (id: string) => {

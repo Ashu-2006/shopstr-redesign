@@ -35,15 +35,13 @@ import {
   MOCK_COMMUNITIES,
   MOCK_COMMUNITY_POSTS,
   MOCK_ORDERS,
-  MOCK_TXNS,
   CLAIMABLE,
   type Community,
   type CommunityPost,
   type Order,
   type OrderStatus,
-  type WalletTx,
 } from "@/data/mock/extras";
-import { useCartStore, useSession, type OwnPost } from "@/data/store";
+import { useCartStore, useSession, type OwnPost, type WalletTxn } from "@/data/store";
 
 /* Re-export the mutable client-state hooks so the whole app imports state and
    data from this one module (the data boundary), never from store/ or mock/. */
@@ -500,16 +498,28 @@ export function useOrder(id: string): AsyncResult<Order | null> {
 }
 
 /** Wallet transaction history. */
-export function useTxns(): AsyncResult<WalletTx[]> {
+export function useTxns(): AsyncResult<WalletTxn[]> {
   const isLoading = useSimulatedLoad("wallet");
-  return { data: isLoading ? [] : MOCK_TXNS, isLoading };
+  // Reads the live ledger, not a static list: sending or receiving updates this
+  // immediately, which is what makes the wallet feel real.
+  const { txns } = useSession();
+  return { data: isLoading ? [] : txns, isLoading };
 }
 
-/** The pending claimable sale (seller-to-buyer bridge), null when none. */
-export function useClaimable(): AsyncResult<typeof CLAIMABLE | null> {
+/** The pending claimable sale (seller-to-buyer bridge), null when none.
+    Disappears once swept, so the CTA can't be replayed against a spent payout. */
+export function useClaimable(): AsyncResult<(typeof CLAIMABLE & { id: string }) | null> {
   const isLoading = useSimulatedLoad("wallet");
-  return { data: isLoading ? null : CLAIMABLE, isLoading };
+  const { claimed } = useSession();
+  const gone = claimed.has(CLAIMABLE_ID);
+  return {
+    data: isLoading || gone ? null : { ...CLAIMABLE, id: CLAIMABLE_ID },
+    isLoading,
+  };
 }
+
+/** Stable id for the single seeded claimable payout. */
+export const CLAIMABLE_ID = "claim_1";
 
 export interface TopSeller {
   profile: Profile;

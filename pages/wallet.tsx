@@ -14,7 +14,30 @@ import { RowSkeleton } from "@/components/skeletons";
 export default function Wallet() {
   const { data: txns, isLoading } = useTxns();
   const { data: claim } = useClaimable();
-  const { walletBalance } = useSession();
+  const { walletBalance, wallet } = useSession();
+
+  // No wallet yet: show the real origin story rather than a fake balance.
+  if (!wallet) {
+    return (
+      <>
+        <Head><title>Wallet · Shopstr</title></Head>
+        <SheetHeader title="Wallet" backTo="/marketplace" contentMax="max-w-[760px]" />
+        <main className="mx-auto max-w-[760px] px-4 pb-28 pt-4 md:pb-12">
+          <EmptyState
+            sticker="shape-sunstar-yellow"
+            headline="No wallet yet"
+            body="Set one up to hold sats, pay for orders in a tap, and get paid when you sell."
+            cta={
+              <Link href="/wallet/setup">
+                <Button variant="secondary">Set up your wallet</Button>
+              </Link>
+            }
+          />
+        </main>
+        <BottomNav active="/wallet" />
+      </>
+    );
+  }
 
   return (
     <>
@@ -53,7 +76,10 @@ export default function Wallet() {
 
         <div className="mb-3 mt-6 flex items-baseline justify-between">
           <h2 className="ds-display text-xl">Activity</h2>
-          <span className="font-mono text-xs text-text-subtle">NIP-60 · Cashu</span>
+          {/* Names the wallet that's actually connected, not a fixed label. */}
+          <span className="font-mono text-xs text-text-subtle">
+            {wallet.type === "cashu" ? `NIP-60 · ${wallet.mint}` : `NIP-47 · ${wallet.walletName}`}
+          </span>
         </div>
         {isLoading ? (
           <div aria-hidden="true">
@@ -74,20 +100,25 @@ export default function Wallet() {
             className="!py-10"
           />
         ) : (
-          txns.map((t, i) => (
-            <div key={i} className="flex items-center gap-3 border-b-2 border-ink py-3">
-              <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono ${t.dir === "out" ? "bg-pink" : "bg-green"}`}>
-                {t.dir === "out" ? "↑" : "↓"}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="font-bold">{t.title}</div>
-                <div className="font-mono text-[0.66rem] text-text-subtle">{t.sub}</div>
+          // Direction is derived from the signed amount: one source of truth, so
+          // a debit can never render with a credit's colour.
+          txns.map((t) => {
+            const out = t.amount < 0;
+            return (
+              <div key={t.id} className="flex items-center gap-3 border-b-2 border-ink py-3">
+                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono ${out ? "bg-pink" : "bg-green"}`}>
+                  {out ? "↑" : "↓"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold">{t.title}</div>
+                  <div className="font-mono text-[0.66rem] text-text-subtle">{t.sub}</div>
+                </div>
+                <span className={`font-mono font-bold tabular-nums ${out ? "text-ink" : "text-green"}`}>
+                  {t.amount > 0 ? "+" : ""}{groupInt(t.amount)}
+                </span>
               </div>
-              <span className={`font-mono font-bold tabular-nums ${t.dir === "out" ? "text-ink" : "text-green"}`}>
-                {t.amount > 0 ? "+" : ""}{groupInt(t.amount)}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </main>
       <BottomNav active="/wallet" />

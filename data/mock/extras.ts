@@ -348,6 +348,9 @@ export const CLAIMABLE = {
   productTitle: "Hand-thrown stoneware mug",
 };
 
+/** @deprecated Superseded by the live ledger in `data/store.tsx` (`WalletTxn`),
+    where the balance is derived from transactions rather than hardcoded. Kept
+    only so the shape is documented for the port; nothing reads it. */
 export interface WalletTx {
   dir: "in" | "out";
   title: string;

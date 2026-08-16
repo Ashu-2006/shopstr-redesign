@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Lightning, Key, Star, UsersThree } from "@phosphor-icons/react";
-import { useCartStore, useCheckout, communityForListing } from "@/data/hooks";
+import { useCartStore, useCheckout, useSession, communityForListing } from "@/data/hooks";
 import { groupInt } from "@/lib/format";
 import { Sticker } from "@/components/ui/Sticker";
 
@@ -11,6 +11,7 @@ const SHIPPING = 4000;
 export default function Paid() {
   const cart = useCartStore();
   const { reset } = useCheckout();
+  const { walletSend, wallet } = useSession();
 
   // Snapshot the order before clearing the cart.
   const [snapshot] = useState(() => ({
@@ -23,6 +24,15 @@ export default function Paid() {
   const showOffIn = communityForListing(snapshot.firstId);
 
   useEffect(() => {
+    // Paying actually debits the ledger, so the wallet balance the user sees
+    // next reflects the purchase instead of staying frozen.
+    if (wallet) {
+      walletSend(snapshot.total, {
+        kind: "purchase",
+        title: snapshot.count === 1 ? "Order paid" : `Order paid · ${snapshot.count} items`,
+        sub: `To @${snapshot.seller} · Lightning`,
+      });
+    }
     cart.clear();
     reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -15,6 +15,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -142,9 +143,104 @@ interface SessionApi {
   /** Where a seller's sats land after a sale. Inverted default = stay in Shopstr. */
   payout: "shopstr" | "lightning";
   setPayout: (v: "shopstr" | "lightning") => void;
-  /** Spendable in-app (Cashu) wallet balance, integer sats. */
+
+  /* ------------------------------------------------------------- WALLET -- */
+  /** How the wallet was set up. `null` = not set up yet: /wallet shows the
+      setup CTA instead of a balance, and buy-with-sats is not offered. */
+  wallet: WalletSetup | null;
+  setupWallet: (w: WalletSetup) => void;
+  /** Spendable balance, integer sats. DERIVED from `txns`, never stored twice
+      (the same rule reviews follow: the average is computed, never persisted). */
   walletBalance: number;
+  /** Full ledger, newest first. The wallet activity list renders this. */
+  txns: WalletTxn[];
+  /** Credit the wallet (mint/receive a token, claim a sale). */
+  walletReceive: (amount: number, opts?: { kind?: WalletTxnKind; title?: string; sub?: string }) => void;
+  /** Debit the wallet. Returns false (and does nothing) if funds are short, so
+      callers can surface a real error instead of going negative. */
+  walletSend: (amount: number, opts?: { kind?: WalletTxnKind; title?: string; sub?: string }) => boolean;
+  /** Ids of claimable payouts already swept, so a claim can't be replayed. */
+  claimed: Set<string>;
+  claim: (id: string, amount: number, fromHandle: string) => void;
+
+  /* ----------------------------------------------------------- SETTINGS -- */
+  /** NIP-65 relay list. `read`/`write` mark the outbox split. */
+  relays: Relay[];
+  addRelay: (url: string, mode: RelayMode) => void;
+  removeRelay: (url: string) => void;
+  /** Cashu mints available to the built-in wallet; first is the active one. */
+  mints: string[];
+  addMint: (url: string) => void;
+  removeMint: (url: string) => void;
+  /** Shipping addresses reused at checkout. */
+  addresses: SavedAddress[];
+  saveAddress: (a: Omit<SavedAddress, "id"> & { id?: string }) => void;
+  removeAddress: (id: string) => void;
+  /** The editable half of the user's nostr profile (kind-0 metadata). */
+  profile: ProfileDraft;
+  saveProfile: (p: ProfileDraft) => void;
 }
+
+export type RelayMode = "read" | "write" | "both";
+export interface Relay {
+  url: string;
+  mode: RelayMode;
+}
+
+export interface SavedAddress {
+  id: string;
+  label: string;
+  name: string;
+  line1: string;
+  city: string;
+  zip: string;
+  country: string;
+}
+
+export interface ProfileDraft {
+  displayName: string;
+  handle: string;
+  about: string;
+  nip05: string;
+  picture: string;
+}
+
+/** How the user's wallet is configured.
+    `cashu` = the built-in NIP-60 wallet against a mint.
+    `nwc`   = an external Lightning wallet over NIP-47. */
+export type WalletSetup =
+  | { type: "cashu"; mint: string }
+  | { type: "nwc"; connection: string; walletName: string };
+
+/** Named union mapped 1:1 onto upstream's six numeric transaction types, so the
+    port is a lookup rather than a redesign (1 receive, 2 send, 3 mint, 4 melt,
+    5 purchase, 6 sale). */
+export type WalletTxnKind = "receive" | "send" | "mint" | "melt" | "purchase" | "sale";
+
+export interface WalletTxn {
+  id: string;
+  kind: WalletTxnKind;
+  /** Signed integer sats: positive credits, negative debits. */
+  amount: number;
+  at: number;
+  title: string;
+  sub: string;
+}
+
+/** Seed ledger. Sums to the 182,400 the design was built around, so nothing
+    on screen changes until the user actually moves money. */
+const SEED_TXNS: WalletTxn[] = [
+  { id: "tx_4", kind: "mint", amount: 8000, at: 1717300000000, title: "Claimed token", sub: "Cashu mint" },
+  { id: "tx_3", kind: "purchase", amount: -14000, at: 1717200000000, title: "Cold-brew concentrate", sub: "To @alice · Lightning" },
+  { id: "tx_2", kind: "receive", amount: 50000, at: 1717100000000, title: "Received", sub: "From @nuno · Cashu" },
+  { id: "tx_1", kind: "purchase", amount: -12000, at: 1717000000000, title: "Risograph zine no.4", sub: "To @ekko · Lightning" },
+];
+/** The opening balance the seed ledger is offset from, so the sum lands on the
+    figure the screens were designed against. */
+const SEED_OPENING = 150400;
+/** Fixed "now" for new transaction stamps. Deliberately not Date.now(): a live
+    clock differs between server and client render and trips hydration. */
+const NOW_REF = 1717372800000;
 
 const SessionCtx = createContext<SessionApi | null>(null);
 
@@ -163,6 +259,152 @@ function SessionProvider({ children }: { children: ReactNode }) {
   const [ownPosts, setOwnPosts] = useState<OwnPost[]>([]);
   const [orderStatus, setOrderStatusMap] = useState<Map<string, OrderStatusValue>>(
     () => new Map()
+  );
+
+  /* Wallet. Seeded as already set up with the built-in Cashu wallet so the
+     designed screens still read populated on first run; /wallet/setup lets the
+     user re-run the flow, and the not-set-up branch is reachable by resetting. */
+  const [wallet, setWallet] = useState<WalletSetup | null>({
+    type: "cashu",
+    mint: "mint.minibits.cash",
+  });
+  const [txns, setTxns] = useState<WalletTxn[]>(SEED_TXNS);
+  const [claimed, setClaimed] = useState<Set<string>>(new Set());
+
+  // Balance is DERIVED, never stored: one source of truth for money on screen.
+  const walletBalance = useMemo(
+    () => txns.reduce((sum, t) => sum + t.amount, SEED_OPENING),
+    [txns]
+  );
+
+  // Monotonic ids without Date.now/random, which would break SSR agreement.
+  const txSeq = useRef(0);
+  const pushTxn = useCallback((t: Omit<WalletTxn, "id" | "at">) => {
+    txSeq.current += 1;
+    const id = `tx_new_${txSeq.current}`;
+    setTxns((prev) => [{ ...t, id, at: NOW_REF + txSeq.current * 1000 }, ...prev]);
+  }, []);
+
+  const setupWallet = useCallback((w: WalletSetup) => setWallet(w), []);
+
+  /* Settings. Seeded with the defaults upstream ships so the manager screens
+     read populated, and every add/remove below is real state. */
+  const [relays, setRelays] = useState<Relay[]>([
+    { url: "wss://relay.damus.io", mode: "both" },
+    { url: "wss://nos.lol", mode: "both" },
+    { url: "wss://relay.primal.net", mode: "read" },
+    { url: "wss://nostr.mutinywallet.com", mode: "write" },
+  ]);
+  const [mints, setMints] = useState<string[]>([
+    "mint.minibits.cash",
+    "mint.coinos.io",
+  ]);
+  const [addresses, setAddresses] = useState<SavedAddress[]>([
+    {
+      id: "addr_1",
+      label: "Home",
+      name: "Ekko R.",
+      line1: "Skalitzer Str. 12",
+      city: "Berlin",
+      zip: "10997",
+      country: "Germany",
+    },
+  ]);
+  const [profile, setProfile] = useState<ProfileDraft>({
+    displayName: "Ekko",
+    handle: "ekko",
+    about: "Riso prints and small-run zines from Berlin.",
+    nip05: "ekko@shopstr.store",
+    picture: "",
+  });
+
+  const addRelay = useCallback((url: string, mode: RelayMode) => {
+    const clean = url.trim();
+    if (!clean) return;
+    // Replace rather than duplicate: adding a known relay changes its mode.
+    setRelays((prev) => {
+      const rest = prev.filter((r) => r.url !== clean);
+      return [...rest, { url: clean, mode }];
+    });
+  }, []);
+  const removeRelay = useCallback((url: string) => {
+    setRelays((prev) => prev.filter((r) => r.url !== url));
+  }, []);
+
+  const addMint = useCallback((url: string) => {
+    const clean = url.trim().replace(/^https?:\/\//, "");
+    if (!clean) return;
+    setMints((prev) => (prev.includes(clean) ? prev : [clean, ...prev]));
+  }, []);
+  const removeMint = useCallback((url: string) => {
+    setMints((prev) => prev.filter((m) => m !== url));
+  }, []);
+
+  const addrSeq = useRef(0);
+  const saveAddress = useCallback((a: Omit<SavedAddress, "id"> & { id?: string }) => {
+    setAddresses((prev) => {
+      if (a.id) return prev.map((x) => (x.id === a.id ? ({ ...a, id: a.id } as SavedAddress) : x));
+      addrSeq.current += 1;
+      return [...prev, { ...a, id: `addr_new_${addrSeq.current}` } as SavedAddress];
+    });
+  }, []);
+  const removeAddress = useCallback((id: string) => {
+    setAddresses((prev) => prev.filter((a) => a.id !== id));
+  }, []);
+
+  const saveProfile = useCallback((p: ProfileDraft) => setProfile(p), []);
+
+  const walletReceive = useCallback(
+    (amount: number, opts?: { kind?: WalletTxnKind; title?: string; sub?: string }) => {
+      if (!Number.isFinite(amount) || amount <= 0) return;
+      pushTxn({
+        kind: opts?.kind ?? "receive",
+        amount: Math.round(amount),
+        title: opts?.title ?? "Received",
+        sub: opts?.sub ?? "Cashu",
+      });
+    },
+    [pushTxn]
+  );
+
+  const walletSend = useCallback(
+    (amount: number, opts?: { kind?: WalletTxnKind; title?: string; sub?: string }) => {
+      if (!Number.isFinite(amount) || amount <= 0) return false;
+      const amt = Math.round(amount);
+      // Guard here rather than at the call site so the ledger can never go
+      // negative, whichever surface is spending.
+      if (amt > walletBalance) return false;
+      pushTxn({
+        kind: opts?.kind ?? "send",
+        amount: -amt,
+        title: opts?.title ?? "Sent",
+        sub: opts?.sub ?? "Lightning",
+      });
+      return true;
+    },
+    [pushTxn, walletBalance]
+  );
+
+  const claim = useCallback(
+    (id: string, amount: number, fromHandle: string) => {
+      // Idempotent: a claimed payout can't be swept twice.
+      let already = false;
+      setClaimed((prev) => {
+        if (prev.has(id)) {
+          already = true;
+          return prev;
+        }
+        return new Set(prev).add(id);
+      });
+      if (already) return;
+      pushTxn({
+        kind: "sale",
+        amount: Math.round(amount),
+        title: "Sale claimed",
+        sub: `From @${fromHandle} · Cashu`,
+      });
+    },
+    [pushTxn]
   );
 
   const toggleFav = useCallback((id: string) => {
@@ -219,12 +461,34 @@ function SessionProvider({ children }: { children: ReactNode }) {
       setOrderStatus,
       payout,
       setPayout,
-      walletBalance: 182400,
+      wallet,
+      setupWallet,
+      walletBalance,
+      txns,
+      walletReceive,
+      walletSend,
+      claimed,
+      claim,
+      relays,
+      addRelay,
+      removeRelay,
+      mints,
+      addMint,
+      removeMint,
+      addresses,
+      saveAddress,
+      removeAddress,
+      profile,
+      saveProfile,
     }),
     [
       signedIn, favs, toggleFav, follows, toggleFollow,
       joinedCommunities, toggleJoin, moderated, moderatePost,
       ownPosts, submitPost, orderStatus, setOrderStatus, payout,
+      wallet, setupWallet, walletBalance, txns, walletReceive, walletSend,
+      claimed, claim,
+      relays, addRelay, removeRelay, mints, addMint, removeMint,
+      addresses, saveAddress, removeAddress, profile, saveProfile,
     ]
   );
 
