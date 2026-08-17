@@ -490,3 +490,76 @@ html:has(body.soft-sep) {
 .soft-sep .bg-ink.gap-px > * {
   background: var(--ds-paper-pure);
 }
+
+/* =============================================================================
+   LANDING SURFACE (/dev/landing)
+   The marketing page is the one surface that WANTS hard strokes: its structure
+   is carried by borders, hairline cell grids and full-bleed colour bands, the
+   way a spec sheet is. body.soft-sep strips every border app-wide, so the
+   landing root opts back in rather than fighting !important per element.
+   ========================================================================== */
+.soft-sep .ls-hard,
+.soft-sep .ls-hard *,
+.soft-sep .ls-hard *::before,
+.soft-sep .ls-hard *::after {
+  border-color: var(--ds-ink) !important;
+}
+/* Escape hatch: on an ink ground an ink stroke is invisible, so those blocks
+   set their own light border and opt out of the blanket override above. */
+.soft-sep .ls-hard .ls-stroke-light,
+.soft-sep .ls-hard .ls-stroke-light * {
+  border-color: rgba(240, 240, 240, 0.28) !important;
+}
+/* hairline cell grids stay hairline here (the app converts them to spacing) */
+.soft-sep .ls-hard .bg-ink.gap-px {
+  background: var(--ds-ink) !important;
+  gap: 1px !important;
+}
+
+/* Blueprint substrate: a faint ink grid that makes a section read as
+   engineered rather than decorated. Two layers so the 1px lines stay crisp. */
+.ls-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--ds-ink) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ds-ink) 8%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+/* On ink grounds the grid has to lighten instead of darken. */
+.ls-grid-invert {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--ds-paper) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ds-paper) 12%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Tick strip: the ruler rule that sits under a spec card's title. Borrowed
+   structure, our tokens. Pure decoration, so it is aria-hidden at the callsite. */
+.ls-ticks {
+  background-image: linear-gradient(
+    to right,
+    var(--ds-ink) 0 1px,
+    transparent 1px 100%
+  );
+  background-size: 12px 100%;
+}
+
+/* Vertical marquee columns for the hero. Transform-only, so it stays on the
+   compositor; the track is duplicated in markup and travels exactly -50%. */
+@keyframes ls-drift-up {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -50%, 0); }
+}
+@keyframes ls-drift-down {
+  from { transform: translate3d(0, -50%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+.ls-drift-up { animation: ls-drift-up 42s linear infinite; }
+.ls-drift-down { animation: ls-drift-down 52s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-drift-up,
+  .ls-drift-down {
+    animation: none;
+    transform: translate3d(0, -25%, 0);
+  }
+}
