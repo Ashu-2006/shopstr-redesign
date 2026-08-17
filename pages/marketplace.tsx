@@ -27,6 +27,10 @@ import {
 
 const catHref = (c: string) => `/c/${encodeURIComponent(c)}`;
 
+/* Editor's picks sit side by side, so they must not share a fill: two identical
+   accent panels read as one wide block rather than two separate arguments. */
+const PICK_TONES = ["green", "blue"] as const;
+
 export default function Marketplace() {
   const { data: listings, isLoading } = useListings();
   const { data: topSellers, isLoading: sellersLoading } = useTopSellers(4);
@@ -106,8 +110,10 @@ export default function Marketplace() {
             so the feed keeps a comfortable margin instead of running to the
             window edge on a wide screen. */}
         <div className="mx-auto max-w-(--ds-measure) px-5 sm:px-8 lg:px-12">
-          {/* Browse categories — static chrome, paints immediately */}
-          <SectionTitle>Browse categories</SectionTitle>
+          {/* Browse categories — static chrome, paints immediately. Extra top
+              margin: the hero is full-bleed, so the default section rhythm
+              crowds this row against the bottom of the image. */}
+          <SectionTitle className="!mt-12">Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <SolidTile label="Ceramics" href={catHref("Ceramics")} tone="green" sticker="shape-smiley" />
             <SolidTile label="Zines & print" href={catHref("Art & Print")} tone="pink" sticker="shape-sparkle-4pt" />
@@ -150,16 +156,27 @@ export default function Marketplace() {
               <SectionTitle note="Curated">Editor's picks</SectionTitle>
               <div className="lg:hidden">
                 <Carousel snap={false}>
-                  {(isLoading ? [] : breaks).map((p) => (
+                  {(isLoading ? [] : breaks).map((p, i) => (
                     <div key={p.id} className="w-[85vw] max-w-[400px] shrink-0 snap-start">
-                      <FeatureCard product={p} format="break" kicker="Editor's pick" />
+                      <FeatureCard
+                        product={p}
+                        format="break"
+                        kicker="Editor's pick"
+                        tone={PICK_TONES[i % PICK_TONES.length]}
+                      />
                     </div>
                   ))}
                 </Carousel>
               </div>
               <div className="hidden lg:grid lg:grid-cols-2 lg:gap-5">
-                {(isLoading ? [] : breaks).map((p) => (
-                  <FeatureCard key={p.id} product={p} format="break" kicker="Editor's pick" />
+                {(isLoading ? [] : breaks).map((p, i) => (
+                  <FeatureCard
+                    key={p.id}
+                    product={p}
+                    format="break"
+                    kicker="Editor's pick"
+                    tone={PICK_TONES[i % PICK_TONES.length]}
+                  />
                 ))}
               </div>
             </>
