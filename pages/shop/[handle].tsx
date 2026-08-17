@@ -12,7 +12,7 @@ import { Stars } from "@/components/ui/Stars";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ListingTileSkeleton } from "@/components/skeletons";
-import { ReviewCard } from "@/components/ReviewCard";
+import { ReviewList } from "@/components/ReviewList";
 import { CaretLeft, Check, Plus, Star, UsersThree } from "@phosphor-icons/react";
 
 const NOW = 1717372800000;
@@ -137,7 +137,7 @@ export default function Shop() {
         )}
         {tab === "items" &&
           (itemsLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10" aria-hidden="true">
               {Array.from({ length: 8 }, (_, i) => (
                 <ListingTileSkeleton key={i} />
               ))}
@@ -154,7 +154,7 @@ export default function Shop() {
               }
             />
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
               {items.map((p) => (
                 <ListingCard key={p.id} product={p} density="tile" fav={favs.has(p.id)} onToggleFav={toggleFav} />
               ))}
@@ -205,16 +205,11 @@ export default function Shop() {
                   </ul>
                 </div>
 
-                <ul className="flex flex-col gap-2.5">
-                  {reviews.reviews.map((r) => (
-                    <ReviewCard
-                      key={r.id}
-                      review={r}
-                      now={NOW}
-                      authorHandle={profileByPubkey(r.authorPubkey)?.handle}
-                    />
-                  ))}
-                </ul>
+                <ReviewList
+                  reviews={reviews.reviews}
+                  now={NOW}
+                  handleFor={(pk) => profileByPubkey(pk)?.handle}
+                />
               </>
             )}
           </div>

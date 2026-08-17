@@ -224,7 +224,7 @@ export default function Search() {
 
           <main className="mx-auto max-w-(--ds-measure) px-4 pb-28 pt-3 md:pb-12">
             {isLoading ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10" aria-hidden="true">
                 {Array.from({ length: 8 }, (_, i) => (
                   <ListingTileSkeleton key={i} />
                 ))}
@@ -252,7 +252,7 @@ export default function Search() {
                 }
               />
             ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {results.map((p) => (
                     <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={tFast}>

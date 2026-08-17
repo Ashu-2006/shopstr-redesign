@@ -32,6 +32,9 @@ export function Button({
       className={[
         "inline-flex items-center justify-center gap-2 rounded-pill border-2 font-bold",
         "px-6 py-3.5 text-base ds-press select-none",
+        // A disabled button must LOOK unavailable, not just ignore clicks.
+        // No press-scale either: feedback on a dead control reads as a bug.
+        "disabled:pointer-events-none disabled:opacity-45",
         full ? "w-full" : "",
         VARIANTS[variant],
         className,

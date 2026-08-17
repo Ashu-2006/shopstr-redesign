@@ -46,12 +46,15 @@ export function ListingRowSkeleton() {
 export function ListingTileSkeleton({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-col ${className}`}>
+      {/* Geometry MUST track ListingCard density="tile" (components/ListingCard.tsx):
+          same aspect ratio and the same body offset. When one changes, change
+          both — a mismatch reflows every tile grid the moment data lands. */}
       <div className="overflow-hidden rounded-lg border-2 border-ink">
-        <Skeleton shape="rect" className="aspect-square !rounded-none" w="100%" />
+        <Skeleton shape="rect" className="aspect-[4/5] !rounded-none" w="100%" />
       </div>
-      <div className="mt-2">
+      <div className="mt-3">
         <Skeleton shape="line" w="85%" h="0.92rem" />
-        <div className="mt-1.5 flex items-baseline justify-between">
+        <div className="mt-2 flex items-baseline justify-between">
           <Skeleton shape="line" w={72} h="0.95rem" />
           <Skeleton shape="line" w={44} h="0.66rem" />
         </div>

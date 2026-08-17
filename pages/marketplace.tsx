@@ -1,19 +1,26 @@
 import Head from "next/head";
 import Link from "next/link";
 import type { ProductData } from "@/data/types";
-import { useListings, useTopSellers, useCartStore, useSession, ratingForPubkey } from "@/data/hooks";
+import {
+  useListings,
+  useEndlessListings,
+  useTopSellers,
+  useCartStore,
+  useSession,
+  ratingForPubkey,
+} from "@/data/hooks";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Carousel } from "@/components/Carousel";
+import { InfiniteSentinel } from "@/components/InfiniteSentinel";
 import { SolidTile, SellerCard } from "@/components/cards";
 import { ListingCard } from "@/components/ListingCard";
 import { FeatureCard } from "@/components/FeatureCard";
 import {
   HeroSkeleton,
-  ListingRowSkeleton,
   ListingTileSkeleton,
   SellerCardSkeleton,
 } from "@/components/skeletons";
@@ -32,15 +39,39 @@ export default function Marketplace() {
   const pick = (ids: string[]) =>
     ids.map(byId).filter((p): p is ProductData => Boolean(p));
   const featured = pick(["lst_007", "lst_005", "lst_017"]);
-  const near = listings.slice(8, 13);
-  const feedA = pick(["lst_001", "lst_003"]);
-  const breakItem = byId("lst_016");
-  const feedB = pick(["lst_011", "lst_013", "lst_009", "lst_002"]);
+  // Four per band so each fills a complete 4-up row: a 2-card band left two
+  // dead columns beside it before the break card.
+  const feedA = pick(["lst_001", "lst_003", "lst_011", "lst_013"]);
+  // Two picks so the desktop band fills its 2-up row.
+  const breaks = pick(["lst_016", "lst_008"]);
+  const feedB = pick(["lst_009", "lst_002", "lst_004", "lst_006"]);
+  /* Near you is positional (a slice), so it has to dodge the bands picked by
+     id above; slice(8,13) overlapped feedA/feedB and showed the same product
+     in two rails on one screen. */
+  const claimed = new Set([...featured, ...feedA, ...breaks, ...feedB].map((p) => p.id));
+  const near = listings.filter((l) => !claimed.has(l.id)).slice(0, 5);
 
+  /* The tail is "everything ELSE", so the hook skips anything already rendered
+     above it. Passed IN (rather than filtered after) so each page is still a
+     full pageSize of cards the user hasn't seen. */
+  const shownAbove = [...featured, ...near, ...feedA, ...breaks, ...feedB].map(
+    (p) => p.id
+  );
+  // The endless tail below the editorial sections: browsing never dead-ends.
+  const {
+    items: tail,
+    isLoadingMore,
+    loadMore,
+  } = useEndlessListings(8, shownAbove);
+
+  /* One card for every product grid in the app: the same tile the search
+     results render, so browse and search never disagree about what a listing
+     looks like. */
   const card = (p: ProductData) => (
     <ListingCard
       key={p.id}
       product={p}
+      density="tile"
       rating={ratingForPubkey(p.pubkey)}
       fav={favs.has(p.id)}
       onToggleFav={toggleFav}
@@ -70,7 +101,11 @@ export default function Marketplace() {
           </Carousel>
         ) : null}
 
-        <div className="mx-auto max-w-(--ds-measure) px-4">
+        {/* Fixed measure, generous side gutters. The content column stops
+            growing at --ds-measure and the padding steps up with the viewport,
+            so the feed keeps a comfortable margin instead of running to the
+            window edge on a wide screen. */}
+        <div className="mx-auto max-w-(--ds-measure) px-5 sm:px-8 lg:px-12">
           {/* Browse categories — static chrome, paints immediately */}
           <SectionTitle>Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -80,22 +115,18 @@ export default function Marketplace() {
             <SolidTile label="Electronics" href={catHref("Electronics")} tone="orange" sticker="shape-starburst" />
           </div>
 
-          {/* For you — H5 feed with an H4 break card; 2-col on desktop */}
+          {/* For you: the same tile card and 4-up grid the search results use,
+              so a product reads identically wherever it is browsed. */}
           <SectionTitle seeAllHref="/new">For you</SectionTitle>
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              {Array.from({ length: 4 }, (_, i) => (
-                <ListingRowSkeleton key={i} />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
+              {Array.from({ length: 8 }, (_, i) => (
+                <ListingTileSkeleton key={i} />
               ))}
             </div>
           ) : feedA.length + feedB.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
               {feedA.map(card)}
-              {breakItem && (
-                <div className="lg:col-span-2">
-                  <FeatureCard product={breakItem} format="break" kicker="Editor's pick" />
-                </div>
-              )}
               {feedB.map(card)}
             </div>
           ) : (
@@ -108,6 +139,30 @@ export default function Marketplace() {
                 </Link>
               }
             />
+          )}
+
+          {/* Editor's picks: its own band, not a row hijacked from the feed.
+              Two side by side on desktop; a horizontal rail on mobile, where
+              two stacked full-width feature cards would push the feed a whole
+              screen down. Same Carousel/grid split the Top sellers rail uses. */}
+          {(isLoading || breaks.length > 0) && (
+            <>
+              <SectionTitle note="Curated">Editor's picks</SectionTitle>
+              <div className="lg:hidden">
+                <Carousel snap={false}>
+                  {(isLoading ? [] : breaks).map((p) => (
+                    <div key={p.id} className="w-[85vw] max-w-[400px] shrink-0 snap-start">
+                      <FeatureCard product={p} format="break" kicker="Editor's pick" />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+              <div className="hidden lg:grid lg:grid-cols-2 lg:gap-5">
+                {(isLoading ? [] : breaks).map((p) => (
+                  <FeatureCard key={p.id} product={p} format="break" kicker="Editor's pick" />
+                ))}
+              </div>
+            </>
           )}
 
           {/* Top sellers — optional discovery rail: hides entirely (header
@@ -168,6 +223,52 @@ export default function Marketplace() {
                       />
                     ))}
               </Carousel>
+            </>
+          )}
+
+          {/* Everything else: the endless tail. The editorial sections above
+              are curated and finite; this is the part that keeps going, so
+              reaching the bottom loads more instead of ending the page. */}
+          <SectionTitle note="Keeps going">Everything else</SectionTitle>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
+            {isLoading
+              ? Array.from({ length: 8 }, (_, i) => <ListingTileSkeleton key={i} />)
+              : tail.map((p) => (
+                  <ListingCard
+                    key={p.id}
+                    product={p}
+                    density="tile"
+                    /* Same rating the editorial bands pass: without it the same
+                       product shows a star above and none down here. */
+                    rating={ratingForPubkey(p.pubkey)}
+                    fav={favs.has(p.id)}
+                    onToggleFav={toggleFav}
+                  />
+                ))}
+            {/* Appended pages land as skeletons first, so the grid grows into
+                real geometry instead of jumping when the data arrives. */}
+            {isLoadingMore &&
+              Array.from({ length: 4 }, (_, i) => <ListingTileSkeleton key={`more-${i}`} />)}
+          </div>
+
+          {!isLoading && (
+            <>
+              <InfiniteSentinel
+                onReach={loadMore}
+                disabled={isLoadingMore}
+                resetKey={tail.length}
+              />
+              {/* Keyboard and no-IO fallback: the sentinel is invisible and
+                  unreachable by tab, so the same action needs a real control. */}
+              <div className="mt-4 flex justify-center">
+                <Button
+                  variant="secondary"
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? "Loading…" : "Load more"}
+                </Button>
+              </div>
             </>
           )}
         </div>

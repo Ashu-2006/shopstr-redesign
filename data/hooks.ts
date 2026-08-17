@@ -11,7 +11,7 @@
    only these hook bodies change; the { data, isLoading } seam stays.
    ========================================================================== */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   ProductData,
   Profile,
@@ -142,6 +142,88 @@ export function useListings(): AsyncResult<ProductData[]> {
   const isLoading = useSimulatedLoad("listings");
   const data = useMemo(() => MOCK_LISTINGS, []);
   return { data: isLoading ? [] : data, isLoading };
+}
+
+/** An endless browse feed.
+ *
+ * A marketplace feed should never dead-end: reaching the bottom loads more.
+ * Upstream pages relays by timestamp (`until` the oldest event seen), so the
+ * shape here is the same one that seam expects: hold what we have, ask for the
+ * next page, append. Only the SOURCE is mocked.
+ *
+ * With a finite mock catalogue, later pages re-walk it from a rotated offset so
+ * the rhythm keeps changing rather than repeating the same block. Ids stay
+ * unique per page (`${id}__p{n}`) because React keys must not collide.
+ */
+export function useEndlessListings(
+  pageSize = 8,
+  /** Ids already rendered elsewhere on the page (editorial bands, rails). They
+      are skipped BEFORE paging, so a page is always `pageSize` cards the user
+      hasn't seen; filtering after the fact would silently shrink each page. */
+  exclude?: readonly string[]
+): {
+  items: ProductData[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  loadMore: () => void;
+  /** Always true for the mock catalogue; kept so the caller reads like the
+      real thing once a relay decides when a feed is genuinely exhausted. */
+  hasMore: boolean;
+} {
+  const isLoading = useSimulatedLoad("listings");
+  const [pages, setPages] = useState(1);
+  const [isLoadingMore, setLoadingMore] = useState(false);
+
+  // Stable across renders so the memo below doesn't rebuild on a fresh array
+  // literal from the caller.
+  const excludeKey = exclude ? exclude.join(",") : "";
+  const items = useMemo(() => {
+    if (isLoading || MOCK_LISTINGS.length === 0) return [];
+    const skip = new Set(excludeKey ? excludeKey.split(",") : []);
+    // Everything the tail is allowed to show, in catalogue order.
+    const pool = MOCK_LISTINGS.filter((l) => !skip.has(l.id));
+    if (pool.length === 0) return [];
+    // Walk the pool with a straight cursor. The previous modular rotation
+    // ((p*pageSize + i + p*5) % len) overlapped itself from page 3 on, so the
+    // same product appeared twice within one screenful. A cursor guarantees a
+    // full pass before anything repeats.
+    const wanted = pages * pageSize;
+    const out: ProductData[] = [];
+    for (let n = 0; n < wanted; n++) {
+      const lap = Math.floor(n / pool.length);
+      const base = pool[n % pool.length];
+      // Only the second lap onward needs a synthetic id; lap 0 keeps the real
+      // one so links and cart lookups still resolve.
+      out.push(lap === 0 ? base : { ...base, id: `${base.id}__r${lap}` });
+    }
+    return out;
+  }, [isLoading, pages, pageSize, excludeKey]);
+
+  // The hook is the SINGLE owner of "a page is in flight". The sentinel and the
+  // button both read this one flag, so they can never disagree.
+  const inFlight = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  const loadMore = useCallback(() => {
+    // Re-entrancy guard: a fast double-click (or a click racing the sentinel)
+    // previously appended a page per call.
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setLoadingMore(true);
+    // A beat of latency so the skeletons are visible: an instant append reads
+    // as a layout jump rather than as loading.
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      inFlight.current = false;
+      setPages((n) => n + 1);
+      setLoadingMore(false);
+    }, 450);
+  }, []);
+
+  return { items, isLoading, isLoadingMore, loadMore, hasMore: true };
 }
 
 /** A single listing by id (null if not found). */

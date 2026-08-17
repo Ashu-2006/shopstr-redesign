@@ -152,7 +152,11 @@ function BreakFormat({
       <h3 className="ds-display text-[1.4rem] leading-[0.92] lg:row-start-2 lg:self-center lg:text-3xl">
         {product.title}
       </h3>
-      <div className="mt-1.5 flex items-baseline justify-between lg:row-start-3 lg:mt-0 lg:self-end">
+      {/* gap-x-3 + wrap: at half width (the 2-up picks band) the column can be
+          exactly as wide as its content, which collapses justify-between to
+          zero and welds the price to the location. The floor gap keeps them
+          apart; wrapping drops the location below on the narrowest cards. */}
+      <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 lg:row-start-3 lg:mt-0 lg:self-end">
         <span className="font-mono text-[1.1rem] font-bold tabular-nums lg:text-[1.3rem]">{priceLabel(product)}</span>
         <span className="font-mono text-[0.74rem]">{product.location}</span>
       </div>
