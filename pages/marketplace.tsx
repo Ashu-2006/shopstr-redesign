@@ -46,7 +46,7 @@ export default function Marketplace() {
   const breaks = pick(["lst_016", "lst_008"]);
   const feedB = pick(["lst_009", "lst_002", "lst_004", "lst_006"]);
   /* Near you is positional (a slice), so it has to dodge the bands picked by
-     id above — slice(8,13) overlapped feedA/feedB and showed the same product
+     id above; slice(8,13) overlapped feedA/feedB and showed the same product
      in two rails on one screen. */
   const claimed = new Set([...featured, ...feedA, ...breaks, ...feedB].map((p) => p.id));
   const near = listings.filter((l) => !claimed.has(l.id)).slice(0, 5);

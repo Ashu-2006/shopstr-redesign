@@ -159,7 +159,7 @@ export function useEndlessListings(
   pageSize = 8,
   /** Ids already rendered elsewhere on the page (editorial bands, rails). They
       are skipped BEFORE paging, so a page is always `pageSize` cards the user
-      hasn't seen — filtering after the fact would silently shrink each page. */
+      hasn't seen; filtering after the fact would silently shrink each page. */
   exclude?: readonly string[]
 ): {
   items: ProductData[];
