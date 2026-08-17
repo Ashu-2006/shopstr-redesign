@@ -11,7 +11,7 @@
    only these hook bodies change; the { data, isLoading } seam stays.
    ========================================================================== */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   ProductData,
   Profile,
@@ -142,6 +142,58 @@ export function useListings(): AsyncResult<ProductData[]> {
   const isLoading = useSimulatedLoad("listings");
   const data = useMemo(() => MOCK_LISTINGS, []);
   return { data: isLoading ? [] : data, isLoading };
+}
+
+/** An endless browse feed.
+ *
+ * A marketplace feed should never dead-end: reaching the bottom loads more.
+ * Upstream pages relays by timestamp (`until` the oldest event seen), so the
+ * shape here is the same one that seam expects: hold what we have, ask for the
+ * next page, append. Only the SOURCE is mocked.
+ *
+ * With a finite mock catalogue, later pages re-walk it from a rotated offset so
+ * the rhythm keeps changing rather than repeating the same block. Ids stay
+ * unique per page (`${id}__p{n}`) because React keys must not collide.
+ */
+export function useEndlessListings(pageSize = 8): {
+  items: ProductData[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  loadMore: () => void;
+  /** Always true for the mock catalogue; kept so the caller reads like the
+      real thing once a relay decides when a feed is genuinely exhausted. */
+  hasMore: boolean;
+} {
+  const isLoading = useSimulatedLoad("listings");
+  const [pages, setPages] = useState(1);
+  const [isLoadingMore, setLoadingMore] = useState(false);
+
+  const items = useMemo(() => {
+    if (isLoading || MOCK_LISTINGS.length === 0) return [];
+    const out: ProductData[] = [];
+    for (let p = 0; p < pages; p++) {
+      for (let i = 0; i < pageSize; i++) {
+        // Rotate by a number coprime-ish to the catalogue length so successive
+        // pages interleave differently instead of repeating in lockstep.
+        const idx = (p * pageSize + i * 1 + p * 5) % MOCK_LISTINGS.length;
+        const base = MOCK_LISTINGS[idx];
+        out.push(p === 0 ? base : { ...base, id: `${base.id}__p${p}` });
+      }
+    }
+    return out;
+  }, [isLoading, pages, pageSize]);
+
+  const loadMore = useCallback(() => {
+    setLoadingMore(true);
+    // A beat of latency so the skeletons are visible: an instant append reads
+    // as a layout jump rather than as loading.
+    window.setTimeout(() => {
+      setPages((n) => n + 1);
+      setLoadingMore(false);
+    }, 450);
+  }, []);
+
+  return { items, isLoading, isLoadingMore, loadMore, hasMore: true };
 }
 
 /** A single listing by id (null if not found). */

@@ -1,19 +1,26 @@
 import Head from "next/head";
 import Link from "next/link";
 import type { ProductData } from "@/data/types";
-import { useListings, useTopSellers, useCartStore, useSession, ratingForPubkey } from "@/data/hooks";
+import {
+  useListings,
+  useEndlessListings,
+  useTopSellers,
+  useCartStore,
+  useSession,
+  ratingForPubkey,
+} from "@/data/hooks";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SectionTitle } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Carousel } from "@/components/Carousel";
+import { InfiniteSentinel } from "@/components/InfiniteSentinel";
 import { SolidTile, SellerCard } from "@/components/cards";
 import { ListingCard } from "@/components/ListingCard";
 import { FeatureCard } from "@/components/FeatureCard";
 import {
   HeroSkeleton,
-  ListingRowSkeleton,
   ListingTileSkeleton,
   SellerCardSkeleton,
 } from "@/components/skeletons";
@@ -25,6 +32,8 @@ export default function Marketplace() {
   const { data: topSellers, isLoading: sellersLoading } = useTopSellers(4);
   const { count } = useCartStore();
   const { favs, toggleFav } = useSession();
+  // The endless tail below the editorial sections: browsing never dead-ends.
+  const { items: more, isLoadingMore, loadMore } = useEndlessListings(8);
 
   // Editorial picks by id, but never non-null asserted: a missing id degrades
   // to "fewer cards", not a crash on an empty/late dataset.
@@ -33,14 +42,20 @@ export default function Marketplace() {
     ids.map(byId).filter((p): p is ProductData => Boolean(p));
   const featured = pick(["lst_007", "lst_005", "lst_017"]);
   const near = listings.slice(8, 13);
-  const feedA = pick(["lst_001", "lst_003"]);
+  // Four per band so each fills a complete 4-up row: a 2-card band left two
+  // dead columns beside it before the break card.
+  const feedA = pick(["lst_001", "lst_003", "lst_011", "lst_013"]);
   const breakItem = byId("lst_016");
-  const feedB = pick(["lst_011", "lst_013", "lst_009", "lst_002"]);
+  const feedB = pick(["lst_009", "lst_002", "lst_004", "lst_006"]);
 
+  /* One card for every product grid in the app: the same tile the search
+     results render, so browse and search never disagree about what a listing
+     looks like. */
   const card = (p: ProductData) => (
     <ListingCard
       key={p.id}
       product={p}
+      density="tile"
       rating={ratingForPubkey(p.pubkey)}
       fav={favs.has(p.id)}
       onToggleFav={toggleFav}
@@ -70,7 +85,11 @@ export default function Marketplace() {
           </Carousel>
         ) : null}
 
-        <div className="mx-auto max-w-(--ds-measure) px-4">
+        {/* Fixed measure, generous side gutters. The content column stops
+            growing at --ds-measure and the padding steps up with the viewport,
+            so the feed keeps a comfortable margin instead of running to the
+            window edge on a wide screen. */}
+        <div className="mx-auto max-w-(--ds-measure) px-5 sm:px-8 lg:px-12">
           {/* Browse categories — static chrome, paints immediately */}
           <SectionTitle>Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -80,19 +99,22 @@ export default function Marketplace() {
             <SolidTile label="Electronics" href={catHref("Electronics")} tone="orange" sticker="shape-starburst" />
           </div>
 
-          {/* For you — H5 feed with an H4 break card; 2-col on desktop */}
+          {/* For you: the same tile card and 4-up grid the search results use,
+              so a product reads identically wherever it is browsed. The break
+              card spans the row to interrupt the rhythm without changing the
+              card language. */}
           <SectionTitle seeAllHref="/new">For you</SectionTitle>
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              {Array.from({ length: 4 }, (_, i) => (
-                <ListingRowSkeleton key={i} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {Array.from({ length: 8 }, (_, i) => (
+                <ListingTileSkeleton key={i} />
               ))}
             </div>
           ) : feedA.length + feedB.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {feedA.map(card)}
               {breakItem && (
-                <div className="lg:col-span-2">
+                <div className="col-span-2 sm:col-span-3 lg:col-span-4">
                   <FeatureCard product={breakItem} format="break" kicker="Editor's pick" />
                 </div>
               )}
@@ -168,6 +190,41 @@ export default function Marketplace() {
                       />
                     ))}
               </Carousel>
+            </>
+          )}
+
+          {/* Everything else: the endless tail. The editorial sections above
+              are curated and finite; this is the part that keeps going, so
+              reaching the bottom loads more instead of ending the page. */}
+          <SectionTitle note="Keeps going">Everything else</SectionTitle>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {isLoading
+              ? Array.from({ length: 8 }, (_, i) => <ListingTileSkeleton key={i} />)
+              : more.map((p) => (
+                  <ListingCard
+                    key={p.id}
+                    product={p}
+                    density="tile"
+                    fav={favs.has(p.id)}
+                    onToggleFav={toggleFav}
+                  />
+                ))}
+            {/* Appended pages land as skeletons first, so the grid grows into
+                real geometry instead of jumping when the data arrives. */}
+            {isLoadingMore &&
+              Array.from({ length: 4 }, (_, i) => <ListingTileSkeleton key={`more-${i}`} />)}
+          </div>
+
+          {!isLoading && (
+            <>
+              <InfiniteSentinel onReach={loadMore} disabled={isLoadingMore} />
+              {/* Keyboard and no-IO fallback: the sentinel is invisible and
+                  unreachable by tab, so the same action needs a real control. */}
+              <div className="mt-4 flex justify-center">
+                <Button variant="secondary" onClick={loadMore}>
+                  {isLoadingMore ? "Loading…" : "Load more"}
+                </Button>
+              </div>
             </>
           )}
         </div>
