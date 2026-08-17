@@ -155,7 +155,13 @@ export function useListings(): AsyncResult<ProductData[]> {
  * the rhythm keeps changing rather than repeating the same block. Ids stay
  * unique per page (`${id}__p{n}`) because React keys must not collide.
  */
-export function useEndlessListings(pageSize = 8): {
+export function useEndlessListings(
+  pageSize = 8,
+  /** Ids already rendered elsewhere on the page (editorial bands, rails). They
+      are skipped BEFORE paging, so a page is always `pageSize` cards the user
+      hasn't seen — filtering after the fact would silently shrink each page. */
+  exclude?: readonly string[]
+): {
   items: ProductData[];
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -168,23 +174,30 @@ export function useEndlessListings(pageSize = 8): {
   const [pages, setPages] = useState(1);
   const [isLoadingMore, setLoadingMore] = useState(false);
 
+  // Stable across renders so the memo below doesn't rebuild on a fresh array
+  // literal from the caller.
+  const excludeKey = exclude ? exclude.join(",") : "";
   const items = useMemo(() => {
     if (isLoading || MOCK_LISTINGS.length === 0) return [];
-    // Walk the catalogue with a straight cursor. The previous modular rotation
+    const skip = new Set(excludeKey ? excludeKey.split(",") : []);
+    // Everything the tail is allowed to show, in catalogue order.
+    const pool = MOCK_LISTINGS.filter((l) => !skip.has(l.id));
+    if (pool.length === 0) return [];
+    // Walk the pool with a straight cursor. The previous modular rotation
     // ((p*pageSize + i + p*5) % len) overlapped itself from page 3 on, so the
     // same product appeared twice within one screenful. A cursor guarantees a
     // full pass before anything repeats.
     const wanted = pages * pageSize;
     const out: ProductData[] = [];
     for (let n = 0; n < wanted; n++) {
-      const lap = Math.floor(n / MOCK_LISTINGS.length);
-      const base = MOCK_LISTINGS[n % MOCK_LISTINGS.length];
+      const lap = Math.floor(n / pool.length);
+      const base = pool[n % pool.length];
       // Only the second lap onward needs a synthetic id; lap 0 keeps the real
       // one so links and cart lookups still resolve.
       out.push(lap === 0 ? base : { ...base, id: `${base.id}__r${lap}` });
     }
     return out;
-  }, [isLoading, pages, pageSize]);
+  }, [isLoading, pages, pageSize, excludeKey]);
 
   // The hook is the SINGLE owner of "a page is in flight". The sentinel and the
   // button both read this one flag, so they can never disagree.

@@ -32,8 +32,6 @@ export default function Marketplace() {
   const { data: topSellers, isLoading: sellersLoading } = useTopSellers(4);
   const { count } = useCartStore();
   const { favs, toggleFav } = useSession();
-  // The endless tail below the editorial sections: browsing never dead-ends.
-  const { items: more, isLoadingMore, loadMore } = useEndlessListings(8);
 
   // Editorial picks by id, but never non-null asserted: a missing id degrades
   // to "fewer cards", not a crash on an empty/late dataset.
@@ -41,22 +39,30 @@ export default function Marketplace() {
   const pick = (ids: string[]) =>
     ids.map(byId).filter((p): p is ProductData => Boolean(p));
   const featured = pick(["lst_007", "lst_005", "lst_017"]);
-  const near = listings.slice(8, 13);
   // Four per band so each fills a complete 4-up row: a 2-card band left two
   // dead columns beside it before the break card.
   const feedA = pick(["lst_001", "lst_003", "lst_011", "lst_013"]);
   // Two picks so the desktop band fills its 2-up row.
   const breaks = pick(["lst_016", "lst_008"]);
   const feedB = pick(["lst_009", "lst_002", "lst_004", "lst_006"]);
+  /* Near you is positional (a slice), so it has to dodge the bands picked by
+     id above — slice(8,13) overlapped feedA/feedB and showed the same product
+     in two rails on one screen. */
+  const claimed = new Set([...featured, ...feedA, ...breaks, ...feedB].map((p) => p.id));
+  const near = listings.filter((l) => !claimed.has(l.id)).slice(0, 5);
 
-  /* The tail is "everything ELSE", so drop anything already rendered above it.
-     Without this the first rows of the endless feed repeat the cards the user
-     just scrolled past. Base ids only: repeat laps carry a __rN suffix and are
-     intentionally allowed once the catalogue has been exhausted. */
-  const shownAbove = new Set(
-    [...featured, ...near, ...feedA, ...breaks, ...feedB].map((p) => p.id)
+  /* The tail is "everything ELSE", so the hook skips anything already rendered
+     above it. Passed IN (rather than filtered after) so each page is still a
+     full pageSize of cards the user hasn't seen. */
+  const shownAbove = [...featured, ...near, ...feedA, ...breaks, ...feedB].map(
+    (p) => p.id
   );
-  const tail = more.filter((p) => !shownAbove.has(p.id));
+  // The endless tail below the editorial sections: browsing never dead-ends.
+  const {
+    items: tail,
+    isLoadingMore,
+    loadMore,
+  } = useEndlessListings(8, shownAbove);
 
   /* One card for every product grid in the app: the same tile the search
      results render, so browse and search never disagree about what a listing

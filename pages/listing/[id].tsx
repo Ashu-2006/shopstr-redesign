@@ -24,7 +24,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Stars } from "@/components/ui/Stars";
 import { Sticker } from "@/components/ui/Sticker";
 import { SellerStrip } from "@/components/SellerStrip";
-import { ReviewCard } from "@/components/ReviewCard";
+import { ReviewList } from "@/components/ReviewList";
 import { ListingCard } from "@/components/ListingCard";
 import { TopBar } from "@/components/ui/TopBar";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -372,16 +372,11 @@ export default function ListingDetail() {
               )}
             </div>
             {reviews.reviews.length > 0 ? (
-              <ul className="flex flex-col gap-2.5">
-                {reviews.reviews.slice(0, 4).map((r) => (
-                  <ReviewCard
-                    key={r.id}
-                    review={r}
-                    now={1717372800000}
-                    authorHandle={profileByPubkey(r.authorPubkey)?.handle}
-                  />
-                ))}
-              </ul>
+              <ReviewList
+                reviews={reviews.reviews}
+                now={1717372800000}
+                handleFor={(pk) => profileByPubkey(pk)?.handle}
+              />
             ) : (
               <EmptyState
                 variant="inline"

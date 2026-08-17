@@ -174,7 +174,9 @@ function TileCard({
   const type = primaryType(product);
   return (
     <div className={`group flex flex-col ${className}`}>
-      <div className={`relative aspect-square overflow-hidden rounded-lg border-2 border-ink ${tintFor(product)}`}>
+      {/* 4:5 portrait, not a square: the taller window gives the product more
+          presence in the grid, the ratio most commerce feeds settle on. */}
+      <div className={`relative aspect-[4/5] overflow-hidden rounded-lg border-2 border-ink ${tintFor(product)}`}>
         <Link href={`/listing/${product.id}`} className="absolute inset-0 block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -194,9 +196,9 @@ function TileCard({
       {/* No "Just in" kicker: condition describes wear, not recency, and 79% of
           the catalog is "New", so the badge fired on 4 of every 5 cards and
           carried no information. Recency needs a real timestamp. */}
-      <Link href={`/listing/${product.id}`} className="mt-2 block">
+      <Link href={`/listing/${product.id}`} className="mt-3 block">
         <h3 className="line-clamp-2 text-[0.92rem] font-bold leading-tight">{product.title}</h3>
-        <div className="mt-1.5">
+        <div className="mt-2">
           <MetaLine product={product} rating={rating} priceClass="text-[0.95rem]" />
         </div>
       </Link>
