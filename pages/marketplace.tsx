@@ -45,8 +45,18 @@ export default function Marketplace() {
   // Four per band so each fills a complete 4-up row: a 2-card band left two
   // dead columns beside it before the break card.
   const feedA = pick(["lst_001", "lst_003", "lst_011", "lst_013"]);
-  const breakItem = byId("lst_016");
+  // Two picks so the desktop band fills its 2-up row.
+  const breaks = pick(["lst_016", "lst_008"]);
   const feedB = pick(["lst_009", "lst_002", "lst_004", "lst_006"]);
+
+  /* The tail is "everything ELSE", so drop anything already rendered above it.
+     Without this the first rows of the endless feed repeat the cards the user
+     just scrolled past. Base ids only: repeat laps carry a __rN suffix and are
+     intentionally allowed once the catalogue has been exhausted. */
+  const shownAbove = new Set(
+    [...featured, ...near, ...feedA, ...breaks, ...feedB].map((p) => p.id)
+  );
+  const tail = more.filter((p) => !shownAbove.has(p.id));
 
   /* One card for every product grid in the app: the same tile the search
      results render, so browse and search never disagree about what a listing
@@ -100,24 +110,17 @@ export default function Marketplace() {
           </div>
 
           {/* For you: the same tile card and 4-up grid the search results use,
-              so a product reads identically wherever it is browsed. The break
-              card spans the row to interrupt the rhythm without changing the
-              card language. */}
+              so a product reads identically wherever it is browsed. */}
           <SectionTitle seeAllHref="/new">For you</SectionTitle>
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
               {Array.from({ length: 8 }, (_, i) => (
                 <ListingTileSkeleton key={i} />
               ))}
             </div>
           ) : feedA.length + feedB.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
               {feedA.map(card)}
-              {breakItem && (
-                <div className="col-span-2 sm:col-span-3 lg:col-span-4">
-                  <FeatureCard product={breakItem} format="break" kicker="Editor's pick" />
-                </div>
-              )}
               {feedB.map(card)}
             </div>
           ) : (
@@ -130,6 +133,30 @@ export default function Marketplace() {
                 </Link>
               }
             />
+          )}
+
+          {/* Editor's picks: its own band, not a row hijacked from the feed.
+              Two side by side on desktop; a horizontal rail on mobile, where
+              two stacked full-width feature cards would push the feed a whole
+              screen down. Same Carousel/grid split the Top sellers rail uses. */}
+          {(isLoading || breaks.length > 0) && (
+            <>
+              <SectionTitle note="Curated">Editor's picks</SectionTitle>
+              <div className="lg:hidden">
+                <Carousel snap={false}>
+                  {(isLoading ? [] : breaks).map((p) => (
+                    <div key={p.id} className="w-[85vw] max-w-[400px] shrink-0 snap-start">
+                      <FeatureCard product={p} format="break" kicker="Editor's pick" />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+              <div className="hidden lg:grid lg:grid-cols-2 lg:gap-5">
+                {(isLoading ? [] : breaks).map((p) => (
+                  <FeatureCard key={p.id} product={p} format="break" kicker="Editor's pick" />
+                ))}
+              </div>
+            </>
           )}
 
           {/* Top sellers — optional discovery rail: hides entirely (header
@@ -197,14 +224,17 @@ export default function Marketplace() {
               are curated and finite; this is the part that keeps going, so
               reaching the bottom loads more instead of ending the page. */}
           <SectionTitle note="Keeps going">Everything else</SectionTitle>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
             {isLoading
               ? Array.from({ length: 8 }, (_, i) => <ListingTileSkeleton key={i} />)
-              : more.map((p) => (
+              : tail.map((p) => (
                   <ListingCard
                     key={p.id}
                     product={p}
                     density="tile"
+                    /* Same rating the editorial bands pass: without it the same
+                       product shows a star above and none down here. */
+                    rating={ratingForPubkey(p.pubkey)}
                     fav={favs.has(p.id)}
                     onToggleFav={toggleFav}
                   />
@@ -217,11 +247,19 @@ export default function Marketplace() {
 
           {!isLoading && (
             <>
-              <InfiniteSentinel onReach={loadMore} disabled={isLoadingMore} />
+              <InfiniteSentinel
+                onReach={loadMore}
+                disabled={isLoadingMore}
+                resetKey={tail.length}
+              />
               {/* Keyboard and no-IO fallback: the sentinel is invisible and
                   unreachable by tab, so the same action needs a real control. */}
               <div className="mt-4 flex justify-center">
-                <Button variant="secondary" onClick={loadMore}>
+                <Button
+                  variant="secondary"
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                >
                   {isLoadingMore ? "Loading…" : "Load more"}
                 </Button>
               </div>

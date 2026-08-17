@@ -11,7 +11,7 @@
    only these hook bodies change; the { data, isLoading } seam stays.
    ========================================================================== */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   ProductData,
   Profile,
@@ -170,24 +170,41 @@ export function useEndlessListings(pageSize = 8): {
 
   const items = useMemo(() => {
     if (isLoading || MOCK_LISTINGS.length === 0) return [];
+    // Walk the catalogue with a straight cursor. The previous modular rotation
+    // ((p*pageSize + i + p*5) % len) overlapped itself from page 3 on, so the
+    // same product appeared twice within one screenful. A cursor guarantees a
+    // full pass before anything repeats.
+    const wanted = pages * pageSize;
     const out: ProductData[] = [];
-    for (let p = 0; p < pages; p++) {
-      for (let i = 0; i < pageSize; i++) {
-        // Rotate by a number coprime-ish to the catalogue length so successive
-        // pages interleave differently instead of repeating in lockstep.
-        const idx = (p * pageSize + i * 1 + p * 5) % MOCK_LISTINGS.length;
-        const base = MOCK_LISTINGS[idx];
-        out.push(p === 0 ? base : { ...base, id: `${base.id}__p${p}` });
-      }
+    for (let n = 0; n < wanted; n++) {
+      const lap = Math.floor(n / MOCK_LISTINGS.length);
+      const base = MOCK_LISTINGS[n % MOCK_LISTINGS.length];
+      // Only the second lap onward needs a synthetic id; lap 0 keeps the real
+      // one so links and cart lookups still resolve.
+      out.push(lap === 0 ? base : { ...base, id: `${base.id}__r${lap}` });
     }
     return out;
   }, [isLoading, pages, pageSize]);
 
+  // The hook is the SINGLE owner of "a page is in flight". The sentinel and the
+  // button both read this one flag, so they can never disagree.
+  const inFlight = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
   const loadMore = useCallback(() => {
+    // Re-entrancy guard: a fast double-click (or a click racing the sentinel)
+    // previously appended a page per call.
+    if (inFlight.current) return;
+    inFlight.current = true;
     setLoadingMore(true);
     // A beat of latency so the skeletons are visible: an instant append reads
     // as a layout jump rather than as loading.
-    window.setTimeout(() => {
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      inFlight.current = false;
       setPages((n) => n + 1);
       setLoadingMore(false);
     }, 450);
