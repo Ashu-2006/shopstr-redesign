@@ -77,6 +77,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Single-origin Ethiopian, steeped 18h. Dilute 1:1. Local pickup only.",
     images: [
       "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=900",
+      "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=900&h=650&fit=crop",
     ],
     price: 14000,
     currency: "sats",
@@ -117,6 +119,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Reusable wraps in three sizes. Plastic-free, compostable.",
     images: [
       "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900",
+      "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&h=650&fit=crop",
     ],
     price: 11000,
     currency: "sats",
@@ -136,6 +140,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "32 pages, 2-color riso on recycled stock. Limited run of 100.",
     images: [
       "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900&h=650&fit=crop",
     ],
     price: 12000,
     currency: "sats",
@@ -155,6 +161,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "12 presets emulating classic stocks. Instant download after payment.",
     images: [
       "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=900",
+      "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=900&h=650&fit=crop",
     ],
     price: 28000,
     currency: "sats",
@@ -174,6 +182,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Soft 100% merino, ribbed cuff. Three colorways.",
     images: [
       "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=900",
+      "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=900&h=650&fit=crop",
     ],
     price: 26000,
     currency: "sats",
@@ -194,6 +204,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Live screen-share review of your relay/Cashu integration. Booked over DM.",
     images: [
       "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900",
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&h=650&fit=crop",
     ],
     price: 85,
     currency: "USD",
@@ -213,6 +225,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "10-inch, pre-seasoned, lifetime piece. Light surface patina.",
     images: [
       "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=900",
+      "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=900&h=650&fit=crop",
     ],
     price: 42000,
     currency: "sats",
@@ -252,6 +266,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Two deep bowls, reactive celadon glaze. Dishwasher safe.",
     images: [
       "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=900",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=900&h=650&fit=crop",
     ],
     price: 33000,
     currency: "sats",
@@ -272,6 +288,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Trade for a GMK base set or escrow swap. Open to offers over DM.",
     images: [
       "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=900",
+      "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1595044426077-d36d9236d54a?w=900&h=650&fit=crop",
     ],
     price: 22000,
     currency: "sats",
@@ -291,6 +309,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "90-min in-person session in Porto. Beans included.",
     images: [
       "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=900",
+      "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=900&h=650&fit=crop",
     ],
     price: 60000,
     currency: "sats",
@@ -311,6 +331,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Lambswool, herringbone weave, 130×170cm. Natural undyed.",
     images: [
       "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=900",
+      "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?w=900&h=650&fit=crop",
     ],
     price: 78000,
     currency: "sats",
@@ -330,6 +352,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Hand-printed 8×10, archival. Signed verso. Edition of 12.",
     images: [
       "https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=900",
+      "https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=900&h=650&fit=crop",
     ],
     price: 120000,
     currency: "sats",
@@ -349,6 +373,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Weatherproof matte vinyl, 10 designs. Great on laptops + bottles.",
     images: [
       "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900",
+      "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&h=650&fit=crop",
     ],
     price: 8000,
     currency: "sats",
@@ -368,6 +394,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Stonewashed linen, adjustable, deep front pocket. Two colors.",
     images: [
       "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=900",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=900&h=650&fit=crop",
     ],
     price: 38000,
     currency: "sats",
@@ -388,6 +416,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Lot of 3, 1m braided, 100W. Open box, never used.",
     images: [
       "https://images.unsplash.com/photo-1610792516307-ea5acd9c3b00?w=900",
+      "https://images.unsplash.com/photo-1610792516307-ea5acd9c3b00?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1610792516307-ea5acd9c3b00?w=900&h=650&fit=crop",
     ],
     price: 9000,
     currency: "sats",
@@ -407,6 +437,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Trade ceramic glaze tiles with other makers. Exchange-only listing.",
     images: [
       "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=900",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=900&h=650&fit=crop",
     ],
     price: 5000,
     currency: "sats",
@@ -426,6 +458,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Custom wordmark + icon, 2 rounds of revision. Source files delivered.",
     images: [
       "https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67?w=900",
+      "https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67?w=900&h=650&fit=crop",
     ],
     price: 240,
     currency: "EUR",
@@ -445,6 +479,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "Speckled enamel over steel, 400ml. Trail-ready.",
     images: [
       "https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=900",
+      "https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=900&h=650&fit=crop",
     ],
     price: 15000,
     currency: "sats",
@@ -464,6 +500,8 @@ export const MOCK_LISTINGS: ProductData[] = [
     summary: "47-min ambient LP. FLAC + WAV, instant download. Name-your-price floor.",
     images: [
       "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=900",
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=900&h=1200&fit=crop",
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=900&h=650&fit=crop",
     ],
     price: 21000,
     currency: "sats",

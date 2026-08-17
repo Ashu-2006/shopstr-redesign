@@ -199,74 +199,96 @@ export default function ListingDetail() {
 
       <TopBar searchHref="/search" cartCount={cart.count} />
 
-      {/* Two columns only. "More from" used to live inside this grid as a
-          col-span-2 row, which ended the gallery's sticky containing block one
-          row early and unstuck it before the page finished scrolling. It is now
-          a sibling below, so the image tracks the info column the whole way. */}
-      <main className="mx-auto max-w-(--ds-measure) px-4 pt-4 md:grid md:grid-cols-2 md:gap-10">
-        {/* ---- Gallery ---- */}
-        <div className="md:sticky md:top-24 md:self-start">
-          <div className="mb-3 flex items-center justify-between">
-            <button
-              onClick={() => router.back()}
-              className="ds-press inline-flex items-center gap-1.5 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 text-sm font-bold"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={() => toggleFav(product.id)}
-              aria-pressed={isFav}
-              aria-label="Save"
-              className={`ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink ${
-                isFav ? "bg-pink" : "bg-paper-pure"
-              }`}
-            >
-              <Heart size={18} weight={isFav ? "fill" : "bold"} />
-            </button>
-          </div>
+      {/* ---- HERO: one viewport at lg. Only what the buy decision needs:
+           gallery, chips, title, price, summary, the buy box. Everything
+           secondary (specs, seller, reviews, related) lives below the fold.
 
-          <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={product.images[activeImg]} alt={product.title} className="aspect-square w-full object-cover" />
-            {type && (
-              <span className="absolute left-3 top-3">
-                <Pill tone="ink">{type}</Pill>
-              </span>
-            )}
-            <Sticker name="badge-bff-star" className="pointer-events-none absolute right-3 top-3 h-14 w-14" />
-          </div>
-
-          {product.images.length > 1 && (
-            <div className="mt-3 flex gap-2.5">
-              {product.images.map((src, i) => (
-                <button
-                  key={src}
-                  onClick={() => setActiveImg(i)}
-                  aria-label={`Image ${i + 1}`}
-                  className={`h-16 w-16 overflow-hidden rounded-lg border-2 ds-press lg:h-20 lg:w-20 ${i === activeImg ? "border-purple" : "border-ink"}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
+           Alignment contract at lg:
+           - the chips row mirrors the Back row's height, so the TITLE's cap
+             line starts exactly where the image's top edge starts;
+           - both columns stretch to the section height, and the buy box rides
+             mt-auto, so its bottom edge lands on the thumbnail rail's bottom. */}
+      <main className="mx-auto max-w-(--ds-measure) px-4 pt-4 sm:px-8 lg:px-12">
+        <section className="md:grid md:grid-cols-2 md:gap-10 lg:h-[calc(100dvh-130px)]">
+          {/* ---- Gallery ---- */}
+          <div className="flex flex-col lg:h-full lg:min-h-0">
+            <div className="mb-3 flex h-10 items-center justify-between">
+              <button
+                onClick={() => router.back()}
+                className="ds-press inline-flex items-center gap-1.5 rounded-pill border-2 border-ink bg-paper-pure px-4 py-2 text-sm font-bold"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={() => toggleFav(product.id)}
+                aria-pressed={isFav}
+                aria-label="Save"
+                className={`ds-press grid h-10 w-10 place-items-center rounded-full border-2 border-ink ${
+                  isFav ? "bg-pink" : "bg-paper-pure"
+                }`}
+              >
+                <Heart size={18} weight={isFav ? "fill" : "bold"} />
+              </button>
             </div>
-          )}
-        </div>
 
-        {/* ---- Info ---- */}
-        <div className="mt-5 flex flex-col gap-5 md:mt-0">
-          <div>
+            {/* Square on mobile; at lg it flex-fills the column so the gallery
+                and the info column share one bottom edge. */}
+            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-3 lg:min-h-0 lg:flex-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={product.images[activeImg]}
+                alt={product.title}
+                className="aspect-square w-full object-cover lg:aspect-auto lg:h-full"
+              />
+              {type && (
+                <span className="absolute left-3 top-3">
+                  <Pill tone="ink">{type}</Pill>
+                </span>
+              )}
+              <Sticker name="badge-bff-star" className="pointer-events-none absolute right-3 top-3 h-14 w-14" />
+            </div>
+
+            {product.images.length > 1 && (
+              <div className="mt-3 flex shrink-0 gap-2.5">
+                {product.images.map((src, i) => (
+                  <button
+                    key={src}
+                    onClick={() => setActiveImg(i)}
+                    aria-label={`Image ${i + 1}`}
+                    aria-pressed={i === activeImg}
+                    className={`h-16 w-16 overflow-hidden rounded-lg border-2 ds-press lg:h-20 lg:w-20 ${i === activeImg ? "border-purple" : "border-ink"}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ---- Info ---- */}
+          <div className="mt-5 flex flex-col md:mt-0 lg:h-full lg:min-h-0">
+            {/* Chips live in the slot that mirrors the Back row, so the title
+                below starts on the image's top line instead of floating above it. */}
+            {/* min-h (not h): mirrors the Back row's 40px when chips fit one
+                line, but can't clip them if they wrap on a narrow phone. */}
+            <div className="mb-3 flex min-h-10 flex-wrap items-center gap-2">
+              {product.condition && <Pill tone="green">{product.condition}</Pill>}
+              <Pill>{product.location}</Pill>
+              {product.quantity != null && product.quantity <= 5 && <Pill tone="red">Only {product.quantity} left</Pill>}
+            </div>
+
             <h1 className="ds-display text-3xl leading-[0.95] md:text-4xl">{product.title}</h1>
-            {/* A fiat-quoted listing leads with the seller's number, because that
-                is what they committed to; sats follow as the settlement amount. */}
-            <div className="mt-3 flex items-end gap-3">
-              {/* A sats listing renders the bare number with the unit as a
-                  separate smaller token; quoted.quoted already carries "sats",
-                  so using it here printed "120,000 sats sats". */}
-              <span className="font-mono text-4xl font-bold leading-none tabular-nums">
+
+            {/* Price is deliberately a step DOWN from the title: one voice
+                shouts on this screen. Mono + tabular still marks it as the
+                value; it no longer competes at display size. */}
+            <div className="mt-4 flex items-baseline gap-2">
+              <span className="font-mono text-2xl font-bold leading-none tabular-nums">
                 {quoted.converted ? quoted.quoted : groupInt(product.price)}
               </span>
-              {!quoted.converted && <span className="pb-1 font-mono text-sm text-text-muted">sats</span>}
+              {!quoted.converted && <span className="font-mono text-sm text-text-muted">sats</span>}
+              <span className="font-mono text-xs text-text-subtle">· {formatSats(product.totalCost)} with shipping</span>
             </div>
             {quoted.converted && (
               <p className="mt-1.5 font-mono text-xs font-bold text-purple">
@@ -275,54 +297,57 @@ export default function ListingDetail() {
                   : `≈ ${groupInt(quoted.sats)} sats · locked at checkout`}
               </p>
             )}
-            <p className="mt-1.5 font-mono text-xs text-text-subtle">{formatSats(product.totalCost)} total with shipping</p>
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            {product.condition && <Pill tone="green">{product.condition}</Pill>}
-            <Pill>{product.location}</Pill>
-            {product.quantity != null && product.quantity <= 5 && <Pill tone="red">Only {product.quantity} left</Pill>}
-          </div>
+            <p className="mt-4 text-[0.98rem] leading-relaxed text-text-muted">{product.summary}</p>
 
-          <p className="text-[0.98rem] leading-relaxed text-text-muted">{product.summary}</p>
-
-          {product.sizes && product.sizes.length > 0 && (
-            <div>
-              <h2 className="mb-2 font-mono text-xs uppercase tracking-[0.12em] text-text-muted">Size</h2>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((s) => (
-                  <Pill key={s} interactive active={size === s} onClick={() => setSize(size === s ? null : s)}>
-                    {s}
-                  </Pill>
-                ))}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="mt-4">
+                <h2 className="mb-2 font-mono text-xs uppercase tracking-[0.12em] text-text-muted">Size</h2>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((s) => (
+                    <Pill key={s} interactive active={size === s} onClick={() => setSize(size === s ? null : s)}>
+                      {s}
+                    </Pill>
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* mt-auto pins the purchase block to the column's bottom edge, so
+                at lg it closes level with the thumbnail rail. The whitespace
+                this opens between summary and CTA is the point: the essentials
+                breathe inside one viewport. */}
+            <div className="mt-auto pt-6">
+              {/* Pickup-only is a hard constraint, not a footnote: it decides
+                  whether this item can reach the buyer at all. */}
+              {canPickup && (
+                <div className={`mb-3 flex items-start gap-2.5 rounded-xl border-2 border-ink p-3 ${canShip ? "bg-blue-soft" : "bg-yellow"}`}>
+                  <MapPin size={18} weight="bold" className="mt-0.5 shrink-0" />
+                  <div className="text-sm leading-snug">
+                    <b>{canShip ? "Ship or collect in person" : "Collection only"}</b>
+                    {product.pickupLocations?.length ? (
+                      <span className="block font-mono text-[0.7rem] text-text-muted">
+                        {product.pickupLocations.join(" · ")}
+                      </span>
+                    ) : null}
+                    {!canShip && (
+                      <span className="block font-mono text-[0.7rem] text-text-muted">
+                        This seller does not post this item.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              {/* Desktop buy box: the CTA lives with the product, not in a viewport-wide bar. */}
+              <div className="hidden lg:block">{buyControls}</div>
             </div>
-          )}
+          </div>
+        </section>
 
-          {/* Desktop buy box: the CTA lives with the product, not in a viewport-wide bar. */}
-          <div className="hidden lg:block">{buyControls}</div>
-
-          {/* Pickup-only is a hard constraint, not a footnote: it decides
-              whether this item can reach the buyer at all. */}
-          {canPickup && (
-            <div className={`flex items-start gap-2.5 rounded-xl border-2 border-ink p-3 ${canShip ? "bg-blue-soft" : "bg-yellow"}`}>
-              <MapPin size={18} weight="bold" className="mt-0.5 shrink-0" />
-              <div className="text-sm leading-snug">
-                <b>{canShip ? "Ship or collect in person" : "Collection only"}</b>
-                {product.pickupLocations?.length ? (
-                  <span className="block font-mono text-[0.7rem] text-text-muted">
-                    {product.pickupLocations.join(" · ")}
-                  </span>
-                ) : null}
-                {!canShip && (
-                  <span className="block font-mono text-[0.7rem] text-text-muted">
-                    This seller does not post this item.
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
+        {/* ---- BELOW THE FOLD: the reference material. Two columns at lg so
+             specs and trust read side by side instead of one long scroll. */}
+        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-5 md:mt-12 lg:grid-cols-2 lg:items-start">
+        <div className="flex flex-col gap-5">
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
             {[
               ["Shipping", shippingLine],
@@ -336,8 +361,6 @@ export default function ListingDetail() {
               </div>
             ))}
           </dl>
-
-          {seller && <SellerStrip profile={seller} avg={avg} count={reviews.reviews.length} />}
 
           {/* Ask before you buy: if members discussed this item in a moderated
               community, that is the strongest pre-purchase trust signal we have. */}
@@ -363,6 +386,11 @@ export default function ListingDetail() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Right rail: who you're buying from, then what buyers said. */}
+        <div className="flex flex-col gap-5">
+          {seller && <SellerStrip profile={seller} avg={avg} count={reviews.reviews.length} />}
 
           <section>
             <div className="mb-3 flex items-baseline justify-between">
@@ -386,7 +414,7 @@ export default function ListingDetail() {
               />
             )}
           </section>
-
+        </div>
         </div>
       </main>
 
