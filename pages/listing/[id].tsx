@@ -199,19 +199,18 @@ export default function ListingDetail() {
 
       <TopBar searchHref="/search" cartCount={cart.count} />
 
-      {/* ---- HERO: one viewport at lg. Only what the buy decision needs:
-           gallery, chips, title, price, summary, the buy box. Everything
-           secondary (specs, seller, reviews, related) lives below the fold.
+      {/* ---- Master-detail at lg: the GALLERY is sticky while the detail
+           column (title, price, specs, buy box, seller, reviews) scrolls past
+           it. position:sticky is bounded by the grid section, so the gallery
+           releases exactly when the detail column ends and the page scrolls
+           on into "More from" as one piece. No nested scroll areas.
 
-           Alignment contract at lg:
-           - the chips row mirrors the Back row's height, so the TITLE's cap
-             line starts exactly where the image's top edge starts;
-           - both columns stretch to the section height, and the buy box rides
-             mt-auto, so its bottom edge lands on the thumbnail rail's bottom. */}
+           The chips row still mirrors the Back row's height, so the title's
+           cap line starts exactly where the image's top edge starts. */}
       <main className="mx-auto max-w-(--ds-measure) px-4 pt-4 sm:px-8 lg:px-12">
-        <section className="md:grid md:grid-cols-2 md:gap-10 lg:h-[calc(100dvh-130px)]">
-          {/* ---- Gallery ---- */}
-          <div className="flex flex-col lg:h-full lg:min-h-0">
+        <section className="md:grid md:grid-cols-2 md:gap-10 lg:items-start">
+          {/* ---- Gallery (sticky rail) ---- */}
+          <div className="flex flex-col lg:sticky lg:top-24">
             <div className="mb-3 flex h-10 items-center justify-between">
               <button
                 onClick={() => router.back()}
@@ -231,9 +230,10 @@ export default function ListingDetail() {
               </button>
             </div>
 
-            {/* Square on mobile; at lg it flex-fills the column so the gallery
-                and the info column share one bottom edge. */}
-            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-3 lg:min-h-0 lg:flex-1">
+            {/* Square on mobile; at lg the height is capped so the whole sticky
+                rail (back row + image + thumbs) fits inside one viewport below
+                the 96px sticky offset. */}
+            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-3 lg:h-[calc(100dvh-286px)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={product.images[activeImg]}
@@ -266,8 +266,8 @@ export default function ListingDetail() {
             )}
           </div>
 
-          {/* ---- Info ---- */}
-          <div className="mt-5 flex flex-col md:mt-0 lg:h-full lg:min-h-0">
+          {/* ---- Detail column: scrolls past the sticky gallery ---- */}
+          <div className="mt-5 flex flex-col md:mt-0">
             {/* Chips live in the slot that mirrors the Back row, so the title
                 below starts on the image's top line instead of floating above it. */}
             {/* min-h (not h): mirrors the Back row's 40px when chips fit one
@@ -300,6 +300,49 @@ export default function ListingDetail() {
 
             <p className="mt-4 text-[0.98rem] leading-relaxed text-text-muted">{product.summary}</p>
 
+            {/* Specs sit with the summary, not below the fold: shipping, origin
+                and stock are what decide the purchase, and the hero column was
+                otherwise empty between the description and the buy box. */}
+            <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
+              {[
+                ["Shipping", shippingLine],
+                [canShip ? "Ships from" : "Collect from", product.location],
+                ["Category", product.categories.filter((c) => !["Digital", "Service", "Resale", "Exchange", "Swap", "Physical"].includes(c)).join(", ") || "-"],
+                ["Quantity", product.quantity != null ? `${groupInt(product.quantity)} available` : "-"],
+              ].map(([k, v]) => (
+                <div key={k} className="bg-paper-pure p-3">
+                  <dt className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-subtle">{k}</dt>
+                  <dd className="mt-0.5 font-medium">{v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {/* Ask before you buy: if members discussed this item in a moderated
+                community, that is the strongest pre-purchase trust signal we
+                have, so it belongs beside the specs rather than below them. */}
+            {discussedIn.length > 0 && (
+              <div className="mt-3 flex flex-col gap-2">
+                {discussedIn.map(({ community, postCount }) => (
+                  <Link
+                    key={community.slug}
+                    href={`/communities/${community.slug}`}
+                    className="ds-press flex items-center gap-3 rounded-xl border-2 border-ink bg-blue-soft p-3"
+                  >
+                    <UsersThree size={20} weight="bold" className="shrink-0" />
+                    <span className="min-w-0 flex-1 text-sm leading-snug">
+                      Discussed in <b>{community.name}</b>
+                      <span className="font-mono text-[0.68rem] text-text-muted tabular-nums">
+                        {" "}· {postCount} post{postCount === 1 ? "" : "s"}
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-purple">
+                      Read →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
             {product.sizes && product.sizes.length > 0 && (
               <div className="mt-4">
                 <h2 className="mb-2 font-mono text-xs uppercase tracking-[0.12em] text-text-muted">Size</h2>
@@ -313,11 +356,9 @@ export default function ListingDetail() {
               </div>
             )}
 
-            {/* mt-auto pins the purchase block to the column's bottom edge, so
-                at lg it closes level with the thumbnail rail. The whitespace
-                this opens between summary and CTA is the point: the essentials
-                breathe inside one viewport. */}
-            <div className="mt-auto pt-6">
+            {/* In a scrolling column the buy box sits in flow: after everything
+                that informs the decision, before the trust material. */}
+            <div className="mt-6">
               {/* Pickup-only is a hard constraint, not a footnote: it decides
                   whether this item can reach the buyer at all. */}
               {canPickup && (
@@ -341,81 +382,39 @@ export default function ListingDetail() {
               {/* Desktop buy box: the CTA lives with the product, not in a viewport-wide bar. */}
               <div className="hidden lg:block">{buyControls}</div>
             </div>
+
+            {/* Trust material stays in the DETAIL column so it scrolls past the
+                sticky gallery: who you're buying from, then what buyers said.
+                It is also what stretches the column, which is what keeps the
+                gallery pinned until the section ends. */}
+            <div className="mt-8 flex flex-col gap-5">
+              {seller && <SellerStrip profile={seller} avg={avg} count={reviews.reviews.length} />}
+
+              <section>
+                <div className="mb-3 flex items-baseline justify-between">
+                  <h2 className="ds-display text-xl">Reviews</h2>
+                  {reviews.reviews.length > 0 && (
+                    <Stars avg={avg} count={reviews.reviews.length} className="text-sm" />
+                  )}
+                </div>
+                {reviews.reviews.length > 0 ? (
+                  <ReviewList
+                    reviews={reviews.reviews}
+                    now={1717372800000}
+                    handleFor={(pk) => profileByPubkey(pk)?.handle}
+                  />
+                ) : (
+                  <EmptyState
+                    variant="inline"
+                    headline="No reviews yet"
+                    body="Be the first after you buy."
+                    className="!py-8"
+                  />
+                )}
+              </section>
+            </div>
           </div>
         </section>
-
-        {/* ---- BELOW THE FOLD: the reference material. Two columns at lg so
-             specs and trust read side by side instead of one long scroll. */}
-        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-5 md:mt-12 lg:grid-cols-2 lg:items-start">
-        <div className="flex flex-col gap-5">
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border-2 border-ink bg-ink text-sm">
-            {[
-              ["Shipping", shippingLine],
-              [canShip ? "Ships from" : "Collect from", product.location],
-              ["Category", product.categories.filter((c) => !["Digital", "Service", "Resale", "Exchange", "Swap", "Physical"].includes(c)).join(", ") || "-"],
-              ["Quantity", product.quantity != null ? `${groupInt(product.quantity)} available` : "-"],
-            ].map(([k, v]) => (
-              <div key={k} className="bg-paper-pure p-3">
-                <dt className="font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-subtle">{k}</dt>
-                <dd className="mt-0.5 font-medium">{v}</dd>
-              </div>
-            ))}
-          </dl>
-
-          {/* Ask before you buy: if members discussed this item in a moderated
-              community, that is the strongest pre-purchase trust signal we have. */}
-          {discussedIn.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {discussedIn.map(({ community, postCount }) => (
-                <Link
-                  key={community.slug}
-                  href={`/communities/${community.slug}`}
-                  className="ds-press flex items-center gap-3 rounded-xl border-2 border-ink bg-blue-soft p-3"
-                >
-                  <UsersThree size={20} weight="bold" className="shrink-0" />
-                  <span className="min-w-0 flex-1 text-sm leading-snug">
-                    Discussed in <b>{community.name}</b>
-                    <span className="font-mono text-[0.68rem] text-text-muted tabular-nums">
-                      {" "}· {postCount} post{postCount === 1 ? "" : "s"}
-                    </span>
-                  </span>
-                  <span className="shrink-0 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-purple">
-                    Read →
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Right rail: who you're buying from, then what buyers said. */}
-        <div className="flex flex-col gap-5">
-          {seller && <SellerStrip profile={seller} avg={avg} count={reviews.reviews.length} />}
-
-          <section>
-            <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="ds-display text-xl">Reviews</h2>
-              {reviews.reviews.length > 0 && (
-                <Stars avg={avg} count={reviews.reviews.length} className="text-sm" />
-              )}
-            </div>
-            {reviews.reviews.length > 0 ? (
-              <ReviewList
-                reviews={reviews.reviews}
-                now={1717372800000}
-                handleFor={(pk) => profileByPubkey(pk)?.handle}
-              />
-            ) : (
-              <EmptyState
-                variant="inline"
-                headline="No reviews yet"
-                body="Be the first after you buy."
-                className="!py-8"
-              />
-            )}
-          </section>
-        </div>
-        </div>
       </main>
 
       {/* Related items sit OUTSIDE the sticky grid and run the full measure:
