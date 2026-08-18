@@ -114,10 +114,20 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Display headings: uppercase Archivo Black, tight tracking, balanced wrap. */
+/* Display headings: uppercase Circular Std, tight tracking, balanced wrap. */
 .ds-display {
   font-family: var(--ds-font-display);
   text-transform: uppercase;
+  letter-spacing: var(--ds-tracking-display);
+  line-height: var(--ds-leading-tight);
+  text-wrap: balance;
+}
+/* Sentence-case variant: same family, weight, tracking and wrap, but no caps.
+   At 60px uppercase is a wall of shouting; this keeps the voice without the
+   volume. Mono kickers and labels stay caps at 11px, where caps is a label
+   signal rather than aggression. */
+.ds-display-sentence {
+  font-family: var(--ds-font-display);
   letter-spacing: var(--ds-tracking-display);
   line-height: var(--ds-leading-tight);
   text-wrap: balance;

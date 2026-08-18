@@ -14,7 +14,7 @@ export function SectionTitle({
   className?: string;
 }) {
   return (
-    <div className={`mb-3 mt-6 flex items-baseline justify-between ${className}`}>
+    <div className={`mb-4 mt-14 flex items-baseline justify-between first:mt-0 ${className}`}>
       <h2 className="ds-display text-xl">{children}</h2>
       {seeAllHref ? (
         <Link href={seeAllHref} className="inline-flex items-center gap-1 text-sm font-bold text-purple">

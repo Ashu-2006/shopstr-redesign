@@ -113,7 +113,7 @@ export default function Marketplace() {
           {/* Browse categories — static chrome, paints immediately. Extra top
               margin: the hero is full-bleed, so the default section rhythm
               crowds this row against the bottom of the image. */}
-          <SectionTitle className="!mt-12">Browse categories</SectionTitle>
+          <SectionTitle>Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <SolidTile label="Ceramics" href={catHref("Ceramics")} tone="green" sticker="shape-smiley" />
             <SolidTile label="Zines & print" href={catHref("Art & Print")} tone="pink" sticker="shape-sparkle-4pt" />
