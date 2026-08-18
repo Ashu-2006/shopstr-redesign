@@ -1,9 +1,11 @@
+import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useOrder, useSession, nextAction } from "@/data/hooks";
+import { AnimatePresence, motion } from "framer-motion";
+import { dur, ease, tEnter } from "@/lib/motion";
+import { useOrder, useSession, nextAction, productById } from "@/data/hooks";
 import type { OrderStatus } from "@/data/mock/extras";
-import { MOCK_LISTINGS } from "@/data/mock/listings";
 import { groupInt } from "@/lib/format";
 import { SheetHeader } from "@/components/ui/SheetHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
@@ -12,9 +14,9 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { RowSkeleton } from "@/components/skeletons";
-import { ChatCircle } from "@phosphor-icons/react";
+import { ChatCircle, X } from "@phosphor-icons/react";
 
-const byId = (id: string) => MOCK_LISTINGS.find((l) => l.id === id);
+const byId = productById;
 
 const STATUS_TONE: Record<OrderStatus, "green" | "blue" | "ink" | "yellow" | "red"> = {
   pending: "yellow",
@@ -28,7 +30,15 @@ export default function OrderDetail() {
   const router = useRouter();
   const id = typeof router.query.id === "string" ? router.query.id : "";
   const { data: order, isLoading } = useOrder(id);
-  const { setOrderStatus } = useSession();
+  const { setOrderStatus, setShipment } = useSession();
+
+  /* Marking shipped is the one transition that carries DATA (carrier +
+     tracking), so it opens a capture sheet instead of flipping the status
+     blind. Everything the buyer sees downstream depends on this being real. */
+  const [shipSheet, setShipSheet] = useState(false);
+  const [carrier, setCarrier] = useState("");
+  const [tracking, setTracking] = useState("");
+  const [shipTouched, setShipTouched] = useState(false);
 
   const notFound = router.isReady && id && !isLoading && !order;
   const p = order ? byId(order.productId) : undefined;
@@ -122,7 +132,11 @@ export default function OrderDetail() {
             the UI never offers a transition the role cannot perform. */}
         {action && (
           <button
-            onClick={() => setOrderStatus(order.id, action.status)}
+            onClick={() =>
+              action.status === "shipped"
+                ? setShipSheet(true)
+                : setOrderStatus(order.id, action.status)
+            }
             className={`ds-press mt-3 w-full rounded-pill border-2 py-3.5 font-bold ${
               action.tone === "red"
                 ? "border-red bg-paper-pure text-red"
@@ -190,6 +204,90 @@ export default function OrderDetail() {
           </Link>
         )}
       </main>
+
+      {/* ---- Mark shipped: the capture sheet. Same anatomy as the search
+           filter sheet (scrim + bottom sheet, swing in, exit down). ---- */}
+      <AnimatePresence>
+        {shipSheet && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShipSheet(false)}
+              className="fixed inset-0 z-40 bg-ink/50"
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%", transition: { duration: dur.moderate, ease: ease.exit } }}
+              transition={tEnter}
+              role="dialog"
+              aria-label="Mark as shipped"
+              className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[560px] rounded-t-2xl border-2 border-ink bg-paper"
+            >
+              <div className="flex items-center justify-between border-b-2 border-ink px-5 py-4">
+                <h2 className="ds-display text-2xl">Mark shipped</h2>
+                <button
+                  onClick={() => setShipSheet(false)}
+                  aria-label="Close"
+                  className="ds-press grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-paper-pure"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+              <div className="px-5 py-5">
+                <p className="text-sm text-text-muted">
+                  @{counterparty} gets the tracking the moment you confirm, so they
+                  stop wondering and you stop getting asked.
+                </p>
+                <label className="mt-4 block">
+                  <span className="mb-1.5 block font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-muted">Carrier</span>
+                  <input
+                    value={carrier}
+                    onChange={(e) => setCarrier(e.target.value)}
+                    placeholder="PostNL, DHL, UPS…"
+                    className="w-full rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 outline-none focus:border-purple"
+                  />
+                </label>
+                <label className="mt-3 block">
+                  <span className="mb-1.5 block font-mono text-[0.66rem] uppercase tracking-[0.1em] text-text-muted">Tracking number</span>
+                  <input
+                    value={tracking}
+                    onChange={(e) => setTracking(e.target.value)}
+                    placeholder="NL8472913746"
+                    className="w-full rounded-md border-2 border-ink bg-paper-pure px-3.5 py-3 font-mono outline-none focus:border-purple"
+                  />
+                </label>
+                {shipTouched && (!carrier.trim() || !tracking.trim()) && (
+                  <p className="mt-2 text-sm font-bold text-red">
+                    Both fields, or the buyer has nothing to follow.
+                  </p>
+                )}
+                <div
+                  className="mt-5 pb-2"
+                  style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
+                >
+                  <Button
+                    variant="primary"
+                    full
+                    onClick={() => {
+                      setShipTouched(true);
+                      if (!carrier.trim() || !tracking.trim()) return;
+                      setShipment(order.id, { carrier: carrier.trim(), tracking: tracking.trim() });
+                      setOrderStatus(order.id, "shipped");
+                      setShipSheet(false);
+                    }}
+                  >
+                    Confirm shipped
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <BottomNav active="/orders" />
     </>
   );

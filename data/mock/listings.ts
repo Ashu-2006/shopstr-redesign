@@ -516,6 +516,46 @@ export const MOCK_LISTINGS: ProductData[] = [
   },
 ];
 
+/** Listings the current user (pk_ekko) SOLD. Kept out of MOCK_LISTINGS so a
+    sold item can never leak into browse/search; only the seller dashboard's
+    Sold lane reads these. */
+export const MOCK_SOLD: ProductData[] = [
+  {
+    id: "sold_001",
+    pubkey: "pk_ekko",
+    title: "Risograph zine: \"Soft Static\" no. 3",
+    summary: "The previous issue. 28 pages, single-color run of 80, sold through in a week.",
+    images: ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800"],
+    price: 11000,
+    currency: "SATS",
+    totalCost: 12500,
+    location: "Berlin, DE",
+    categories: ["Physical", "Art & Print"],
+    shippingType: "Added Cost",
+    shippingCost: 1500,
+    condition: "New",
+    quantity: 0,
+    status: "sold",
+  },
+  {
+    id: "sold_002",
+    pubkey: "pk_ekko",
+    title: "Concert photography print, A3",
+    summary: "Long-exposure stage rig from the winter tour. Numbered 4/20.",
+    images: ["https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800"],
+    price: 32000,
+    currency: "SATS",
+    totalCost: 34000,
+    location: "Berlin, DE",
+    categories: ["Physical", "Photography"],
+    shippingType: "Added Cost",
+    shippingCost: 2000,
+    condition: "New",
+    quantity: 0,
+    status: "sold",
+  },
+];
+
 /** Distinct primary categories for filter chips (excludes the "type" tags). */
 export const TYPE_TAGS = [
   "Physical",

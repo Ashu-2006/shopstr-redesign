@@ -24,7 +24,7 @@ import type {
   AsyncResult,
 } from "@/data/types";
 import { REVIEW_DIMENSIONS } from "@/data/types";
-import { MOCK_LISTINGS } from "@/data/mock/listings";
+import { MOCK_LISTINGS, MOCK_SOLD } from "@/data/mock/listings";
 import {
   MOCK_PROFILES,
   MOCK_REVIEWS,
@@ -41,11 +41,12 @@ import {
   type Order,
   type OrderStatus,
 } from "@/data/mock/extras";
-import { useCartStore, useSession, type OwnPost, type WalletTxn } from "@/data/store";
+import { useCartStore, useSession, type OwnPost, type WalletTxn, type ListingDraft } from "@/data/store";
 
 /* Re-export the mutable client-state hooks so the whole app imports state and
    data from this one module (the data boundary), never from store/ or mock/. */
 export { useCartStore, useSession, useCheckout } from "@/data/store";
+export type { ListingDraft } from "@/data/store";
 
 /* ---------------------------------------------------------- SIMULATED LOAD --
    One simulated first-load per DATA FAMILY per session (module-level Set, so
@@ -287,12 +288,64 @@ export function useThreadMessages(handle: string): AsyncResult<ChatMessage[]> {
   return { data: isLoading ? [] : data, isLoading };
 }
 
-/** All listings by a seller (by pubkey). */
+/** All listings by a seller (by pubkey). For the CURRENT user this includes
+    listings published this session (prepended, newest first), so publishing
+    has a visible result the moment the composer finishes. */
 export function useSellerListings(pubkey: string): AsyncResult<ProductData[]> {
   const isLoading = useSimulatedLoad("listings");
+  const { ownListings } = useSession();
+  const data = useMemo(() => {
+    const catalogue = MOCK_LISTINGS.filter((l) => l.pubkey === pubkey);
+    if (pubkey !== ME_PUBKEY) return catalogue;
+    // PublishedListing is structurally a ProductData subset; spread keeps it honest.
+    const mine = ownListings.map((l) => ({ ...l }) as ProductData);
+    return [...mine, ...catalogue];
+  }, [pubkey, ownListings]);
+  return { data: isLoading ? [] : data, isLoading };
+}
+
+/* ------------------------------------------------------------- SELLER LANES --
+   The three lanes of /sell/mine. Active = catalogue + session-published (the
+   hook above). Sold and Drafts each get their own hook so the lanes stop being
+   fake-empties: Sold reads a fixture the browse surfaces can never leak, and
+   Drafts reads live session state written by the composer's autosave. */
+
+/** The current user's pubkey. Pairs with ME (the handle) below. */
+export const ME_PUBKEY = "pk_ekko";
+
+/** Listings the current user sold. */
+export function useSoldListings(): AsyncResult<ProductData[]> {
+  const isLoading = useSimulatedLoad("listings");
+  return { data: isLoading ? [] : MOCK_SOLD, isLoading };
+}
+
+/** Pure product lookup across active AND sold (an order can reference either;
+    a sold-out product still has to render on its order rows). */
+export function productById(id: string): ProductData | undefined {
+  return MOCK_LISTINGS.find((l) => l.id === id) ?? MOCK_SOLD.find((l) => l.id === id);
+}
+
+/** Listing drafts, newest edit first. Live client state: no simulated load
+    (a skeleton over data the user just typed would be a lie). */
+export function useDrafts(): AsyncResult<ListingDraft[]> {
+  const { drafts } = useSession();
+  return { data: drafts, isLoading: false };
+}
+
+/** Sales that are waiting on the SELLER (paid, unconfirmed) — the dashboard's
+    "needs your action" band. Folds in this session's status changes so
+    confirming an order removes it here immediately. */
+export function usePendingSales(): AsyncResult<Order[]> {
+  const isLoading = useSimulatedLoad("orders");
+  const { orderStatus } = useSession();
   const data = useMemo(
-    () => MOCK_LISTINGS.filter((l) => l.pubkey === pubkey),
-    [pubkey]
+    () =>
+      MOCK_ORDERS.filter((o) => {
+        if (!o.isSale) return false;
+        const status = orderStatus.get(o.id) ?? o.status;
+        return status === "pending";
+      }),
+    [orderStatus]
   );
   return { data: isLoading ? [] : data, isLoading };
 }
@@ -568,14 +621,17 @@ export function nextAction(
 
 export function useOrder(id: string): AsyncResult<Order | null> {
   const isLoading = useSimulatedLoad("orders");
-  const { orderStatus } = useSession();
+  const { orderStatus, shipments } = useSession();
   const data = useMemo(() => {
     const found = MOCK_ORDERS.find((o) => o.id === id) ?? null;
     if (!found) return null;
-    return orderStatus.has(found.id)
-      ? { ...found, status: orderStatus.get(found.id)! }
-      : found;
-  }, [id, orderStatus]);
+    const captured = shipments.get(found.id);
+    return {
+      ...found,
+      status: orderStatus.get(found.id) ?? found.status,
+      shipment: captured ?? found.shipment,
+    };
+  }, [id, orderStatus, shipments]);
   return { data: isLoading ? null : data, isLoading };
 }
 

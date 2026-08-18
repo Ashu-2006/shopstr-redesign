@@ -140,6 +140,11 @@ interface SessionApi {
   /** Order-status changes made this session, by order id. */
   orderStatus: Map<string, OrderStatusValue>;
   setOrderStatus: (id: string, status: OrderStatusValue) => void;
+  /** Shipment details the seller captured when marking an order shipped.
+      Separate from status so "shipped" can never exist without a tracking
+      story — the upstream flow's one real modal, kept. */
+  shipments: Map<string, { carrier: string; tracking: string }>;
+  setShipment: (id: string, s: { carrier: string; tracking: string }) => void;
   /** Where a seller's sats land after a sale. Inverted default = stay in Shopstr. */
   payout: "shopstr" | "lightning";
   setPayout: (v: "shopstr" | "lightning") => void;
@@ -179,6 +184,57 @@ interface SessionApi {
   /** The editable half of the user's nostr profile (kind-0 metadata). */
   profile: ProfileDraft;
   saveProfile: (p: ProfileDraft) => void;
+
+  /* ------------------------------------------------------------ SELLING -- */
+  /** Listing drafts, newest first. Autosaved by the composer on every change:
+      losing a half-written listing to a closed tab is the upstream failure
+      this exists to fix (its 1,761-line form has zero draft support). */
+  drafts: ListingDraft[];
+  saveDraft: (d: ListingDraft) => void;
+  deleteDraft: (id: string) => void;
+  /** Listings published this session, newest first. Merged into the seller's
+      Active lane by the hooks so publish has a visible result immediately. */
+  ownListings: PublishedListing[];
+  publishListing: (l: PublishedListing) => void;
+  unlistListing: (id: string) => void;
+}
+
+/** A listing in progress. Everything optional except identity + freshness:
+    a draft is valid the moment it has ANY content worth returning to. */
+export interface ListingDraft {
+  id: string;
+  title: string;
+  summary: string;
+  /** Raw input string, so the composer round-trips exactly what was typed. */
+  price: string;
+  category: string;
+  condition: string;
+  quantity: string;
+  location: string;
+  shippingCost: string;
+  sizes: string;
+  images: string[];
+  /** Unix ms of the last edit; drives the "edited 2m ago" line in Drafts. */
+  updatedAt: number;
+}
+
+/** The publishable shape the composer produces. Kept structural (not imported
+    from mock/) so client state never depends on fixture modules. */
+export interface PublishedListing {
+  id: string;
+  pubkey: string;
+  title: string;
+  summary: string;
+  images: string[];
+  price: number;
+  currency: string;
+  totalCost: number;
+  location: string;
+  categories: string[];
+  shippingCost?: number;
+  condition?: string;
+  quantity?: number;
+  sizes?: string[];
 }
 
 export type RelayMode = "read" | "write" | "both";
@@ -354,6 +410,30 @@ function SessionProvider({ children }: { children: ReactNode }) {
 
   const saveProfile = useCallback((p: ProfileDraft) => setProfile(p), []);
 
+  /* Selling: drafts autosave (upsert by id, newest edit first) and the
+     session-published listings that feed the Active lane. */
+  const [drafts, setDrafts] = useState<ListingDraft[]>([]);
+  const saveDraft = useCallback((d: ListingDraft) => {
+    setDrafts((prev) => [d, ...prev.filter((x) => x.id !== d.id)]);
+  }, []);
+  const deleteDraft = useCallback((id: string) => {
+    setDrafts((prev) => prev.filter((x) => x.id !== id));
+  }, []);
+  const [shipments, setShipments] = useState<Map<string, { carrier: string; tracking: string }>>(
+    () => new Map()
+  );
+  const setShipment = useCallback((id: string, s: { carrier: string; tracking: string }) => {
+    setShipments((prev) => new Map(prev).set(id, s));
+  }, []);
+
+  const [ownListings, setOwnListings] = useState<PublishedListing[]>([]);
+  const publishListing = useCallback((l: PublishedListing) => {
+    setOwnListings((prev) => [l, ...prev.filter((x) => x.id !== l.id)]);
+  }, []);
+  const unlistListing = useCallback((id: string) => {
+    setOwnListings((prev) => prev.filter((x) => x.id !== id));
+  }, []);
+
   const walletReceive = useCallback(
     (amount: number, opts?: { kind?: WalletTxnKind; title?: string; sub?: string }) => {
       if (!Number.isFinite(amount) || amount <= 0) return;
@@ -480,6 +560,14 @@ function SessionProvider({ children }: { children: ReactNode }) {
       removeAddress,
       profile,
       saveProfile,
+      drafts,
+      saveDraft,
+      deleteDraft,
+      ownListings,
+      publishListing,
+      unlistListing,
+      shipments,
+      setShipment,
     }),
     [
       signedIn, favs, toggleFav, follows, toggleFollow,
@@ -489,6 +577,8 @@ function SessionProvider({ children }: { children: ReactNode }) {
       claimed, claim,
       relays, addRelay, removeRelay, mints, addMint, removeMint,
       addresses, saveAddress, removeAddress, profile, saveProfile,
+      drafts, saveDraft, deleteDraft, ownListings, publishListing, unlistListing,
+      shipments, setShipment,
     ]
   );
 
