@@ -54,6 +54,12 @@ next-env.d.ts
 # (git will not descend into an excluded directory to re-include a child).
 /docs/*
 !/docs/app-map.md
+# Maintainer handoff docs: written to ship, not private notes.
+!/docs/HANDOFF.md
+!/docs/architecture.md
+!/docs/data-hooks-contract.md
+!/docs/design-decisions.md
+!/docs/running-and-verifying.md
 
 # dev playgrounds: internal review surfaces (/dev/*), not shipped product
 /pages/dev/
