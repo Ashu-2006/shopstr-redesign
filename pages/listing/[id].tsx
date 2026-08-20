@@ -15,7 +15,7 @@ import {
   profileByPubkey,
   averageRating,
 } from "@/data/hooks";
-import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree, MapPin } from "@phosphor-icons/react";
+import { Heart, Lightning, ShoppingBag, ChatCircle, Star, UsersThree, MapPin, X } from "@phosphor-icons/react";
 import { formatSats, groupInt, timeAgo } from "@/lib/format";
 import { shippingLabel, fulfilmentOptions } from "@/lib/fulfilment";
 import { quotedPrice, satsFor } from "@/lib/money";
@@ -50,6 +50,8 @@ export default function ListingDetail() {
   // replay) and a toast confirms. Pages own the timers; Toast stays pure.
   const [addedPop, setAddedPop] = useState(0);
   const [toast, setToast] = useState(false);
+  // Session-local: once dismissed on a listing, do not re-nag on the next one.
+  const [walletDismissed, setWalletDismissed] = useState(false);
   const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
@@ -131,13 +133,24 @@ export default function ListingDetail() {
   // the fixed bottom bar; lg+ renders it inline in the info column (buy box).
   const buyControls = (
     <>
-      {walletCovers && (
-        <div className="mb-2 flex items-center justify-center gap-1.5 rounded-pill border-2 border-purple bg-purple-soft px-3.5 py-2 font-mono text-[0.72rem] font-bold text-purple-press">
-          <Lightning size={14} />
-          Pay from your Shopstr wallet · {formatSats(walletBalance)} available
+      {walletCovers && !walletDismissed && (
+        <div className="mb-2 flex items-center gap-1.5 rounded-pill border-2 border-purple bg-purple-soft py-2 pl-3.5 pr-1.5 font-mono text-[0.72rem] font-bold text-purple-press">
+          <Lightning size={14} className="shrink-0" />
+          <span className="min-w-0 flex-1">Pay from your Shopstr wallet · {formatSats(walletBalance)} available</span>
+          {/* Dismissible: once someone knows they can pay from wallet, the banner
+              becomes a nag on every scroll of the sticky bar. */}
+          <button
+            onClick={() => setWalletDismissed(true)}
+            aria-label="Dismiss wallet notice"
+            className="ds-press grid h-6 w-6 shrink-0 place-items-center rounded-full text-purple-press hover:bg-purple/15"
+          >
+            <X size={13} weight="bold" />
+          </button>
         </div>
       )}
-      <div className="flex items-center gap-2.5 rounded-2xl border-2 border-ink bg-ink p-3">
+      {/* Fully rounded on mobile: the fixed bar reads as one pill-shaped control
+          rather than a card, which matches the pill CTAs on every other sheet. */}
+      <div className="flex items-center gap-2 rounded-pill border-2 border-ink bg-ink p-2 lg:gap-2.5 lg:rounded-2xl lg:p-3">
         <div className="hidden flex-col pl-2 pr-3 text-text-on-dark sm:flex">
           <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-text-on-dark-muted">
             {walletCovers ? "From wallet" : "Price"}
@@ -147,9 +160,11 @@ export default function ListingDetail() {
         <Button variant="secondary" full className="flex-1" onClick={buyNow}>
           {walletCovers ? "Buy with sats" : "Buy now"}
         </Button>
+        {/* Smaller round action buttons on mobile (44px min-hit target still met),
+            standard 52px at lg where the bar has room. */}
         <span className="relative">
-          <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-yellow text-ink">
-            <ShoppingBag size={22} />
+          <button onClick={addToCart} aria-label="Add to cart" className="ds-press grid h-11 w-11 shrink-0 place-items-center rounded-full bg-yellow text-ink lg:h-[52px] lg:w-[52px]">
+            <ShoppingBag size={20} />
           </button>
           {/* On-action reveal: the sparkle pops off the bag. The one sanctioned
               jumpy moment on this screen; opacity resolves fast+smooth while the
@@ -182,9 +197,9 @@ export default function ListingDetail() {
         <Link
           href={`/messages/${seller?.handle ?? ""}?pid=${product.id}&from=listing`}
           aria-label="Message seller"
-          className="ds-press grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-green text-ink"
+          className="ds-press grid h-11 w-11 shrink-0 place-items-center rounded-full bg-green text-ink lg:h-[52px] lg:w-[52px]"
         >
-          <ChatCircle size={22} />
+          <ChatCircle size={20} />
         </Link>
       </div>
     </>

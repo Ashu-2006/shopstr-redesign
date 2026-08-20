@@ -109,10 +109,10 @@ export default function Marketplace() {
             growing at --ds-measure and the padding steps up with the viewport,
             so the feed keeps a comfortable margin instead of running to the
             window edge on a wide screen. */}
-        <div className="mx-auto max-w-(--ds-measure) px-5 sm:px-8 lg:px-12">
-          {/* Browse categories — static chrome, paints immediately. Extra top
-              margin: the hero is full-bleed, so the default section rhythm
-              crowds this row against the bottom of the image. */}
+        {/* pt-10 lg:pt-14: the hero above is full-bleed, and SectionTitle now
+            strips its own top margin when it is the first child. Without this
+            the category grid crowded against the bottom of the hero image. */}
+        <div className="mx-auto max-w-(--ds-measure) px-5 pt-10 sm:px-8 lg:px-12 lg:pt-14">
           <SectionTitle>Browse categories</SectionTitle>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <SolidTile label="Ceramics" href={catHref("Ceramics")} tone="green" sticker="shape-smiley" />
